@@ -1,16 +1,29 @@
-# Loja de Avatares e Skins para Programadores
+# vue-project
 
-## Descrição
-Este projeto tem como objetivo criar uma loja virtual onde programadores podem personalizar e baixar avatares exclusivos para uso em perfis como GitHub e Discord. 
+This template should help get you started developing with Vue 3 in Vite.
 
-## Tecnologias Utilizadas
-- **Front-end:** Vue.js + Tailwind CSS
-- **Back-end:** Node.js + Express
-- **Autenticação:** OAuth (GitHub e Discord)
+## Recommended IDE Setup
 
-## Como Rodar o Projeto
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/seu-usuario/loja-avatares.git
-cd loja-avatares
+## Customize configuration
+
+See [Vite Configuration Reference](https://vite.dev/config/).
+
+## Project Setup
+
+```sh
+npm install
+```
+
+### Compile and Hot-Reload for Development
+
+```sh
+npm run dev
+```
+
+### Compile and Minify for Production
+
+```sh
+npm run build
+```
