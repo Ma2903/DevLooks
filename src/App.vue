@@ -1,46 +1,24 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import axios from '../src/axios';
 import Header from './components/Header.vue'
 import Product from './components/Product.vue';
 import SearchBar from './components/Search-bar.vue';
 // import HelloWorld from './components/HelloWorld.vue'
 // import TheWelcome from './components/TheWelcome.vue'
 
-const images = import.meta.glob('@/assets/*.{jpg,jpeg}', { eager: true });
+const produtos = ref([]);
 
-const produtos = [ 
-  {
-    id: 1,
-    name: 'Produto 1',
-    image: images['/src/assets/camisa.jpg'].default,
-    price: 99.99,
-    category: 'Camisetas'
-  },
-  {
-    id: 2,
-    name: 'Produto 2',
-    price: 199.99,
-    category: 'Camisetas'
-  },
-  {
-    id: 3,
-    name: 'Produto 3',
-    price: 299.99,
-    category: 'Camisetas'
-  },
-  {
-    id: 4,
-    name: 'Produto 4',
-    price: 399.99,
-    category: 'Camisetas'
-  },
-  {
-    id: 5,
-    name: 'Produto 5',
-    image : images['/src/assets/camisa2.jpeg'].default,
-    price: 499.99,
-    category: 'Camisetas'
+const fetchProdutos = async () => {
+  try {
+    const response = await axios.get('/data');
+    produtos.value = response.data;
+  } catch (error) {
+    console.error('Erro ao buscar produtos:', error);
   }
-]
+};
+
+onMounted(fetchProdutos);
 </script>
 
 <template>
