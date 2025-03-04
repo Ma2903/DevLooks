@@ -1,9 +1,11 @@
-import MongoDBManager from '../config/database';
+import DataMongoManager from '../config/database';
+
+const dataMongoManager = new DataMongoManager('products');  
 
 export default class ProductsController {
     async getProducts(req, res) {
-        const data = await MongoDBManager();
-        res.send(data)
+        const data = await dataMongoManager.buscar({});
+        res.send(data);
     }
     getProduct(req, res) {
         res.send('GET /products/:id');

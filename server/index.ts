@@ -26,27 +26,10 @@ interface Produto {
     category: string;
 }
 
-const produtos: Produto[] = [ 
-    {
-        id: 1,
-        name: 'Produto 1',
-        image: 'camisa.jpg',
-        price: 99.99,
-        category: 'Camisetas'
-    },
-    {
-        id: 5,
-        name: 'Produto 5',
-        image : 'camisa2.jpeg',
-        price: 499.99,
-        category: 'Camisetas'
-    }
-];
-
 app.use('/products',  productRoutes);
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`API Rodando http://localhost:${port}`);
 });
 
 // npx tsx server/index.ts
