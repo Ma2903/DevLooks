@@ -1,0 +1,20 @@
+[{
+  "_id": {
+    "$oid": "67c7500d9afe8eac47d99cb4"
+  },
+  "id": 1,
+  "name": "Produto 1",
+  "image": "camisa.jpg",
+  "price": 99.99,
+  "category": "Camisetas"
+},
+{
+  "_id": {
+    "$oid": "67c7500d9afe8eac47d99cb5"
+  },
+  "id": 2,
+  "name": "Produto 2",
+  "image": "camisa.jpg",
+  "price": 199.99,
+  "category": "Camisetas"
+}]
