@@ -3,12 +3,12 @@ import { ref, onMounted } from 'vue';
 import ProductService from '@/services/ProductService';
 import Home from './components/Home.vue';
 import Header from './components/Header.vue';
-import Product from './components/Product.vue';
-import SearchBar from './components/Search-bar.vue';
+import CreateAvatar from './components/CreateAvatar.vue';
 
 const produtos = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const currentPage = ref('home');
 
 const fetchProdutos = async () => {
   try {
@@ -21,24 +21,18 @@ const fetchProdutos = async () => {
 };
 
 onMounted(fetchProdutos);
+
+const navigateTo = (page) => {
+  currentPage.value = page;
+};
 </script>
 
 <template>
   <div>
-    <Header />
+    <Header @navigate="navigateTo" />
     <main class="mt-0">
-      <Home />
+      <component :is="currentPage === 'home' ? Home : CreateAvatar" :produtos="produtos" :loading="loading" :error="error" />
     </main>
-    <!-- 
-    <SearchBar />
-    <div class="max-w-screen-lg mx-auto p-4">
-      <h1 class="text-2xl font-bold mb-4">Produtos</h1>
-      <div v-if="loading">Carregando...</div>
-      <div v-else-if="error" class="text-red-500">{{ error }}</div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Product v-for="produto in produtos" :key="produto.id" :product="produto" />
-      </div>
-    </div> -->
   </div>
 </template>
 
