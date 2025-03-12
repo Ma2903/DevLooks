@@ -1,4 +1,5 @@
 import DataMongoManager from '../config/database';
+import express from 'express';
 
 const dataMongoManager = new DataMongoManager('products');  
 
@@ -7,16 +8,22 @@ export default class ProductsController {
         const data = await dataMongoManager.buscar({});
         res.send(data);
     }
-    getProduct(req, res) {
-        res.send('GET /products/:id');
+    async getProductById(req: express.Request, res: express.Response) {
+        const data = await dataMongoManager.buscar({ id: parseInt(req.params.id) });
+        res.send(data);
     }
-    createProduct(req, res) {
-        res.send('POST /products');
+    async createProduct(req, res) {
+        const data = req.body;
+        dataMongoManager.inserir(data);
+        res.send({error : false , message : 'Product created'});
     }
-    updateProduct(req, res) {
-        res.send('PUT /products/:id');
+    async updateProduct(req, res) {
+        const data = req.body;
+        dataMongoManager.atualizar({ id: parseInt(req.params.id) }, data);
+        res.send({error : false , message : 'Product updated'});
     }
     deleteProduct(req, res) {
-        res.send('DELETE /products/:id');
+        dataMongoManager.deletar({ id: parseInt(req.params.id) });
+        res.send({error : false , message : 'Product deleted'});
     }
 }

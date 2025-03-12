@@ -18,14 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT || 3000;
 
-interface Produto {
-    id: number;
-    name: string;
-    image: string;
-    price: number;
-    category: string;
-}
-
 app.use('/products',  productRoutes);
 
 app.listen(port, () => {
