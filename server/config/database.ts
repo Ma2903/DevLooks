@@ -21,6 +21,18 @@ export class DataMongoManager{
         const data = await this.collection.find(query).toArray();
         return data;
     }
+
+    async inserir(data: any){
+        await this.collection.insertOne(data);
+    }
+
+    async atualizar(query: any, data: any){
+        await this.collection.update(query, { $set: data });
+    }
+
+    async deletar(query: any){
+        await this.collection.deleteOne(query);
+    }
 }
 
 export default DataMongoManager;
