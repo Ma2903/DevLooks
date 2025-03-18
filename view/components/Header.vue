@@ -55,42 +55,27 @@ export default {
 </script>
 
 <template>
-    <header class="bg-gray-800 text-white p-6 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
+    <header class="bg-gray-800 text-white p-4 md:p-6 shadow-lg">
+        <div class="container mx-auto flex flex-wrap justify-between items-center">
             <!-- Logo -->
-            <div class="text-3xl font-bold text-purple-400 flex items-center space-x-2">
-                <img src="../assets/logo_teste.jpg" alt="Logo da Loja de Avatares" class="w-24 h-24 rounded-full animate-spin-slow">
-                <span class="title-highlight">Loja de <span class="text-4xl text-purple-600">Avatares</span></span>
+            <div class="text-2xl md:text-3xl font-bold text-purple-400 flex items-center space-x-2">
+                <img src="../assets/logo_teste.jpg" alt="Logo da Loja de Avatares" class="w-16 h-16 md:w-24 md:h-24 rounded-full animate-spin-slow">
+                <span class="title-highlight">Loja de Avatares </span>
             </div>
             <!-- Navegação -->
-            <nav :class="{'hidden': !menuOpen, 'block': menuOpen}" class="md:flex md:items-center md:space-x-6 text-xl">
+            <nav :class="{'hidden': !menuOpen, 'block': menuOpen}" class="w-full md:w-auto md:flex md:items-center md:space-x-6 text-lg md:text-xl mt-4 md:mt-0">
                 <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
                     <li><a href="#" @click.prevent="navigate('home')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-home"></i><span>Home</span></a></li>
                     <li><a href="#" @click.prevent="navigate('create-avatar')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-user-plus"></i><span>Criar Avatar</span></a></li>
                     <li><a href="#about" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-info-circle"></i><span>Sobre</span></a></li>
                     <li><a href="#features" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-cogs"></i><span>Funcionalidades</span></a></li>
                     <li><a href="#products" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-box-open"></i><span>Produtos</span></a></li>
-             </ul>
+                </ul>
             </nav>
             <!-- Menu Toggle Button -->
             <button @click="toggleMenu" class="md:hidden text-2xl">
                 <i :class="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
             </button>
-            <!-- Tema -->
-            <button @click="toggleTheme" class="ml-4 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-purple-700 border-2 border-purple-600 hover:from-purple-600 hover:to-purple-800 transition duration-300">
-                <i :class="theme.value === 'light' ? 'fas fa-moon' : 'fas fa-sun'"></i>
-            </button>
-            <!-- Usuário -->
-            <div v-if="isAuthenticated" class="relative ml-4">
-                <button @click="toggleDropdown" class="flex items-center space-x-2">
-                    <img :src="userAvatar" alt="Avatar" class="w-10 h-10 rounded-full">
-                    <span>{{ username }}</span>
-                </button>
-                <div v-if="dropdownOpen" class="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg">
-                    <a href="#" class="block px-4 py-2 hover:bg-gray-200">Perfil</a>
-                    <a @click="logout" href="#" class="block px-4 py-2 hover:bg-gray-200">Logout</a>
-                </div>
-            </div>
         </div>
     </header>
 </template>

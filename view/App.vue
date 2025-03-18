@@ -1,26 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import ProductService from '@/services/ProductService';
+import { ref } from 'vue';
 import Home from './components/Home.vue';
-import Header from './components/Header.vue';
 import CreateAvatar from './components/CreateAvatar.vue';
+import Header from './components/Header.vue';
+import Footer from './components/Footer.vue';
 
-const produtos = ref([]);
-const loading = ref(true);
-const error = ref(null);
 const currentPage = ref('home');
-
-const fetchProdutos = async () => {
-  try {
-    produtos.value = await ProductService.getAllProducts();
-  } catch (err) {
-    error.value = 'Erro ao carregar produtos.';
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(fetchProdutos);
 
 const navigateTo = (page) => {
   currentPage.value = page;
@@ -31,14 +16,11 @@ const navigateTo = (page) => {
   <div>
     <Header @navigate="navigateTo" />
     <main class="mt-0">
-      <component :is="currentPage === 'home' ? Home : CreateAvatar" :produtos="produtos" :loading="loading" :error="error" />
+      <component
+        :is="currentPage === 'home' ? Home : CreateAvatar"
+        @navigate="navigateTo"
+      />
     </main>
+    <Footer />
   </div>
 </template>
-
-<style scoped>
-main {
-  margin-top: 0; /* Remove qualquer margem superior */
-  padding-top: 0; /* Remove qualquer padding superior */
-}
-</style>
