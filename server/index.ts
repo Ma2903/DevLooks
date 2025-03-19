@@ -2,7 +2,9 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-import productRoutes from './routes/productsRoutes';
+// import productRoutes from './routes/productsRoutes';
+import usersRoutes from './routes/UserRoutes';
+import connectDB from "./config/database";
 
 const app = express();
 dotenv.config();
@@ -18,7 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT || 3000;
 
-app.use('/products',  productRoutes);
+connectDB();
+// app.use('/products',  productRoutes);
+app.use('/api', usersRoutes);
 
 app.listen(port, () => {
     console.log(`API Rodando http://localhost:${port}`);
