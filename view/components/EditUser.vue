@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
-      <div class="bg-gray-900 p-20 rounded-3xl shadow-2xl w-full max-w-6xl">
+      <div class="m-10 bg-gray-900 p-20 rounded-3xl shadow-2xl w-full max-w-6xl">
         <div class="text-center mb-10">
           <img src="../assets/logo_teste.jpg" alt="Logo" class="w-28 h-28 mx-auto rounded-full shadow-lg">
           <h1 class="text-5xl font-extrabold text-purple-400 mt-6">Editar Dados</h1>
@@ -142,6 +142,11 @@
             <i class="fas fa-save mr-2"></i> Salvar Alterações
           </button>
         </form>
+        <div class="mt-8 text-center">
+          <router-link to="/profile" class="text-purple-400 hover:underline text-lg">
+            <i class="fas fa-arrow-left mr-2"></i> Voltar ao Perfil
+          </router-link>
+        </div>
       </div>
     </div>
   </template>

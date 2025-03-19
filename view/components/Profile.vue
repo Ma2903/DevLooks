@@ -2,12 +2,12 @@
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
     <div class="bg-gray-900 p-16 rounded-3xl shadow-2xl w-full max-w-4xl">
       <div class="text-center mb-10">
-        <img :src="user.avatar" alt="Avatar" class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500">
+        <img src="https://via.placeholder.com/150" alt="Avatar" class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500">
         <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center">
-          <i class="fas fa-user-circle mr-3"></i> {{ user.name }}
+          <i class="fas fa-user-circle mr-3"></i> João Silva
         </h1>
         <p class="text-gray-400 mt-3 text-lg flex items-center justify-center">
-          <i class="fas fa-envelope mr-2"></i> {{ user.email }}
+          <i class="fas fa-envelope mr-2"></i> joao.silva@email.com
         </p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -15,32 +15,32 @@
           <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center">
             <i class="fas fa-id-card mr-2"></i> Informações Pessoais
           </h2>
-          <p class="text-gray-300 mb-2"><i class="fas fa-id-badge mr-2"></i> CPF: {{ user.cpf }}</p>
-          <p class="text-gray-300 mb-2"><i class="fas fa-phone mr-2"></i> Telefone: {{ user.phone }}</p>
-          <p class="text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> Endereço: {{ user.address }}</p>
+          <p class="text-gray-300 mb-2"><i class="fas fa-id-badge mr-2"></i> CPF: 123.456.789-00</p>
+          <p class="text-gray-300 mb-2"><i class="fas fa-phone mr-2"></i> Telefone: (11) 98765-4321</p>
+          <p class="text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> Endereço: Rua Exemplo, 123, Bairro Teste</p>
         </div>
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
           <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center">
             <i class="fas fa-map mr-2"></i> Localização
           </h2>
-          <p class="text-gray-300 mb-2"><i class="fas fa-map-pin mr-2"></i> CEP: {{ user.cep }}</p>
-          <p class="text-gray-300 mb-2"><i class="fas fa-city mr-2"></i> Cidade: {{ user.city }}</p>
-          <p class="text-gray-300"><i class="fas fa-flag mr-2"></i> Estado: {{ user.state }}, {{ user.country }}</p>
+          <p class="text-gray-300 mb-2"><i class="fas fa-map-pin mr-2"></i> CEP: 12345-678</p>
+          <p class="text-gray-300 mb-2"><i class="fas fa-city mr-2"></i> Cidade: São Paulo</p>
+          <p class="text-gray-300"><i class="fas fa-flag mr-2"></i> Estado: SP, Brasil</p>
         </div>
       </div>
       <div class="flex justify-center space-x-4 mt-10">
-        <button
-          @click="$emit('navigate', 'edit-user')"
+        <router-link
+          to="/edit-user"
           class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
         >
           <i class="fas fa-edit mr-2"></i> Editar Dados
-        </button>
-        <button
-          @click="$emit('navigate', 'create-avatar')"
+        </router-link>
+        <router-link
+          to="/create-avatar"
           class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
         >
           <i class="fas fa-user-edit mr-2"></i> Editar Avatar
-        </button>
+        </router-link>
         <button
           @click="showDeleteModal = true"
           class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
@@ -85,12 +85,6 @@
 
 <script>
 export default {
-  props: {
-    user: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
       showDeleteModal: false,
@@ -100,9 +94,7 @@ export default {
   methods: {
     deleteAccount() {
       if (this.deleteConfirmation === "DELETAR") {
-        // Lógica para deletar a conta do usuário
-        console.log("Conta deletada:", this.user);
-        this.$emit("account-deleted"); // Emite um evento para o App.vue ou outro componente pai
+        console.log("Conta deletada");
         this.showDeleteModal = false;
         this.deleteConfirmation = "";
       }
@@ -123,6 +115,6 @@ button:hover {
 }
 
 input::placeholder {
-  color: #9CA3AF; /* Cor do placeholder */
+  color: #9CA3AF;
 }
 </style>

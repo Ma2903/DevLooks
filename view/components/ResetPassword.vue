@@ -31,8 +31,8 @@
         <div class="mt-8 text-center">
           <p class="text-gray-400 text-lg">
             Lembrou sua senha? 
-            <a href="#" @click.prevent="$emit('navigate', 'login')" class="text-purple-400 hover:underline">Faça login</a>
-          </p>
+            <router-link to="/login" class="text-purple-400 hover:underline">Faça login</router-link>
+            </p>
         </div>
       </div>
     </div>

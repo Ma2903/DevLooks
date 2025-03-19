@@ -163,6 +163,12 @@
             <i class="fas fa-user-plus mr-2"></i> Cadastrar
           </button>
         </form>
+        <div class="mt-8 text-center">
+          <p class="text-gray-400 text-lg">
+            Já tem uma conta? 
+            <router-link to="/login" class="text-purple-400 hover:underline">Voltar para o Login</router-link>
+          </p>
+        </div>
       </div>
     </div>
   </template>

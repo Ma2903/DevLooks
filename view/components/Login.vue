@@ -43,9 +43,9 @@
             </div>
           </div>
           <div class="mb-8 text-right">
-          <a href="#" @click.prevent="$emit('navigate', 'ResetPassword')" class="text-sm text-purple-400 hover:underline">
+          <router-link to="/reset-password" class="text-sm text-purple-400 hover:underline">
             Esqueceu sua senha?
-          </a>
+          </router-link>
         </div>
           <button
             type="submit"
@@ -57,7 +57,7 @@
         <div class="mt-8 text-center">
             <p class="text-gray-400 text-lg">
                 Não tem uma conta? 
-                <a href="#" @click.prevent="$emit('navigate', 'register')" class="text-purple-400 hover:underline">Cadastre-se</a>
+                <router-link to="/register" class="text-purple-400 hover:underline">Cadastre-se</router-link>
             </p>
         </div>
       </div>
@@ -82,6 +82,7 @@
         // Lógica de autenticação aqui
         console.log("Email:", this.email);
         console.log("Senha:", this.password);
+        this.$router.push('/home'); // Redireciona para a página inicial após o login
       },
     },
   };

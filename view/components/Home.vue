@@ -6,12 +6,12 @@
       <div class="relative z-10 container mx-auto px-4 md:px-6">
         <h1 class="text-4xl md:text-5xl font-semibold mb-4 text-purple-400 animate-fade-in"><i class="fas fa-code mr-2"></i>Bem-vindo à Loja de Avatares</h1>
         <p class="text-base md:text-lg mb-8 animate-fade-in">Personalize seu avatar exclusivo para GitHub e Discord. Dê um toque geek ao seu perfil!</p>
-        <button
-          @click="$emit('navigate', 'create-avatar')"
+        <router-link
+          to="/create-avatar"
           class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in"
         >
           <i class="fas fa-user-astronaut mr-2"></i>Criar e Editar Avatar
-        </button>
+        </router-link>
       </div>
     </section>
 

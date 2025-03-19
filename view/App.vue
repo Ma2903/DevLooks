@@ -26,17 +26,7 @@ const handleLogin = (userData) => {
   <div>
     <Header :user="user" @navigate="navigateTo" />
     <main class="mt-0">
-      <component
-        :is="currentPage === 'Home' ? Home 
-          : currentPage === 'CreateAvatar' ? CreateAvatar 
-          : currentPage === 'Register' ? Register 
-          : currentPage === 'EditUser' ? EditUser
-          : currentPage === 'ResetPassword' ? ResetPassword  
-          : Login"
-        @navigate="navigateTo"
-        @login="handleLogin"
-        :user="user"
-      />
+      <router-view :user="user" @login="handleLogin" />
     </main>
     <Footer />
   </div>
