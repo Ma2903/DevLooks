@@ -4,6 +4,8 @@ import cors from 'cors';
 
 // import productRoutes from './routes/productsRoutes';
 import usersRoutes from './routes/UserRoutes';
+import productRoutes from './routes/ProductRoutes';
+
 import connectDB from "./config/database";
 
 const app = express();
@@ -23,6 +25,7 @@ const port = process.env.PORT || 3000;
 connectDB();
 // app.use('/products',  productRoutes);
 app.use('/api', usersRoutes);
+app.use('/api', productRoutes);
 
 app.listen(port, () => {
     console.log(`API Rodando http://localhost:${port}`);
