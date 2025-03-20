@@ -1,29 +1,20 @@
-# vue-project
+# CodeCouture
 
-This template should help get you started developing with Vue 3 in Vite.
+**CodeCouture** é um e-commerce inovador especializado em avatares e skins para programadores. Nosso objetivo é oferecer uma experiência única para desenvolvedores que querem personalizar seu ambiente digital com produtos criativos e de alta qualidade.
 
-## Recommended IDE Setup
+## Recursos
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Catálogo Dinâmico:** Explore uma ampla variedade de avatares e skins customizados para diferentes perfis de programadores.
+- **Design Responsivo:** Interface otimizada para desktops, tablets e dispositivos móveis.
+- **Integração com Pagamentos:** Sistema seguro e confiável para transações online.
+- **Personalização:** Filtros e buscas avançadas para encontrar exatamente o que você procura.
+- **Experiência Interativa:** Interface moderna desenvolvida com Vue.js para garantir fluidez e reatividade.
 
-## Customize configuration
+## Tecnologias
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+O projeto utiliza as seguintes tecnologias:
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+- **Vue.js:** Framework para construção de interfaces reativas e componentes reutilizáveis.
+- **Vue Router:** Gerenciamento de rotas para navegação entre páginas.
+- **CSS3 / Pré-processadores:** Para estilização responsiva e moderna.
+- **APIs de Pagamento:** Integração com gateways de pagamento (a ser configurado conforme a necessidade).
