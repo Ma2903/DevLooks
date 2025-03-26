@@ -36,7 +36,7 @@
 
     <!-- Seção de Funcionalidades -->
     <section id="features" class="bg-gray-900 py-16">
-      <h2 class="text-2xl md:text-3xl font-semibold text-purple-400 text-center mb-8">Funcionalidades</h2>
+      <h2 class="text-2xl md:text-3xl font-semibold text-purple-400 text-center mb-8"><i class="fas fa-cogs"></i>Funcionalidades</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-12 px-4 md:px-6">
         <div class="text-center">
           <i class="fas fa-palette text-4xl md:text-5xl text-purple-400"></i>

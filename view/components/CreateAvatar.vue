@@ -1,8 +1,14 @@
 <template>
   <div class="bg-gray-900 min-h-screen font-mono text-gray-200">
+    <!-- Add Font Awesome CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
     <main class="container mx-auto py-16 px-6">
       <h1 class="text-5xl font-semibold mb-8 text-purple-400 text-center">
-        <i class="fas fa-user-astronaut mr-2"></i>Criar e Editar Avatar
+        <i class="fas fa-user-astronaut mr-2"></i> 
+        Criar e Editar Avatar
       </h1>
       <div class="flex flex-col md:flex-row gap-8">
         <!-- Canvas para o Avatar -->
