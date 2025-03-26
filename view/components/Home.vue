@@ -77,32 +77,34 @@
 
 <script>
 import Product from './Product.vue';
+import ProductService from '../services/ProductService';
 
 export default {
   name: "Home",
   components: {
     Product
   },
-  props: {
-    produtos: {
-      type: Array,
-      required: true
-    },
-    loading: {
-      type: Boolean,
-      required: true
-    },
-    error: {
-      type: String,
-      required: false
-    }
-  },
   data() {
     return {
+      produtos: [], // Lista de produtos
+      loading: true, // Estado de carregamento
+      error: null, // Estado de erro
       showScrollButton: false
     };
   },
   methods: {
+    async fetchProducts() {
+      try {
+        this.loading = true;
+        this.error = null;
+        this.produtos = await ProductService.getAllProducts(); // Busca os produtos
+      } catch (err) {
+        this.error = 'Erro ao carregar os produtos. Tente novamente mais tarde.';
+        console.error(err);
+      } finally {
+        this.loading = false;
+      }
+    },
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -110,8 +112,9 @@ export default {
       this.showScrollButton = window.scrollY > 200;
     }
   },
-  mounted() {
+  async mounted() {
     window.addEventListener('scroll', this.handleScroll);
+    await this.fetchProducts(); // Chama o método para buscar os produtos
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);

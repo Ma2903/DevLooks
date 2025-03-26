@@ -1,6 +1,6 @@
 import axios from '@/services/main';
 
-const API_URL = '/products';
+const API_URL = '/api/products';
 
 export default {
   // Buscar todos os produtos

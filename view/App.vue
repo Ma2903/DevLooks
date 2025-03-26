@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Home from './components/Home.vue';
 import CreateAvatar from './components/CreateAvatar.vue';
 import Login from './components/Login.vue';
@@ -20,6 +20,14 @@ const handleLogin = (userData) => {
   user.value = userData; // Armazena os dados do usuário logado
   currentPage.value = 'home'; // Redireciona para a página inicial
 };
+
+const navigateToUrl = (url) => {
+  // window.location.href = 'http://localhost:5173/' + url;
+};
+
+onMounted (() => {
+  navigateToUrl('login');
+});
 </script>
 
 <template>
