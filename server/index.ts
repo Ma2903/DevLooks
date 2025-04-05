@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import axios from 'axios';
 
 // import productRoutes from './routes/productsRoutes';
 import usersRoutes from './routes/UserRoutes';

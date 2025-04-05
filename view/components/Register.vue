@@ -174,6 +174,8 @@
   </template>
   
   <script>
+  import axios from "@/services/main";
+
   export default {
     name: "Register",
     data() {
@@ -195,19 +197,40 @@
       togglePasswordVisibility() {
         this.showPassword = !this.showPassword;
       },
-      handleRegister() {
-        console.log("Dados do usuário:", {
-          name: this.name,
-          email: this.email,
-          cpf: this.cpf,
-          phone: this.phone,
-          address: this.address,
-          cep: this.cep,
-          city: this.city,
-          state: this.state,
-          country: this.country,
-          password: this.password,
-        });
+      async handleRegister() {
+        try {
+          const userData = {
+            name: this.name,
+            email: this.email,
+            cpf: this.cpf,
+            telephone: this.phone,
+            address: this.address,
+            cep: this.cep,
+            city: this.city,
+            state: this.state,
+            country: this.country,
+            password: this.password,
+          };
+
+          const response = await axios.post("/api/users", userData); // Faz a requisição POST
+          alert("Usuário cadastrado com sucesso!");
+          console.log("Usuário criado:", response.data);
+
+          // Limpa os campos do formulário
+          this.name = "";
+          this.email = "";
+          this.cpf = "";
+          this.phone = "";
+          this.address = "";
+          this.cep = "";
+          this.city = "";
+          this.state = "";
+          this.country = "";
+          this.password = "";
+        } catch (error) {
+          console.error("Erro ao cadastrar usuário:", error.response?.data || error);
+          alert("Erro ao cadastrar usuário. Verifique os dados e tente novamente.");
+        }
       },
     },
   };
