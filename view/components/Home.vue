@@ -62,7 +62,7 @@
       <div v-if="loading" class="text-base md:text-lg text-gray-300">Carregando...</div>
       <div v-else-if="error" class="text-base md:text-lg text-red-500">{{ error }}</div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <transition-group name="fade" tag="div">
+        <transition-group name="fade" tag="div" class="contents">
           <Product v-for="produto in produtos" :key="produto.id" :product="produto" />
         </transition-group>
       </div>

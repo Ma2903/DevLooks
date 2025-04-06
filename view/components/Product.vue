@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-sm rounded-lg overflow-hidden shadow-lg p-4 bg-white cursor-pointer hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105">
+  <div @click="gotoPage" class="max-w-sm rounded-lg overflow-hidden shadow-lg p-4 bg-white cursor-pointer hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105">
     <!-- Imagem quadrada -->
     <div class="w-full h-64 flex items-center justify-center overflow-hidden bg-gray-200 rounded-lg">
       <img class="object-cover w-full h-full" src="/camisa.jpg" :alt="product.name">
@@ -36,6 +36,9 @@ export default {
     getImageUrl(imageName) {
       const image = images[`./${imageName}`];
       return image ? image.default : '';
+    },
+    gotoPage() {
+      this.$router.push({ path: `/product/${this.product._id}` });
     }
   }
 };

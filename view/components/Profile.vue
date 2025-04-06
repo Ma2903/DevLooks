@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
     <div class="bg-gray-900 p-16 rounded-3xl shadow-2xl w-full max-w-4xl">
       <div class="text-center mb-10">
-        <img src="https://via.placeholder.com/150" alt="Avatar" class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500">
+        <img src="./" alt="Avatar" class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500">
         <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center">
           <i class="fas fa-user-circle mr-3"></i> {{ userData.name }}
         </h1>
@@ -92,6 +92,7 @@ export default {
       userData : {},
       showDeleteModal: false,
       deleteConfirmation: "",
+      token: localStorage.getItem("token"),
     };
   },
 
@@ -122,9 +123,20 @@ export default {
   },
 
   methods: {
-    deleteAccount() {
+    async deleteAccount() {
       if (this.deleteConfirmation === "DELETAR") {
-        console.log("Conta deletada");
+        const res = await axios.delete(`/api/users/${this.userData._id}`, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        });
+        if(res.status === 200) {
+          console.log("Conta deletada com sucesso");
+          localStorage.removeItem("token");
+          this.$router.push("/login");
+        } else {
+          console.error("Erro ao deletar a conta:", res.data);
+        }
         this.showDeleteModal = false;
         this.deleteConfirmation = "";
       }

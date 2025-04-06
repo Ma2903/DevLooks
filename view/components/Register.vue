@@ -11,7 +11,7 @@
             <div>
               <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
               <div class="relative">
-                <i class="fas fa-user absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-user absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="name"
@@ -25,7 +25,7 @@
             <div>
               <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
               <div class="relative">
-                <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-envelope absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="email"
                   id="email"
@@ -39,7 +39,7 @@
             <div>
               <label for="cpf" class="block text-sm font-medium text-gray-300 mb-2">CPF</label>
               <div class="relative">
-                <i class="fas fa-id-card absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-id-card absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="cpf"
@@ -53,7 +53,7 @@
             <div>
               <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
               <div class="relative">
-                <i class="fas fa-phone absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-phone absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="phone"
@@ -67,7 +67,7 @@
             <div>
               <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
               <div class="relative">
-                <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="address"
@@ -81,7 +81,7 @@
             <div>
               <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
               <div class="relative">
-                <i class="fas fa-map-pin absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-map-pin absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="cep"
@@ -95,7 +95,7 @@
             <div>
               <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
               <div class="relative">
-                <i class="fas fa-city absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-city absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="city"
@@ -109,7 +109,7 @@
             <div>
               <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
               <div class="relative">
-                <i class="fas fa-flag absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-flag absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="state"
@@ -123,7 +123,7 @@
             <div>
               <label for="country" class="block text-sm font-medium text-gray-300 mb-2">País</label>
               <div class="relative">
-                <i class="fas fa-globe absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-globe absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="country"
@@ -137,7 +137,7 @@
             <div>
               <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
               <div class="relative">
-                <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-lock absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   :type="showPassword ? 'text' : 'password'"
                   id="password"
@@ -151,7 +151,7 @@
                   @click="togglePasswordVisibility"
                   class="absolute right-3 top-3 text-gray-400 hover:text-gray-200 focus:outline-none"
                 >
-                  <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  <i :class="showPassword ? 'fas fa-eye-slash mt-2' : 'fas fa-eye mt-2'"></i>
                 </button>
               </div>
             </div>
@@ -215,6 +215,8 @@
           const response = await axios.post("/api/users", userData); // Faz a requisição POST
           alert("Usuário cadastrado com sucesso!");
           console.log("Usuário criado:", response.data);
+          // Redireciona para a página de login após o cadastro
+          this.$router.push("/login");
 
           // Limpa os campos do formulário
           this.name = "";

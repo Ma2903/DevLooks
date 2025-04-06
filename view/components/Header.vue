@@ -8,7 +8,7 @@ export default {
         const dropdownOpen = ref(false)
         const isAuthenticated = ref(false)
         const username = ref('Usuário')
-        const userAvatar = ref('https://via.placeholder.com/50')
+        const userAvatar = ref('./')
         const theme = ref('light')
 
         const themeText = computed(() => (theme.value === 'light' ? 'Dark Mode' : 'Light Mode'))
@@ -70,7 +70,7 @@ export default {
                     <li><router-link to="/create-avatar" @click.native="navigate('create-avatar')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-user-plus"></i><span>Criar Avatar</span></router-link></li>
                     <li><router-link to="/Home" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-info-circle"></i><span>Sobre</span></router-link></li>
                     <li><router-link to="/Home" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-cogs"></i><span>Funcionalidades</span></router-link></li>
-                    <li><router-link to="/Home" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-box-open"></i><span>Produtos</span></router-link></li>
+                    <li><router-link to="/Home" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-box-open"></i><span>Novo Produto</span></router-link></li>
                     <li><router-link to="/profile" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-user"></i><span>Perfil</span></router-link></li>
                 </ul>
             </nav>

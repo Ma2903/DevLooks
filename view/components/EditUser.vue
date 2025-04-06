@@ -11,11 +11,11 @@
             <div>
               <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
               <div class="relative">
-                <i class="fas fa-user absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-user absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="name"
-                  v-model="user.name"
+                  v-model="userData.name"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu nome completo"
                   required
@@ -25,11 +25,11 @@
             <div>
               <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
               <div class="relative">
-                <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-envelope absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="email"
                   id="email"
-                  v-model="user.email"
+                  v-model="userData.email"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu email"
                   required
@@ -39,11 +39,11 @@
             <div>
               <label for="cpf" class="block text-sm font-medium text-gray-300 mb-2">CPF</label>
               <div class="relative">
-                <i class="fas fa-id-card absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-id-card absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="cpf"
-                  v-model="user.cpf"
+                  v-model="userData.cpf"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu CPF"
                   required
@@ -53,11 +53,11 @@
             <div>
               <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
               <div class="relative">
-                <i class="fas fa-phone absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-phone absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="phone"
-                  v-model="user.phone"
+                  v-model="userData.telephone"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu telefone"
                   required
@@ -67,11 +67,11 @@
             <div>
               <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
               <div class="relative">
-                <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="address"
-                  v-model="user.address"
+                  v-model="userData.address"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu endereço"
                   required
@@ -81,11 +81,11 @@
             <div>
               <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
               <div class="relative">
-                <i class="fas fa-map-pin absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-map-pin absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="cep"
-                  v-model="user.cep"
+                  v-model="userData.cep"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu CEP"
                   required
@@ -95,11 +95,11 @@
             <div>
               <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
               <div class="relative">
-                <i class="fas fa-city absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-city absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="city"
-                  v-model="user.city"
+                  v-model="userData.city"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite sua cidade"
                   required
@@ -109,11 +109,11 @@
             <div>
               <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
               <div class="relative">
-                <i class="fas fa-flag absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-flag absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="state"
-                  v-model="user.state"
+                  v-model="userData.state"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu estado"
                   required
@@ -123,11 +123,11 @@
             <div>
               <label for="country" class="block text-sm font-medium text-gray-300 mb-2">País</label>
               <div class="relative">
-                <i class="fas fa-globe absolute left-3 top-3 text-gray-400"></i>
+                <i class="fas fa-globe absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
                   type="text"
                   id="country"
-                  v-model="user.country"
+                  v-model="userData.country"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite seu país"
                   required
@@ -152,15 +152,18 @@
   </template>
   
   <script>
+  import axios from 'axios';
+  import Swal from 'sweetalert2'
+  
   export default {
     name: "EditUser",
     data() {
       return {
-        user: {
+        userData: {
           name: "",
           email: "",
           cpf: "",
-          phone: "",
+          telephone: "",
           address: "",
           cep: "",
           city: "",
@@ -169,10 +172,55 @@
         },
       };
     },
+    async mounted() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.log("Token não encontrado, redirecionando para o login");
+        // redireciona para o login
+        this.$router.push("/login");
+        return;
+      }
+
+      try {
+        const res = await axios.post("/api/users/me", {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        this.userData = res.data;
+
+      } catch (err) {
+        console.error("Erro ao validar o token:", err.response?.data || err.message);
+        localStorage.removeItem("token");
+        this.$router.push("/login");
+      }
+    },
     methods: {
-      handleEdit() {
-        // Lógica para salvar as alterações do usuário
-        console.log("Dados atualizados do usuário:", this.user);
+      async handleEdit() {
+        const token = localStorage.getItem("token");
+        const res = await axios.put(`/api/users/${this.userData._id}`,this.userData,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.status === 200) {
+          Swal.fire({
+            title: "Usuário Editado com Sucesso!",
+            icon: "success",
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
+          this.$router.push("/profile");
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Do you want to continue',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+          })
+        }
       },
     },
   };
