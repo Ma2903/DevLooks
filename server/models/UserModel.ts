@@ -56,6 +56,10 @@ class User {
         return await User.model.findById(id);
     }
 
+    static async findByEmail(email: string): Promise<IUser | null> {
+        return await User.model.findOne({ email });
+    }
+
     // Atualizar usuário
     static async update(id: string, userData: Partial<IUser>): Promise<IUser | null> {
         return await User.model.findByIdAndUpdate(id, userData, { new: true });

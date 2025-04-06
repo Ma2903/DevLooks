@@ -9,8 +9,8 @@
         <form @submit.prevent="handleLogin">
           <div class="mb-8">
             <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-            <div class="relative">
-              <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+            <div class="relative flex">
+              <i class="fas fa-envelope absolute left-3 mt-5 text-gray-400"></i>
               <input
                 type="email"
                 id="email"
@@ -24,7 +24,7 @@
           <div class="mb-8">
             <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
             <div class="relative">
-              <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+              <i class="fas fa-lock absolute left-3 mt-5 text-gray-400"></i>
               <input
                 :type="showPassword ? 'text' : 'password'"
                 id="password"
@@ -38,7 +38,7 @@
                 @click="togglePasswordVisibility"
                 class="absolute right-3 top-3 text-gray-400 hover:text-gray-200 focus:outline-none"
               >
-                <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                <i :class="showPassword ? 'fas fa-eye-slash mt-2' : 'fas fa-eye mt-2' "></i>
               </button>
             </div>
           </div>
@@ -65,6 +65,7 @@
   </template>
   
   <script>
+  import axios from "axios";
   export default {
     name: "Login",
     data() {
@@ -78,12 +79,26 @@
       togglePasswordVisibility() {
         this.showPassword = !this.showPassword;
       },
-      handleLogin() {
-        // Lógica de autenticação aqui
-        console.log("Email:", this.email);
-        console.log("Senha:", this.password);
-        this.$router.push('/home'); // Redireciona para a página inicial após o login
-      },
+      async handleLogin() {
+        try {
+          // Envia a requisição de login para o backend
+          const response = await axios.post("/api/users/login", {
+            email: this.email,
+            password: this.password,
+          });
+
+          // Sucesso no login
+          console.log("Login bem-sucedido:", response.data);
+          // Armazena o token no localStorage
+          localStorage.setItem("token", response.data.token);
+          this.$router.push("/home");
+        } catch (error) {
+          // Trata erros de autenticação
+          console.error("Erro no login:", error.response?.data || error.message);
+          this.errorMessage =
+            error.response?.data?.message || "Erro ao realizar login.";
+        }
+      }
     },
   };
   </script>
