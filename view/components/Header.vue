@@ -51,7 +51,15 @@ export default {
             navigate
         }
     },
-    name: 'Header'
+    name: 'Header',
+    methods: {
+        scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        },
+    },
 }
 </script>
 
@@ -61,15 +69,15 @@ export default {
             <!-- Logo -->
             <div class="text-2xl md:text-3xl font-bold text-purple-400 flex items-center space-x-2">
                 <img src="../assets/logo_teste.jpg" alt="Logo da Loja de Avatares" class="w-16 h-16 md:w-24 md:h-24 rounded-full animate-spin-slow">
-                <span class="title-highlight">Loja de Avatares </span>
+                <span class="title-highlight">Loja de Avatares</span>
             </div>
             <!-- Navegação -->
             <nav :class="{'hidden': !menuOpen, 'block': menuOpen}" class="w-full md:w-auto md:flex md:items-center md:space-x-6 text-lg md:text-xl mt-4 md:mt-0">
                 <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
-                    <li><router-link to="/Home" @click.native="navigate('home')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-home"></i><span>Home</span></router-link></li>
-                    <li><router-link to="/create-avatar" @click.native="navigate('create-avatar')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-user-plus"></i><span>Criar Avatar</span></router-link></li>
-                    <li><router-link to="/Home" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-info-circle"></i><span>Sobre</span></router-link></li>
-                    <li><router-link to="/Home" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-cogs"></i><span>Funcionalidades</span></router-link></li>
+                    <li><router-link to="/Home" @click.native="scrollToSection('home')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-home"></i><span>Home</span></router-link></li>
+                    <li><router-link to="/Home" @click.native="scrollToSection('about')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-info-circle"></i><span>Sobre</span></router-link></li>
+                    <li><router-link to="/Home" @click.native="scrollToSection('features')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-cogs"></i><span>Funcionalidades</span></router-link></li>
+                    <li><router-link to="/Home" @click.native="scrollToSection('products')" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-box-open"></i><span>Produtos</span></router-link></li>
                     <li><router-link to="/profile" class="hover:text-purple-500 flex items-center space-x-1"><i class="fas fa-user"></i><span>Perfil</span></router-link></li>
                 </ul>
             </nav>

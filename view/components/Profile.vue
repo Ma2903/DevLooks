@@ -1,10 +1,22 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
     <div class="bg-gray-900 p-16 rounded-3xl shadow-2xl w-full max-w-4xl">
-      <div class="text-center mb-10">
-        <img src="./" alt="Avatar" class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500">
+      <div class="text-center mb-10 relative">
+        <!-- Avatar com ícone de edição -->
+        <div class="relative inline-block">
+          <img
+            src="./"
+            class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500"
+          />
+          <router-link
+            to="/create-avatar"
+            class="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 text-white font-bold p-2 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            <i class="fas fa-edit"></i>
+          </router-link>
+        </div>
         <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center">
-          <i class="fas fa-user-circle mr-3"></i> {{ userData.name }}
+          <i class="fas fa-user-circle mr-1"></i> {{ userData.name }}
         </h1>
         <p class="text-gray-400 mt-3 text-lg flex items-center justify-center">
           <i class="fas fa-envelope mr-2"></i> {{ userData.email }}
@@ -34,12 +46,6 @@
           class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
         >
           <i class="fas fa-edit mr-2"></i> Editar Dados
-        </router-link>
-        <router-link
-          to="/create-avatar"
-          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
-        >
-          <i class="fas fa-user-edit mr-2"></i> Editar Avatar
         </router-link>
         <button
           @click="showDeleteModal = true"
@@ -89,7 +95,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      userData : {},
+      userData: {},
       showDeleteModal: false,
       deleteConfirmation: "",
       token: localStorage.getItem("token"),
@@ -101,7 +107,6 @@ export default {
 
     if (!token) {
       console.log("Token não encontrado, redirecionando para o login");
-      // redireciona para o login
       this.$router.push("/login");
       return;
     }
@@ -130,7 +135,7 @@ export default {
             Authorization: `Bearer ${this.token}`,
           },
         });
-        if(res.status === 200) {
+        if (res.status === 200) {
           console.log("Conta deletada com sucesso");
           localStorage.removeItem("token");
           this.$router.push("/login");

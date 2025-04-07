@@ -7,7 +7,7 @@
         </div>
         <div class="flex justify-end mb-6">
           <router-link
-            to="/add-product"
+            to="/addProduto"
             class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
           >
             <i class="fas fa-plus-circle mr-2"></i> Adicionar Produto
