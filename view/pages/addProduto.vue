@@ -1,119 +1,118 @@
 <template>
-    <div class="add-produto">
-        <h1>Adicionar Produto</h1>
-        <form @submit.prevent="adicionarProduto">
-            <div class="form-group">
-                <label for="nome">Nome do Produto:</label>
-                <input
-                    type="text"
-                    id="nome"
-                    v-model="produto.nome"
-                    placeholder="Digite o nome do produto"
-                    required
-                />
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
+      <div class="text-center mb-10">
+        <h1 class="text-5xl font-extrabold text-purple-400 mt-6">Adicionar Produto</h1>
+        <p class="text-gray-400 mt-3 text-lg">Preencha os campos abaixo para adicionar um novo produto</p>
+      </div>
+      <form @submit.prevent="adicionarProduto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label for="nome" class="block text-sm font-medium text-gray-300 mb-2">Nome do Produto</label>
+            <div class="relative">
+              <i class="fas fa-box absolute left-3 top-3 text-gray-400 mt-2"></i>
+              <input
+                type="text"
+                id="nome"
+                v-model="produto.nome"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Digite o nome do produto"
+                required
+              />
             </div>
-
-            <div class="form-group">
-                <label for="descricao">Descrição:</label>
-                <textarea
-                    id="descricao"
-                    v-model="produto.descricao"
-                    placeholder="Digite a descrição do produto"
-                    required
-                ></textarea>
+          </div>
+          <div>
+            <label for="descricao" class="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
+            <div class="relative">
+              <i class="fas fa-align-left absolute left-3 top-3 text-gray-400 mt-2"></i>
+              <textarea
+                id="descricao"
+                v-model="produto.descricao"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Digite a descrição do produto"
+                required
+              ></textarea>
             </div>
-
-            <div class="form-group">
-                <label for="preco">Preço:</label>
-                <input
-                    type="number"
-                    id="preco"
-                    v-model="produto.preco"
-                    placeholder="Digite o preço do produto"
-                    required
-                />
+          </div>
+          <div>
+            <label for="preco" class="block text-sm font-medium text-gray-300 mb-2">Preço</label>
+            <div class="relative">
+              <i class="fas fa-dollar-sign absolute left-3 top-3 text-gray-400 mt-2"></i>
+              <input
+                type="number"
+                id="preco"
+                v-model="produto.preco"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Digite o preço do produto"
+                required
+              />
             </div>
-
-            <div class="form-group">
-                <label for="imagem">URL da Imagem:</label>
-                <input
-                    type="url"
-                    id="imagem"
-                    v-model="produto.imagem"
-                    placeholder="Digite a URL da imagem do produto"
-                />
+          </div>
+          <div>
+            <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">URL da Imagem</label>
+            <div class="relative">
+              <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
+              <input
+                type="url"
+                id="imagem"
+                v-model="produto.imagem"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Digite a URL da imagem do produto"
+              />
             </div>
-
-            <button type="submit">Adicionar Produto</button>
-        </form>
+          </div>
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8"
+        >
+          <i class="fas fa-plus-circle mr-2"></i> Adicionar Produto
+        </button>
+      </form>
     </div>
+  </div>
 </template>
 
 <script>
 export default {
-    data() {
-        return {
-            produto: {
-                nome: '',
-                descricao: '',
-                preco: null,
-                imagem: '',
-            },
-        };
+  data() {
+    return {
+      produto: {
+        nome: '',
+        descricao: '',
+        preco: null,
+        imagem: '',
+      },
+    };
+  },
+  methods: {
+    adicionarProduto() {
+      console.log('Produto adicionado:', this.produto);
+      alert('Produto adicionado com sucesso!');
+      this.produto = {
+        nome: '',
+        descricao: '',
+        preco: null,
+        imagem: '',
+      };
     },
-    methods: {
-        adicionarProduto() {
-            console.log('Produto adicionado:', this.produto);
-            // Aqui você pode adicionar a lógica para salvar o produto, como uma chamada à API
-            alert('Produto adicionado com sucesso!');
-            this.produto = {
-                nome: '',
-                descricao: '',
-                preco: null,
-                imagem: '',
-            };
-        },
-    },
+  },
 };
 </script>
 
 <style scoped>
-.add-produto {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
+@import '@fortawesome/fontawesome-free/css/all.css';
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input,
-textarea {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+body {
+  font-family: 'Fira Code', monospace;
 }
 
 button:hover {
-    background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9CA3AF; /* Cor do placeholder */
 }
 </style>

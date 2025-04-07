@@ -9,6 +9,9 @@ import EditUser from './components/EditUser.vue';
 import ResetPassword from './components/ResetPassword.vue';
 import Profile from './components/Profile.vue';
 import SingleProduct from './pages/singleProduto.vue';
+import AdminProducts from './pages/AdminProducts.vue';
+import addProduto from './pages/addProduto.vue';
+import EditProduto from './pages/editProduto.vue';
 
 // Define as rotas
 const routes = [
@@ -21,6 +24,9 @@ const routes = [
   { path: '/reset-password', name: 'ResetPassword', component: ResetPassword },
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/product/:id',name : 'Product', component: SingleProduct }, // Rota para o produto único
+  { path: '/admin/products', name: 'AdminProducts', component: AdminProducts },
+  { path: '/admin/products/add', name: 'AddProduct', component: addProduto },
+  { path: '/admin/products/edit/:id', name: 'EditProduct', component: EditProduto, props: true }, // Passa o id como prop para o componente EditProduto
 ];
 
 // Cria o roteador
