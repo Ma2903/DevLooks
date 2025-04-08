@@ -13,6 +13,7 @@ import AdminProducts from './pages/AdminProducts.vue';
 import addProduto from './pages/addProduto.vue';
 import EditProduto from './pages/editProduto.vue';
 import ProductList from './pages/ProductList.vue'; // Corrigido o caminho
+import Cart from './components/Cart.vue';
 
 // Define as rotas
 const routes = [
@@ -29,6 +30,7 @@ const routes = [
   { path: '/admin/products', name: 'AdminProducts', component: AdminProducts },
   { path: '/admin/products/add', name: 'AddProduct', component: addProduto },
   { path: '/admin/products/edit/:id', name: 'EditProduct', component: EditProduto, props: true },
+  { path: '/cart', name: 'Cart', component: Cart },
 ];
 
 // Cria o roteador

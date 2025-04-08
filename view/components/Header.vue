@@ -51,6 +51,17 @@
             </router-link>
           </li>
 
+          <!-- Botão Carrinho -->
+          <li>
+            <router-link
+              to="/cart"
+              class="hover:text-purple-500 flex items-center space-x-1"
+            >
+              <i class="fas fa-shopping-cart"></i>
+              <span>Carrinho</span>
+            </router-link>
+          </li>
+
           <!-- Botão Perfil ou Entrar -->
           <li>
             <router-link

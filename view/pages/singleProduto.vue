@@ -34,6 +34,14 @@
       >
         Voltar para a Loja
       </router-link>
+
+      <!-- Botão de Adicionar ao Carrinho -->
+      <button
+        @click="addToCart(product)"
+        class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
+      >
+        Adicionar ao Carrinho
+      </button>
     </div>
   </div>
 </template>
@@ -65,6 +73,20 @@ export default {
       } catch (error) {
         console.error("Erro ao carregar o produto:", error.message);
       }
+    },
+    addToCart(product) {
+      const cart = localStorage.getItem("cart");
+      const cartItems = cart ? JSON.parse(cart) : [];
+
+      const existingItem = cartItems.find((item) => item._id === product._id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cartItems.push({ ...product, quantity: 1 });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+      alert("Produto adicionado ao carrinho!");
     },
   },
 };
