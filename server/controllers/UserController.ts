@@ -62,7 +62,7 @@ class UserController {
     };
 
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const JWT_SECRET = process.env.JWT_SECRET
+        const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Certifique-se de que a chave está configurada
         try {
             const { email, password } = req.body;
             const user = await User.findByEmail(email);
@@ -70,8 +70,6 @@ class UserController {
                 res.status(401).json({ error: "Credenciais inválidas." });
             } else {
                 const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "5h" });
-
-
                 res.status(200).json({ message: "Login bem-sucedido.", token: token });
             }
         } catch (error) {

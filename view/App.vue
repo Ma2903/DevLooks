@@ -9,6 +9,9 @@ import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
 import ResetPassword from './components/ResetPassword.vue';
 
+import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/all.js';
+
 const currentPage = ref('login'); // Página inicial alterada para 'login'
 const user = ref(null); // Estado para armazenar os dados do usuário logado
 

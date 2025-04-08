@@ -81,22 +81,18 @@
       },
       async handleLogin() {
         try {
-          // Envia a requisição de login para o backend
           const response = await axios.post("/api/users/login", {
             email: this.email,
             password: this.password,
           });
-
-          // Sucesso no login
-          console.log("Login bem-sucedido:", response.data);
-          // Armazena o token no localStorage
-          localStorage.setItem("token", response.data.token);
-          this.$router.push("/home");
+          const token = response.data.token;
+          localStorage.setItem("token", token); // Armazena o token no localStorage
+          window.dispatchEvent(new Event("storage")); // Dispara o evento de mudança no localStorage
+          alert("Login bem-sucedido!");
+          this.$router.push("/profile"); // Redireciona para o perfil
         } catch (error) {
-          // Trata erros de autenticação
-          console.error("Erro no login:", error.response?.data || error.message);
-          this.errorMessage =
-            error.response?.data?.message || "Erro ao realizar login.";
+          console.error("Erro ao fazer login:", error.response?.data || error);
+          alert("Erro ao fazer login. Verifique suas credenciais.");
         }
       }
     },

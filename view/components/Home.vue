@@ -49,24 +49,72 @@
     </section>
 
     <!-- Seção "Produtos em Destaque" -->
-    <section id="featured-products" class="bg-gray-900 py-16">
-      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 text-center mb-8">
-        <i class="fas fa-star mr-2"></i>Produtos em Destaque
-      </h2>
-      <div v-if="loading" class="text-lg text-gray-300 text-center">Carregando...</div>
-      <div v-else-if="error" class="text-lg text-red-500 text-center">{{ error }}</div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 md:px-6">
-        <Product v-for="produto in produtos" :key="produto.id" :product="produto" />
+    <section id="best-sellers" class="container mx-auto py-16 px-4 md:px-6">
+    <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 text-center mb-8">
+      <i class="fas fa-fire mr-2"></i>Mais Vendidos
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <Product v-for="produto in produtosMaisVendidos" :key="produto.id" :product="produto" />
+    </div>
+  </section>
+
+    <!-- Seção "Benefícios" -->
+    <section id="benefits" class="bg-gray-900 py-16">
+      <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div>
+          <i class="fas fa-shipping-fast text-5xl text-purple-400 mb-4"></i>
+          <h3 class="text-lg font-bold text-white">Frete Grátis</h3>
+          <p class="text-gray-300">Para compras acima de R$ 150,00.</p>
+        </div>
+        <div>
+          <i class="fas fa-sync-alt text-5xl text-purple-400 mb-4"></i>
+          <h3 class="text-lg font-bold text-white">Devolução Fácil</h3>
+          <p class="text-gray-300">30 dias para devolução sem custo.</p>
+        </div>
+        <div>
+          <i class="fas fa-lock text-5xl text-purple-400 mb-4"></i>
+          <h3 class="text-lg font-bold text-white">Pagamento Seguro</h3>
+          <p class="text-gray-300">Seus dados protegidos com criptografia.</p>
+        </div>
       </div>
     </section>
+
+    <!-- Seção de Newsletter -->
+    <div class="bg-purple-800 py-8 mt-8 text-center rounded-lg">
+      <h3 class="text-2xl font-bold text-white mb-4">
+        <i class="fas fa-envelope mr-2"></i>Inscreva-se na nossa Newsletter
+      </h3>
+      <p class="text-gray-200 mb-6">Receba novidades, promoções e ofertas exclusivas diretamente no seu email!</p>
+      <router-link
+        to="/register"
+        class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+      >
+        <i class="fas fa-user-plus mr-2"></i> Inscrever-se
+      </router-link>
+    </div>
 
     <!-- Seção "Sobre Nós" -->
     <section id="about" class="container mx-auto py-16 px-4 md:px-6 text-center">
       <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 mb-6">
         <i class="fas fa-info-circle mr-2"></i>Sobre Nós
       </h2>
+      <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
+        Bem-vindo à <span class="text-purple-400 font-bold">Loja Geek</span>, o lugar perfeito para os apaixonados por tecnologia, cultura pop e personalização. Nossa missão é oferecer produtos exclusivos e de alta qualidade que combinem estilo, funcionalidade e inovação.
+      </p>
+      <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
+        Desde avatares personalizados até acessórios únicos, trabalhamos para trazer o que há de mais moderno e criativo para o seu dia a dia. Seja para expressar sua paixão por tecnologia ou para presentear alguém especial, aqui você encontra tudo o que precisa.
+      </p>
+      <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
+        Na <span class="text-purple-400 font-bold">Loja Geek</span>, valorizamos a experiência do cliente. Por isso, oferecemos:
+      </p>
+      <ul class="text-lg md:text-xl text-gray-300 leading-relaxed list-disc list-inside mb-6">
+        <li>Frete grátis para compras acima de R$ 150,00.</li>
+        <li>Devolução fácil e sem custo em até 30 dias.</li>
+        <li>Pagamento seguro com criptografia avançada.</li>
+        <li>Atendimento ao cliente dedicado e personalizado.</li>
+      </ul>
       <p class="text-lg md:text-xl text-gray-300 leading-relaxed">
-        Somos apaixonados por tecnologia e cultura geek. Nossa missão é oferecer produtos exclusivos que combinem estilo e funcionalidade para todos os entusiastas de tecnologia.
+        Estamos sempre em busca de novidades e tendências para garantir que você tenha acesso aos melhores produtos do mercado. Junte-se à nossa comunidade e descubra como é fácil transformar o seu estilo e destacar-se no mundo digital!
       </p>
     </section>
 
@@ -78,6 +126,7 @@
     >
       <i class="fas fa-arrow-up"></i>
     </button>
+
   </div>
 </template>
 
@@ -116,6 +165,12 @@ export default {
     },
     handleScroll() {
       this.showScrollButton = window.scrollY > 200;
+    },
+    scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
     }
   },
   async mounted() {
@@ -154,6 +209,14 @@ section.bg-gradient-to-r .container h1 {
 
 section.bg-gradient-to-r .container p {
   color: #E5E7EB;
+}
+
+footer {
+  border-top: 2px solid #444444;
+}
+
+footer a:hover {
+  color: #9b4dff;
 }
 
 .fade-enter-active, .fade-leave-active {

@@ -6,7 +6,7 @@
     >
       <img
         class="object-cover w-full h-full"
-        :src="`/view/assets/${product.image}` || '@/camisa.jpg'"
+        :src="product.image || '@/camisa.jpg'"
         :alt="product.name"
       />
     </div>
@@ -29,7 +29,7 @@
 
       <!-- Botão de Voltar -->
       <router-link
-        to="/"
+        to="/products"
         class="inline-block bg-blue-500 text-white text-sm font-medium px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
       >
         Voltar para a Loja
@@ -39,10 +39,10 @@
 </template>
 
 <script>
-import axios from "axios"; // Importa o axios para fazer requisições HTTP
+import axios from "axios";
 
 export default {
-  name: "SingleProduct",
+  name: "SingleProduto",
   data() {
     return {
       product: {}, // Objeto para armazenar os dados do produto
@@ -52,13 +52,12 @@ export default {
     // Recupera o ID do produto da rota
     const productId = this.$route.params.id;
 
-    // Simulação de busca do produto (substitua por uma chamada à API)
+    // Busca o produto com base no ID
     this.fetchProduct(productId);
   },
   methods: {
     async fetchProduct(productId) {
       try {
-        // Substitua pela chamada à API real usando axios
         const response = await axios.get(
           `http://localhost:3000/api/products/${productId}`
         );

@@ -16,7 +16,7 @@
           </router-link>
         </div>
         <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center">
-          <i class="fas fa-user-circle mr-1"></i> {{ userData.name }}
+          <i class="fas fa-user-circle text-6xl mr-3 text-purple-500"></i> {{ userData.name }}
         </h1>
         <p class="text-gray-400 mt-3 text-lg flex items-center justify-center">
           <i class="fas fa-envelope mr-2"></i> {{ userData.email }}
@@ -53,6 +53,12 @@
         >
           <i class="fas fa-trash-alt mr-2"></i> Deletar Conta
         </button>
+        <button
+          @click="showLogoutModal = true"
+          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+        >
+          <i class="fas fa-sign-out-alt mr-2"></i> Sair
+        </button>
       </div>
     </div>
 
@@ -86,6 +92,30 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Confirmação de Logout -->
+    <div v-if="showLogoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 class="text-2xl font-bold text-purple-400 mb-4 text-center">Confirmação de Logout</h2>
+        <p class="text-gray-300 mb-4 text-center">
+          Tem certeza que deseja sair do sistema?
+        </p>
+        <div class="flex justify-between mt-6">
+          <button
+            @click="showLogoutModal = false"
+            class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="logout"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -97,6 +127,7 @@ export default {
     return {
       userData: {},
       showDeleteModal: false,
+      showLogoutModal: false, // Estado para o modal de logout
       deleteConfirmation: "",
       token: localStorage.getItem("token"),
     };
@@ -145,6 +176,11 @@ export default {
         this.showDeleteModal = false;
         this.deleteConfirmation = "";
       }
+    },
+    logout() {
+      localStorage.removeItem("token");
+      window.dispatchEvent(new Event("storage")); // Dispara o evento de mudança no localStorage
+      this.$router.push("/login");
     },
   },
 };
