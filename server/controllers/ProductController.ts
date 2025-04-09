@@ -13,7 +13,7 @@ class ProductController {
 
     static getAllProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const products = await Product.find();
+            const products = await Product.findAll();
             res.status(200).json(products);
         } catch (error) {
             res.status(500).json({ error: "Erro ao buscar produtos." });
