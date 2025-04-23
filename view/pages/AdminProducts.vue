@@ -7,18 +7,21 @@
         </div>
         <div class="flex justify-end mb-6">
           <router-link
-            to="/addProduto"
+            to="/admin/products/add"
             class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
           >
             <i class="fas fa-plus-circle mr-2"></i> Adicionar Produto
           </router-link>
         </div>
-        <table class="w-full text-left bg-gray-800 rounded-lg shadow-lg">
+        <table class="w-full bg-gray-800 rounded-lg shadow-lg">
           <thead>
             <tr class="bg-gray-700 text-gray-300">
-              <th class="py-4 px-6">Nome</th>
-              <th class="py-4 px-6">Preço</th>
-              <th class="py-4 px-6">Ações</th>
+              <th class="py-4 px-6"><i class="fas fa-tag mr-2"></i>Nome</th>
+              <th class="py-4 px-6"><i class="fas fa-align-left mr-2"></i>Descrição</th>
+              <th class="py-4 px-6"><i class="fas fa-dollar-sign mr-2"></i>Preço</th>
+              <th class="py-4 px-6"><i class="fas fa-list-alt mr-2"></i>Categoria</th>
+              <th class="py-4 px-6"><i class="fas fa-boxes mr-2"></i>Quantidade</th>
+              <th class="py-4 px-6"><i class="fas fa-tools mr-2"></i>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -27,15 +30,18 @@
               :key="produto._id"
               class="border-b border-gray-700 hover:bg-gray-700"
             >
-              <td class="py-4 px-6">{{ produto.nome }}</td>
-              <td class="py-4 px-6">R$ {{ produto.preco.toFixed(2) }}</td>
+              <td class="py-4 px-6">{{ produto.name }}</td>
+              <td class="py-4 px-6">{{ produto.description }}</td>
+              <td class="py-4 px-6">{{ produto.price ? produto.price.toFixed(2) : 'N/A' }}</td>
+              <td class="py-4 px-6">{{ produto.category }}</td>
+              <td class="py-4 px-6">{{ produto.stock }}</td>
               <td class="py-4 px-6 flex space-x-4">
-                <router-link
-                  :to="`/edit-product/${produto._id}`"
+                <button
+                  @click="handleEdit(produto._id)"
                   class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
                 >
                   <i class="fas fa-edit mr-2"></i> Editar
-                </router-link>
+                </button>
                 <button
                   @click="confirmarExclusao(produto)"
                   class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
@@ -47,107 +53,169 @@
           </tbody>
         </table>
       </div>
-  
-      <!-- Modal de Confirmação -->
-      <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 class="text-2xl font-bold text-red-500 mb-4 text-center">Confirmação de Exclusão</h2>
-          <p class="text-gray-300 mb-4 text-center">
-            Tem certeza que deseja excluir o produto <span class="text-red-500 font-bold">{{ produtoSelecionado?.nome }}</span>?
-          </p>
-          <div class="flex justify-between mt-6">
-            <button
-              @click="cancelarExclusao"
-              class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-            >
-              Cancelar
-            </button>
-            <button
-              @click="deletarProduto"
-              class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
-  </template>
+</template>
   
-  <script>
-  import axios from "@/services/main";
-  
-  export default {
-    data() {
-      return {
-        produtos: [],
-        showDeleteModal: false,
-        produtoSelecionado: null,
-      };
+<script>
+import axios from "@/services/main";
+import Swal from "sweetalert2";
+
+export default {
+  data() {
+    return {
+      produtos: [],
+      showDeleteModal: false,
+      produtoSelecionado: null,
+      imageFile: null, // Armazena o arquivo de imagem selecionado
+    };
+  },
+  methods: {
+    async carregarProdutos() {
+      try {
+        const response = await axios.get("/api/products");
+        this.produtos = response.data;
+      } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: "Erro ao carregar produtos.",
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+      }
     },
-    methods: {
-      async carregarProdutos() {
-        try {
-          const response = await axios.get("/api/products");
-          this.produtos = response.data;
-        } catch (error) {
-          console.error("Erro ao carregar produtos:", error);
-          alert("Erro ao carregar produtos.");
+    async handleEdit(productId) {
+      try {
+        const response = await axios.get(`/api/products/${productId}`);
+        if (response.data) {
+          this.$router.push(`/admin/products/edit/${productId}`);
+        } else {
+          throw new Error("Produto não encontrado.");
         }
-      },
-      confirmarExclusao(produto) {
-        this.produtoSelecionado = produto;
-        this.showDeleteModal = true;
-      },
-      cancelarExclusao() {
-        this.produtoSelecionado = null;
-        this.showDeleteModal = false;
-      },
-      async deletarProduto() {
-        try {
-          await axios.delete(`/api/products/${this.produtoSelecionado._id}`);
-          this.produtos = this.produtos.filter(p => p._id !== this.produtoSelecionado._id);
-          this.cancelarExclusao();
-          alert("Produto excluído com sucesso!");
-        } catch (error) {
-          console.error("Erro ao excluir produto:", error);
-          alert("Erro ao excluir produto.");
+      } catch (error) {
+        console.error("Erro ao carregar dados do produto:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: "Erro ao carregar os dados do produto. Por favor, tente novamente.",
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+      }
+    },
+    confirmarExclusao(produto) {
+      this.produtoSelecionado = produto;
+      Swal.fire({
+        title: "Confirmação de Exclusão",
+        text: `Tem certeza que deseja excluir o produto "${produto.name}"?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#6B7280",
+        confirmButtonText: "Excluir",
+        cancelButtonText: "Cancelar",
+        background: "#1F2937",
+        color: "#E5E7EB",
+      }).then(result => {
+        if (result.isConfirmed) {
+          this.deletarProduto();
         }
-      },
+      });
     },
-    mounted() {
-      this.carregarProdutos();
+    cancelarExclusao() {
+      this.produtoSelecionado = null;
     },
-  };
-  </script>
+    async deletarProduto() {
+      try {
+        console.log("Tentando excluir o produto com ID:", this.produtoSelecionado._id); // Log para depuração
+        await axios.delete(`/api/products/${this.produtoSelecionado._id}`);
+        this.produtos = this.produtos.filter(p => p._id !== this.produtoSelecionado._id);
+        this.cancelarExclusao();
+        Swal.fire({
+          icon: "success",
+          title: "Produto Excluído",
+          text: "Produto excluído com sucesso!",
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+      } catch (error) {
+        console.error("Erro ao excluir produto:", error.response || error); // Log detalhado do erro
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: "Erro ao excluir produto.",
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+      }
+    },
+    handleImageUpload(event) {
+      this.imageFile = event.target.files[0]; // Salva o arquivo de imagem
+    },
+    async cadastrarProduto() {
+      const formData = new FormData();
+      formData.append("name", this.name);
+      formData.append("description", this.description);
+      formData.append("price", this.price);
+      formData.append("category", this.category);
+      formData.append("stock", this.stock);
+      formData.append("image", this.imageFile); // Adiciona a imagem ao formulário
+
+      try {
+        await axios.post("/api/products", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        Swal.fire({
+          icon: "success",
+          title: "Sucesso",
+          text: "Produto cadastrado com sucesso!",
+        });
+        // ...existing code...
+      } catch (error) {
+        console.error("Erro ao cadastrar produto:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: "Erro ao cadastrar produto.",
+        });
+      }
+    },
+  },
+  mounted() {
+    this.carregarProdutos();
+  },
+};
+</script>
   
-  <style scoped>
-  @import '@fortawesome/fontawesome-free/css/all.css';
-  
-  body {
-    font-family: 'Fira Code', monospace;
-  }
-  
-  button:hover {
-    transform: scale(1.05);
-  }
-  
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  th, td {
-    text-align: left;
-    padding: 8px;
-  }
-  
-  th {
-    background-color: #4a5568;
-    color: white;
-  }
-  
-  tr:hover {
-    background-color: #2d3748;
-  }
-  </style>
+<style scoped>
+@import '@fortawesome/fontawesome-free/css/all.css';
+
+body {
+  font-family: 'Fira Code', monospace;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #4a5568;
+  color: white;
+  min-width: 150px;
+}
+
+tr:hover {
+  background-color: #2d3748;
+}
+</style>

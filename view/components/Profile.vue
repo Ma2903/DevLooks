@@ -121,6 +121,7 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -161,17 +162,28 @@ export default {
   methods: {
     async deleteAccount() {
       if (this.deleteConfirmation === "DELETAR") {
-        const res = await axios.delete(`/api/users/${this.userData._id}`, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        });
-        if (res.status === 200) {
-          console.log("Conta deletada com sucesso");
-          localStorage.removeItem("token");
-          this.$router.push("/login");
-        } else {
-          console.error("Erro ao deletar a conta:", res.data);
+        try {
+          const res = await axios.delete(`/api/users/${this.userData._id}`, {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+            },
+          });
+          if (res.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Conta deletada",
+              text: "Sua conta foi deletada com sucesso.",
+            });
+            localStorage.removeItem("token");
+            this.$router.push("/login");
+          }
+        } catch (error) {
+          console.error("Erro ao deletar a conta:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Erro",
+            text: "Não foi possível deletar a conta. Tente novamente mais tarde.",
+          });
         }
         this.showDeleteModal = false;
         this.deleteConfirmation = "";

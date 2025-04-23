@@ -21,7 +21,26 @@
                 <div>
                   <h2 class="text-lg font-bold text-white">{{ item.name }}</h2>
                   <p class="text-gray-300">Preço: R$ {{ item.price.toFixed(2) }}</p>
-                  <p class="text-gray-300">Quantidade: {{ item.quantity }}</p>
+                  <div class="flex items-center mt-2">
+                    <button
+                      @click="decreaseQuantity(item._id)"
+                      class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-1 px-3 rounded-lg transition duration-300"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      v-model.number="item.quantity"
+                      min="1"
+                      class="w-12 text-center bg-gray-800 text-gray-200 text-lg font-bold mx-2 py-1 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      @click="increaseQuantity(item._id)"
+                      class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-1 px-3 rounded-lg transition duration-300"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
               <button
@@ -92,10 +111,22 @@
         this.cartItems = this.cartItems.filter((item) => item._id !== productId);
         localStorage.setItem("cart", JSON.stringify(this.cartItems));
       },
+      increaseQuantity(productId) {
+        const item = this.cartItems.find((item) => item._id === productId);
+        if (item) {
+          item.quantity += 1;
+          localStorage.setItem("cart", JSON.stringify(this.cartItems));
+        }
+      },
+      decreaseQuantity(productId) {
+        const item = this.cartItems.find((item) => item._id === productId);
+        if (item && item.quantity > 1) {
+          item.quantity -= 1;
+          localStorage.setItem("cart", JSON.stringify(this.cartItems));
+        }
+      },
       finalizarCompra() {
-        alert("Compra finalizada com sucesso!");
-        this.cartItems = [];
-        localStorage.removeItem("cart");
+        this.$router.push("/checkout");
       },
     },
     mounted() {
@@ -113,5 +144,15 @@
   
   button:hover {
     transform: scale(1.05);
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
   </style>

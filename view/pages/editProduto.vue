@@ -49,6 +49,38 @@
               </div>
             </div>
             <div>
+              <label for="categoria" class="block text-sm font-medium text-gray-300 mb-2">Categoria</label>
+              <div class="relative">
+                <i class="fas fa-tags absolute left-3 top-3 text-gray-400 mt-2"></i>
+                <select
+                  id="categoria"
+                  v-model="produto.categoria"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                >
+                  <option value="" disabled>Selecione uma categoria</option>
+                  <option value="Avatares">Avatares</option>
+                  <option value="Skins">Skins</option>
+                  <option value="Acessórios">Acessórios</option>
+                  <option value="Presentes">Presentes</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label for="estoque" class="block text-sm font-medium text-gray-300 mb-2">Estoque</label>
+              <div class="relative">
+                <i class="fas fa-boxes absolute left-3 top-3 text-gray-400 mt-2"></i>
+                <input
+                  type="number"
+                  id="estoque"
+                  v-model="produto.estoque"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Digite a quantidade em estoque"
+                  required
+                />
+              </div>
+            </div>
+            <div>
               <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">URL da Imagem</label>
               <div class="relative">
                 <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
@@ -74,6 +106,8 @@
   </template>
   
   <script>
+  import ProductService from '../services/ProductService'; // Certifique-se de que o serviço está implementado corretamente
+
   export default {
     data() {
       return {
@@ -81,6 +115,8 @@
           nome: '',
           descricao: '',
           preco: null,
+          categoria: '',
+          estoque: null,
           imagem: '',
         },
       };
@@ -88,13 +124,7 @@
     methods: {
       async carregarProduto(id) {
         try {
-          // Simulação de carregamento do produto (substitua pela chamada à API)
-          const produtoCarregado = {
-            nome: 'Produto Exemplo',
-            descricao: 'Descrição do produto exemplo',
-            preco: 100.0,
-            imagem: 'https://via.placeholder.com/150',
-          };
+          const produtoCarregado = await ProductService.getProdutoById(id); // Busca o produto pelo ID
           this.produto = produtoCarregado;
         } catch (error) {
           console.error('Erro ao carregar produto:', error);
@@ -103,8 +133,7 @@
       },
       async editarProduto() {
         try {
-          // Simulação de envio da edição (substitua pela chamada à API)
-          console.log('Produto editado:', this.produto);
+          await ProductService.updateProduto(this.produto); // Atualiza o produto
           alert('Produto editado com sucesso!');
         } catch (error) {
           console.error('Erro ao editar produto:', error);
@@ -113,8 +142,7 @@
       },
     },
     mounted() {
-      // Simulação de carregamento do produto ao montar o componente
-      const produtoId = 1; // Substitua pelo ID real do produto
+      const produtoId = this.$route.params.id; // Obtém o ID do produto da rota
       this.carregarProduto(produtoId);
     },
   };

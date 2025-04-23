@@ -49,16 +49,48 @@
             </div>
           </div>
           <div>
-            <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">URL da Imagem</label>
+            <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">Imagem do Produto</label>
             <div class="relative">
               <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
               <input
-                type="url"
+                type="file"
                 id="imagem"
-                v-model="produto.imagem"
+                @change="onFileChange"
                 class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite a URL da imagem do produto"
+                placeholder="Importe a imagem do produto"
               />
+            </div>
+          </div>
+          <div>
+            <label for="estoque" class="block text-sm font-medium text-gray-300 mb-2">Estoque</label>
+            <div class="relative">
+              <i class="fas fa-boxes absolute left-3 top-3 text-gray-400 mt-2"></i>
+              <input
+                type="number"
+                id="estoque"
+                v-model="produto.estoque"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Digite o estoque do produto"
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label for="categoria" class="block text-sm font-medium text-gray-300 mb-2">Categoria</label>
+            <div class="relative">
+              <i class="fas fa-tags absolute left-3 top-3 text-gray-400 mt-2"></i>
+              <select
+                id="categoria"
+                v-model="produto.categoria"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                required
+              >
+                <option value="" disabled>Selecione uma categoria</option>
+                <option value="avatares">Avatares</option>
+                <option value="skins">Skins</option>
+                <option value="acessorios">Acessórios</option>
+                <option value="presentes">Presentes</option>
+              </select>
             </div>
           </div>
         </div>
@@ -74,6 +106,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -81,20 +115,47 @@ export default {
         nome: '',
         descricao: '',
         preco: null,
-        imagem: '',
+        imagem: null,
+        estoque: null,
+        categoria: '', 
       },
     };
   },
   methods: {
-    adicionarProduto() {
-      console.log('Produto adicionado:', this.produto);
-      alert('Produto adicionado com sucesso!');
-      this.produto = {
-        nome: '',
-        descricao: '',
-        preco: null,
-        imagem: '',
-      };
+    onFileChange(event) {
+      const file = event.target.files[0];
+      this.produto.imagem = file; // Alterado para armazenar o arquivo diretamente
+    },
+    async adicionarProduto() {
+      try {
+        const formData = new FormData();
+        formData.append('nome', this.produto.nome);
+        formData.append('descricao', this.produto.descricao);
+        formData.append('preco', this.produto.preco);
+        formData.append('imagem', this.produto.imagem);
+        formData.append('estoque', this.produto.estoque);
+        formData.append('categoria', this.produto.categoria);
+
+        const response = await axios.post('http://localhost:3000/api/products', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        console.log('Produto adicionado:', response.data);
+        alert('Produto adicionado com sucesso!');
+        this.produto = {
+          nome: '',
+          descricao: '',
+          preco: null,
+          imagem: null,
+          estoque: null,
+          categoria: '',
+        };
+      } catch (error) {
+        console.error("Erro ao adicionar o produto:", error.response?.data || error);
+        alert(`Erro ao adicionar o produto: ${error.response?.data?.error || "Erro desconhecido."}`);
+      }
     },
   },
 };

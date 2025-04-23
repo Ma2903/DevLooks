@@ -1,4 +1,4 @@
-import { Schema, model, Document, Model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
 export interface IProduct extends Document {
     name: string;
@@ -6,44 +6,38 @@ export interface IProduct extends Document {
     price: number;
     category: string;
     stock: number;
+    image: string; 
     createdAt: Date;
     updatedAt: Date;
 }
 
-class Product {
-    private static schema: Schema<IProduct> = new Schema<IProduct>({
-        name: { type: String, required: true },
-        description: { type: String, required: true },
-        price: { type: Number, required: true },
-        category: { type: String, required: true },
-        stock: { type: Number, required: true },
-        createdAt: { type: Date, default: Date.now },
-        updatedAt: { type: Date, default: Date.now },
-    });
+const ProductSchema = new Schema<IProduct>({
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    price: { type: Number, required: true },
+    category: { type: String, required: true },
+    stock: { type: Number, required: true },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
+});
 
-    private static model: Model<IProduct> = model<IProduct>("Product", Product.schema);
+// Métodos estáticos para operações usadas no ProductController
+ProductSchema.statics.findAll = async function () {
+    return this.find();
+};
 
-    static async create(productData: Partial<IProduct>): Promise<IProduct> {
-        const product = new Product.model(productData);
-        return await product.save();
-    }
+ProductSchema.statics.findById = async function (id: string) {
+    return this.findOne({ _id: id });
+};
 
-    static async findAll(): Promise<IProduct[]> {
-        return await Product.model.find();
-    }
+ProductSchema.statics.findByIdAndUpdate = async function (id: string, update: Partial<IProduct>, options: object) {
+    return this.findOneAndUpdate({ _id: id }, update, options);
+};
 
-    static async findById(id: string): Promise<IProduct | null> {
-        return await Product.model.findById(id);
-    }
+ProductSchema.statics.findByIdAndDelete = async function (id: string) {
+    return this.findOneAndDelete({ _id: id });
+};
 
-    static async update(id: string, productData: Partial<IProduct>): Promise<IProduct | null> {
-        return await Product.model.findByIdAndUpdate(id, productData, { new: true });
-    }
-
-    static async delete(id: string): Promise<IProduct | null> {
-        return await Product.model.findByIdAndDelete(id);
-    }
-}
-
+const Product = model<IProduct>("Product", ProductSchema);
 
 export default Product;

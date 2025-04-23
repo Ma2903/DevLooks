@@ -41,6 +41,7 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   name: "ProductList",
@@ -59,7 +60,11 @@ export default {
         this.produtos = response.data;
       } catch (error) {
         console.error("Erro ao carregar os produtos:", error.message);
-        alert("Erro ao carregar os produtos. Tente novamente mais tarde.");
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: "Erro ao carregar os produtos. Tente novamente mais tarde.",
+        });
       }
     },
   },

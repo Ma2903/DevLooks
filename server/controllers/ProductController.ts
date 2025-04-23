@@ -1,15 +1,35 @@
 import { Request, Response, RequestHandler } from "express";
 import Product from "../models/ProductModel";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
 
 class ProductController {
-    static createProduct: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const product = await Product.create(req.body);
-            res.status(201).json(product);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao criar produto." });
-        }
-    };
+    static createProduct = [
+        upload.single("imagem"),
+        async (req: Request, res: Response): Promise<void> => {
+            try {
+                console.log("Dados recebidos no body:", req.body);
+                console.log("Arquivo recebido:", req.file);
+
+                const { name, description, price, category, stock } = req.body;
+                const image = req.file?.path;
+
+                if (!name || !description || !price || !category || !stock || !image) {
+                    console.error("Erro: Campos obrigatórios ausentes.");
+                    res.status(400).json({ error: "Todos os campos são obrigatórios." });
+                    return;
+                }
+
+                const product = await Product.create({ name, description, price, category, stock, image });
+                console.log("Produto criado com sucesso:", product);
+                res.status(201).json(product);
+            } catch (error) {
+                console.error("Erro ao criar produto:", error.message); // Log detalhado do erro
+                res.status(500).json({ error: "Erro ao criar produto." });
+            }
+        },
+    ];
 
     static getAllProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
