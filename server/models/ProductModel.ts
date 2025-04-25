@@ -6,7 +6,7 @@ export interface IProduct extends Document {
     price: number;
     category: string;
     stock: number;
-    image: string; 
+    image: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -17,6 +17,7 @@ const ProductSchema = new Schema<IProduct>({
     price: { type: Number, required: true },
     category: { type: String, required: true },
     stock: { type: Number, required: true },
+    image: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

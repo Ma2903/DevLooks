@@ -7,7 +7,7 @@
       >
         <img
           class="object-cover w-full h-full"
-          :src="product.image || '@/camisa.jpg'"
+          :src="'/' + product.image || '@/camisa.jpg'"
           :alt="product.name"
         />
       </div>
@@ -175,9 +175,9 @@ p {
   font-size: 1.125rem;
 }
 
-input[type="number"] {
+/* input[type="number"] {
   -moz-appearance: textfield;
-}
+} */
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {

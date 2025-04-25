@@ -14,7 +14,7 @@
                 <input
                   type="text"
                   id="nome"
-                  v-model="produto.nome"
+                  v-model="produto.name"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite o nome do produto"
                   required
@@ -27,7 +27,7 @@
                 <i class="fas fa-align-left absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <textarea
                   id="descricao"
-                  v-model="produto.descricao"
+                  v-model="produto.description"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite a descrição do produto"
                   required
@@ -41,7 +41,7 @@
                 <input
                   type="number"
                   id="preco"
-                  v-model="produto.preco"
+                  v-model="produto.price"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite o preço do produto"
                   required
@@ -54,15 +54,15 @@
                 <i class="fas fa-tags absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <select
                   id="categoria"
-                  v-model="produto.categoria"
+                  v-model="produto.category"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                 >
                   <option value="" disabled>Selecione uma categoria</option>
-                  <option value="Avatares">Avatares</option>
-                  <option value="Skins">Skins</option>
-                  <option value="Acessórios">Acessórios</option>
-                  <option value="Presentes">Presentes</option>
+                  <option value="avatares">Avatares</option>
+                  <option value="skins">Skins</option>
+                  <option value="acessórios">Acessórios</option>
+                  <option value="presentes">Presentes</option>
                 </select>
               </div>
             </div>
@@ -73,7 +73,7 @@
                 <input
                   type="number"
                   id="estoque"
-                  v-model="produto.estoque"
+                  v-model="produto.stock"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite a quantidade em estoque"
                   required
@@ -87,7 +87,7 @@
                 <input
                   type="url"
                   id="imagem"
-                  v-model="produto.imagem"
+                  v-model="produto.image"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite a URL da imagem do produto"
                 />
@@ -107,30 +107,26 @@
   
   <script>
   import ProductService from '../services/ProductService'; // Certifique-se de que o serviço está implementado corretamente
-
+  import axios from "axios";
   export default {
     data() {
       return {
         produto: {
-          nome: '',
-          descricao: '',
-          preco: null,
-          categoria: '',
-          estoque: null,
-          imagem: '',
+          name : ''
         },
       };
     },
     methods: {
-      async carregarProduto(id) {
-        try {
-          const produtoCarregado = await ProductService.getProdutoById(id); // Busca o produto pelo ID
-          this.produto = produtoCarregado;
-        } catch (error) {
-          console.error('Erro ao carregar produto:', error);
-          alert('Erro ao carregar produto.');
-        }
-      },
+      async fetchProduct(productId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/products/${productId}`
+        );
+        this.produto = response.data;
+      } catch (error) {
+        console.error("Erro ao carregar o produto:", error.message);
+      }
+    },
       async editarProduto() {
         try {
           await ProductService.updateProduto(this.produto); // Atualiza o produto
@@ -143,7 +139,8 @@
     },
     mounted() {
       const produtoId = this.$route.params.id; // Obtém o ID do produto da rota
-      this.carregarProduto(produtoId);
+      console.log(produtoId) // Obtém o ID do produto da rota
+      this.fetchProduct(produtoId);
     },
   };
   </script>

@@ -2,18 +2,26 @@ import { Request, Response, RequestHandler } from "express";
 import Product from "../models/ProductModel";
 import multer from "multer";
 
-const upload = multer({ dest: "uploads/" });
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public/images/products/");
+    },
+    filename: (req, file, cb) => {
+        const originalName = file.originalname;
+        cb(null, `${Date.now()}-${originalName}`);
+    },
+});
+
+const upload = multer({ storage });
 
 class ProductController {
     static createProduct = [
         upload.single("imagem"),
         async (req: Request, res: Response): Promise<void> => {
             try {
-                console.log("Dados recebidos no body:", req.body);
-                console.log("Arquivo recebido:", req.file);
-
                 const { name, description, price, category, stock } = req.body;
                 const image = req.file?.path;
+                console.log("Imagem recebida:", image); // Log da imagem recebida
 
                 if (!name || !description || !price || !category || !stock || !image) {
                     console.error("Erro: Campos obrigatórios ausentes.");
@@ -22,7 +30,6 @@ class ProductController {
                 }
 
                 const product = await Product.create({ name, description, price, category, stock, image });
-                console.log("Produto criado com sucesso:", product);
                 res.status(201).json(product);
             } catch (error) {
                 console.error("Erro ao criar produto:", error.message); // Log detalhado do erro

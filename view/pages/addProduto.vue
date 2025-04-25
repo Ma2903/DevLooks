@@ -129,12 +129,12 @@ export default {
     async adicionarProduto() {
       try {
         const formData = new FormData();
-        formData.append('nome', this.produto.nome);
-        formData.append('descricao', this.produto.descricao);
-        formData.append('preco', this.produto.preco);
+        formData.append('name', this.produto.nome);
+        formData.append('description', this.produto.descricao);
+        formData.append('price', this.produto.preco);
         formData.append('imagem', this.produto.imagem);
-        formData.append('estoque', this.produto.estoque);
-        formData.append('categoria', this.produto.categoria);
+        formData.append('stock', this.produto.estoque);
+        formData.append('category', this.produto.categoria);
 
         const response = await axios.post('http://localhost:3000/api/products', formData, {
           headers: {
