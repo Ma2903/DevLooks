@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT || 3000;
 
-connectDB();
+connectDB.getInstance();
 // app.use('/products',  productRoutes);
 app.use('/api', usersRoutes);
 app.use('/api', productRoutes);
