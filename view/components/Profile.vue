@@ -157,6 +157,8 @@ export default {
       localStorage.removeItem("token");
       this.$router.push("/login");
     }
+
+    this.checkNivel();
   },
 
   methods: {
@@ -194,7 +196,23 @@ export default {
       window.dispatchEvent(new Event("storage")); // Dispara o evento de mudança no localStorage
       this.$router.push("/login");
     },
+
+
+    async checkNivel() {
+      const res = await axios.get(`/api/users/${this.userData._id}`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      if (res.role === 'admin') {
+        alert("Você é um administrador!");
+      } else {
+        alert("Você é um usuário comum.");
+      }
+    },
   },
+
+  
 };
 </script>
 
