@@ -1,20 +1,60 @@
-# CodeCouture
+# 🛍️ DevLooks
 
-**CodeCouture** é um e-commerce inovador especializado em avatares e skins para programadores. Nosso objetivo é oferecer uma experiência única para desenvolvedores que querem personalizar seu ambiente digital com produtos criativos e de alta qualidade.
+**DevLooks** é uma loja online voltada para programadores que desejam expressar seu estilo através de avatares, camisetas e skins com temática tech. Desenvolvida com foco em uma experiência moderna, visualmente agradável e responsiva, a plataforma oferece uma navegação fluida e componentes reutilizáveis usando as melhores práticas de desenvolvimento front-end.
 
-## Recursos
+## 🚀 Tecnologias Utilizadas
 
-- **Catálogo Dinâmico:** Explore uma ampla variedade de avatares e skins customizados para diferentes perfis de programadores.
-- **Design Responsivo:** Interface otimizada para desktops, tablets e dispositivos móveis.
-- **Integração com Pagamentos:** Sistema seguro e confiável para transações online.
-- **Personalização:** Filtros e buscas avançadas para encontrar exatamente o que você procura.
-- **Experiência Interativa:** Interface moderna desenvolvida com Vue.js para garantir fluidez e reatividade.
+- **HTML5 & CSS3**
+- **JavaScript (ES6+)**
+- **Tailwind CSS**
+- **Vite** – build rápido e moderno
+- **Node.js & NPM** – gerenciamento de dependências
 
-## Tecnologias
+## 📂 Estrutura do Projeto
 
-O projeto utiliza as seguintes tecnologias:
+```
 
-- **Vue.js:** Framework para construção de interfaces reativas e componentes reutilizáveis.
-- **Vue Router:** Gerenciamento de rotas para navegação entre páginas.
-- **CSS3 / Pré-processadores:** Para estilização responsiva e moderna.
-- **APIs de Pagamento:** Integração com gateways de pagamento (a ser configurado conforme a necessidade).
+DevLooks/
+├── public/              # Imagens e arquivos estáticos
+├── src/                 # Componentes e páginas
+│   ├── assets/          # Recursos visuais
+│   ├── components/      # Componentes reutilizáveis
+│   └── views/           # Páginas principais da loja
+├── index.html
+├── package.json
+├── tailwind.config.js
+├── vite.config.js
+└── .env
+
+````
+
+## ✨ Funcionalidades
+
+- Catálogo de produtos com imagens atrativas
+- Design responsivo para todas as telas
+- Layout limpo e minimalista
+- Organização modular para escalabilidade
+
+## 📦 Instalação e Uso
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/DevLooks.git
+
+2. Instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+3. Execute o projeto:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Acesse em `http://localhost:5173`
+
+---
+
+Desenvolvido com ❤️ por \ João Pedro Girotto e Manoela Silva – para devs que também têm estilo.
