@@ -158,10 +158,16 @@
           </div>
           <button
             type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8"
+            :disabled="loading"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
           >
+            <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
             <i class="fas fa-user-plus mr-2"></i> Cadastrar
           </button>
+          <div v-if="registerError" class="mt-4 flex items-center gap-2 text-red-400 bg-red-900/40 px-4 py-3 rounded-lg animate-pulse">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ registerError }}
+          </div>
         </form>
         <div class="mt-8 text-center">
           <p class="text-gray-400 text-lg">
@@ -191,6 +197,8 @@
         country: "",
         password: "",
         showPassword: false,
+        loading: false,
+        registerError: "",
       };
     },
     methods: {
@@ -198,6 +206,8 @@
         this.showPassword = !this.showPassword;
       },
       async handleRegister() {
+        this.loading = true;
+        this.registerError = "";
         try {
           const userData = {
             name: this.name,
@@ -230,9 +240,9 @@
           this.country = "";
           this.password = "";
         } catch (error) {
-          console.error("Erro ao cadastrar usuário:", error.response?.data || error);
-          alert("Erro ao cadastrar usuário. Verifique os dados e tente novamente.");
+          this.registerError = "Erro ao cadastrar usuário. Verifique os dados.";
         }
+        this.loading = false;
       },
     },
   };

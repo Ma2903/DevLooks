@@ -21,68 +21,75 @@
         class="w-full md:w-auto md:flex md:items-center md:space-x-6 text-lg md:text-xl mt-4 md:mt-0"
       >
         <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
-          <!-- Botão Home -->
+          <!-- Botão Home (sempre visível) -->
           <li>
             <router-link
-              to="/Home"
-              class="hover:text-purple-500 flex items-center space-x-1"
+              to="/home"
+              class="hover:text-purple-400 flex items-center space-x-2 transition"
             >
               <i class="fas fa-home"></i><span>Home</span>
             </router-link>
           </li>
 
-          <!-- Botão Criar Avatar -->
+          <!-- Botão Produtos (sempre visível) -->
           <li>
             <router-link
-              to="/create-avatar"
-              class="hover:text-purple-500 flex items-center space-x-1"
-            >
-              <i class="fas fa-user-astronaut"></i><span>Criar Avatar</span>
-            </router-link>
-          </li>
-
-          <!-- Botão Ver Produtos ou Gerenciar Produtos -->
-          <li v-if="userType === 'admin'">
-            <router-link
-              to="/admin/products"
-              class="hover:text-purple-500 flex items-center space-x-1"
-            >
-              <i class="fas fa-cogs"></i><span>Gerenciar Produtos</span>
-            </router-link>
-          </li>
-          <li v-else>
-            <router-link
               to="/products"
-              class="hover:text-purple-500 flex items-center space-x-1"
+              class="hover:text-purple-400 flex items-center space-x-2 transition"
             >
               <i class="fas fa-store"></i><span>Produtos</span>
             </router-link>
           </li>
 
-          <!-- Botão Carrinho -->
-          <li>
-            <router-link
-              to="/cart"
-              class="hover:text-purple-500 flex items-center space-x-1"
-            >
-              <i class="fas fa-shopping-cart"></i>
-              <span>Carrinho</span>
-            </router-link>
-          </li>
+          <!-- Os demais só aparecem se estiver logado -->
+          <template v-if="isLoggedIn">
+            <!-- Botão Criar Avatar (todos logados) -->
+            <li>
+              <router-link
+                to="/create-avatar"
+                class="hover:text-purple-400 flex items-center space-x-2 transition"
+              >
+                <i class="fas fa-user-astronaut"></i><span>Criar Avatar</span>
+              </router-link>
+            </li>
 
-          <!-- Botão Perfil ou Entrar -->
-          <li>
+            <!-- Botão Gerenciar Produtos (apenas admin) -->
+            <li v-if="userType === 'admin'">
+              <router-link
+                to="/admin/products"
+                class="hover:text-purple-400 flex items-center space-x-2 transition"
+              >
+                <i class="fas fa-cogs"></i><span>Gerenciar Produtos</span>
+              </router-link>
+            </li>
+
+            <!-- Botão Carrinho (apenas user normal) -->
+            <li v-if="userType !== 'admin'">
+              <router-link
+                to="/cart"
+                class="hover:text-purple-400 flex items-center space-x-2 transition"
+              >
+                <i class="fas fa-shopping-cart"></i>
+                <span>Carrinho</span>
+              </router-link>
+            </li>
+
+            <!-- Botão Perfil -->
+            <li>
+              <router-link
+                to="/profile"
+                class="hover:text-purple-400 flex items-center space-x-2 transition"
+              >
+                <i class="fas fa-user"></i><span>Perfil</span>
+              </router-link>
+            </li>
+          </template>
+
+          <!-- Botão Entrar (aparece só se não estiver logado) -->
+          <li v-if="!isLoggedIn">
             <router-link
-              v-if="isLoggedIn"
-              to="/profile"
-              class="hover:text-purple-500 flex items-center space-x-1"
-            >
-              <i class="fas fa-user"></i><span>Perfil</span>
-            </router-link>
-            <router-link
-              v-else
               to="/login"
-              class="hover:text-purple-500 flex items-center space-x-1"
+              class="hover:text-purple-400 flex items-center space-x-2 transition"
             >
               <i class="fas fa-sign-in-alt"></i><span>Entrar</span>
             </router-link>
@@ -91,12 +98,13 @@
       </nav>
 
       <!-- Menu Toggle Button -->
-      <button @click="toggleMenu" class="md:hidden text-2xl">
+      <button @click="toggleMenu" class="md:hidden text-2xl focus:outline-none transition">
         <i :class="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
       </button>
     </div>
   </header>
 </template>
+
 <script>
 export default {
   name: "Header",
@@ -119,14 +127,13 @@ export default {
       }
       this.userType = userData.role || (userData.user && userData.user.role) || "user";
       this.isLoggedIn = !!localStorage.getItem("token");
-      console.log("userType Header:", this.userType);
     },
   },
   created() {
     this.atualizarUserType();
     window.addEventListener("storage", this.atualizarUserType);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener("storage", this.atualizarUserType);
   },
   watch: {
@@ -141,31 +148,28 @@ export default {
 @import '@fortawesome/fontawesome-free/css/all.css';
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
-/* Estilo do Header */
 header {
-  background-color: #1a202c; /* Fundo escuro */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra leve */
+  background-color: #1a202c;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Logo e Título */
 h1 {
-  font-family: "Poppins", sans-serif; /* Fonte estilizada para o título */
+  font-family: "Poppins", sans-serif;
   letter-spacing: 1px;
-  text-transform: uppercase; /* Deixa o título em letras maiúsculas */
+  text-transform: uppercase;
 }
 
-/* Links de Navegação */
 a {
-  transition: color 0.3s ease;
+  transition: color 0.3s, transform 0.2s;
 }
 
 a:hover {
-  color: #9b4dff; /* Roxo vibrante */
+  color: #a78bfa;
+  transform: scale(1.07);
 }
 
-/* Botão de Menu */
 button:hover {
   transform: scale(1.1);
-  color: #9b4dff;
+  color: #a78bfa;
 }
 </style>

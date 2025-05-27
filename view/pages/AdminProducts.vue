@@ -1,26 +1,30 @@
 <template>
-    <div class="min-h-screen flex flex-col items-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
-      <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
-        <div class="text-center mb-10">
-          <h1 class="text-5xl font-extrabold text-purple-400 mt-6">Gerenciar Produtos</h1>
-          <p class="text-gray-400 mt-3 text-lg">Adicione, edite ou exclua produtos</p>
-        </div>
-        <div class="flex justify-end mb-6">
-          <router-link
-            to="/admin/products/add"
-            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
-          >
-            <i class="fas fa-plus-circle mr-2"></i> Adicionar Produto
-          </router-link>
-        </div>
-        <table class="w-full bg-gray-800 rounded-lg shadow-lg">
+  <div class="min-h-screen flex flex-col items-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
+      <div class="text-center mb-10">
+        <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center gap-3">
+          <i class="fas fa-cogs text-purple-500"></i>
+          Gerenciar Produtos
+        </h1>
+        <p class="text-gray-400 mt-3 text-lg">Adicione, edite ou exclua produtos do seu ecommerce</p>
+      </div>
+      <div class="flex justify-end mb-6">
+        <router-link
+          to="/admin/products/add"
+          class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2"
+        >
+          <i class="fas fa-plus-circle"></i> Adicionar Produto
+        </router-link>
+      </div>
+      <div class="overflow-x-auto rounded-lg shadow-lg">
+        <table class="w-full bg-gray-800 rounded-lg">
           <thead>
             <tr class="bg-gray-700 text-gray-300">
               <th class="py-4 px-6"><i class="fas fa-tag mr-2"></i>Nome</th>
               <th class="py-4 px-6"><i class="fas fa-align-left mr-2"></i>Descrição</th>
               <th class="py-4 px-6"><i class="fas fa-dollar-sign mr-2"></i>Preço</th>
               <th class="py-4 px-6"><i class="fas fa-list-alt mr-2"></i>Categoria</th>
-              <th class="py-4 px-6"><i class="fas fa-boxes mr-2"></i>Quantidade</th>
+              <th class="py-4 px-6"><i class="fas fa-boxes mr-2"></i>Estoque</th>
               <th class="py-4 px-6"><i class="fas fa-tools mr-2"></i>Ações</th>
             </tr>
           </thead>
@@ -28,25 +32,37 @@
             <tr
               v-for="produto in produtos"
               :key="produto._id"
-              class="border-b border-gray-700 hover:bg-gray-700"
+              class="border-b border-gray-700 hover:bg-gray-700 transition"
             >
-              <td class="py-4 px-6">{{ produto.name }}</td>
-              <td class="py-4 px-6">{{ produto.description }}</td>
-              <td class="py-4 px-6">{{ produto.price ? produto.price.toFixed(2) : 'N/A' }}</td>
-              <td class="py-4 px-6">{{ produto.category }}</td>
-              <td class="py-4 px-6">{{ produto.stock }}</td>
-              <td class="py-4 px-6 flex space-x-4">
+              <td class="py-4 px-6 font-semibold flex items-center gap-2">
+                <i class="fas fa-box text-purple-400"></i>
+                {{ produto.name }}
+              </td>
+              <td class="py-4 px-6 text-gray-300 truncate max-w-xs">{{ produto.description }}</td>
+              <td class="py-4 px-6 text-green-400 font-bold">R$ {{ produto.price ? produto.price.toFixed(2) : 'N/A' }}</td>
+              <td class="py-4 px-6">
+                <span class="bg-purple-700 text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
+                  <i class="fas fa-tag"></i> {{ produto.category }}
+                </span>
+              </td>
+              <td class="py-4 px-6">
+                <span :class="produto.stock < 5 ? 'bg-red-600' : 'bg-green-600'"
+                  class="text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
+                  <i class="fas fa-boxes"></i> {{ produto.stock }}
+                </span>
+              </td>
+              <td class="py-4 px-6 flex flex-col md:flex-row gap-2">
                 <button
                   @click="handleEdit(produto._id)"
-                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 flex items-center gap-2"
                 >
-                  <i class="fas fa-edit mr-2"></i> Editar
+                  <i class="fas fa-edit"></i> Editar
                 </button>
                 <button
                   @click="confirmarExclusao(produto)"
-                  class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+                  class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 flex items-center gap-2"
                 >
-                  <i class="fas fa-trash-alt mr-2"></i> Excluir
+                  <i class="fas fa-trash-alt"></i> Excluir
                 </button>
               </td>
             </tr>
@@ -54,6 +70,7 @@
         </table>
       </div>
     </div>
+  </div>
 </template>
   
 <script>
@@ -67,6 +84,7 @@ export default {
       showDeleteModal: false,
       produtoSelecionado: null,
       imageFile: null, // Armazena o arquivo de imagem selecionado
+      previewUrl: null, // Armazena a URL da imagem para pré-visualização
     };
   },
   methods: {
@@ -150,8 +168,16 @@ export default {
         });
       }
     },
-    handleImageUpload(event) {
-      this.imageFile = event.target.files[0]; // Salva o arquivo de imagem
+    onFileChange(event) {
+      const file = event.target.files[0];
+      this.imageFile = file;
+
+      // Cria uma URL de pré-visualização para a imagem selecionada
+      if (file) {
+        this.previewUrl = URL.createObjectURL(file);
+      } else {
+        this.previewUrl = null;
+      }
     },
     async cadastrarProduto() {
       const formData = new FormData();
@@ -171,7 +197,8 @@ export default {
           title: "Sucesso",
           text: "Produto cadastrado com sucesso!",
         });
-        // ...existing code...
+        this.carregarProdutos(); // Recarrega a lista de produtos
+        this.limparCampos(); // Limpa os campos do formulário
       } catch (error) {
         console.error("Erro ao cadastrar produto:", error);
         Swal.fire({
@@ -180,6 +207,15 @@ export default {
           text: "Erro ao cadastrar produto.",
         });
       }
+    },
+    limparCampos() {
+      this.name = "";
+      this.description = "";
+      this.price = null;
+      this.category = "";
+      this.stock = null;
+      this.imageFile = null;
+      this.previewUrl = null; // Limpa a URL da pré-visualização
     },
   },
   mounted() {

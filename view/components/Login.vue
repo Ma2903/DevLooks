@@ -12,9 +12,11 @@
             <div class="relative flex">
               <i class="fas fa-envelope absolute left-3 mt-5 text-gray-400"></i>
               <input
+                ref="emailInput"
                 type="email"
                 id="email"
                 v-model="email"
+                aria-label="Email"
                 class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Digite seu email"
                 required
@@ -29,6 +31,7 @@
                 :type="showPassword ? 'text' : 'password'"
                 id="password"
                 v-model="password"
+                aria-label="Senha"
                 class="w-full pl-10 pr-12 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Digite sua senha"
                 required
@@ -37,10 +40,15 @@
                 type="button"
                 @click="togglePasswordVisibility"
                 class="absolute right-3 top-3 text-gray-400 hover:text-gray-200 focus:outline-none"
+                :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
               >
                 <i :class="showPassword ? 'fas fa-eye-slash mt-2' : 'fas fa-eye mt-2' "></i>
               </button>
             </div>
+          </div>
+          <div v-if="loginError" class="mb-6 flex items-center gap-2 text-red-400 bg-red-900/40 px-4 py-3 rounded-lg animate-pulse">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ loginError }}
           </div>
           <div class="mb-8 text-right">
           <router-link to="/reset-password" class="text-sm text-purple-400 hover:underline">
@@ -49,8 +57,10 @@
         </div>
           <button
             type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg"
+            :disabled="loading"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg flex items-center justify-center gap-2"
           >
+            <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
             <i class="fas fa-sign-in-alt mr-2"></i> Entrar
           </button>
         </form>
@@ -74,13 +84,20 @@
         email: "",
         password: "",
         showPassword: false,
+        loading: false,
+        loginError: "",
       };
+    },
+    mounted() {
+      this.$refs.emailInput.focus();
     },
     methods: {
       togglePasswordVisibility() {
         this.showPassword = !this.showPassword;
       },
       async handleLogin() {
+        this.loading = true;
+        this.loginError = "";
         try {
           const response = await axios.post("/api/users/login", {
             email: this.email,
@@ -103,6 +120,7 @@
             window.location.href = "/profile"; // ou "/" se preferir ir para a home
           }, 1500);
         } catch (error) {
+          this.loginError = "Verifique suas credenciais.";
           console.error("Erro ao fazer login:", error.response?.data || error);
           Swal.fire({
             icon: 'error',
@@ -112,6 +130,7 @@
             color: "#E5E7EB",
           });
         }
+        this.loading = false;
       }
     },
   };

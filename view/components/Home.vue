@@ -1,7 +1,7 @@
 <template>
   <div class="bg-gray-900 min-h-screen font-mono text-gray-200 relative">
     <!-- Banner de Boas-Vindas -->
-    <section id="home" class="bg-gradient-to-r from-purple-800 to-black text-white text-center py-40 relative">
+    <section id="home" class="relative bg-gradient-to-r from-purple-800 to-black text-white text-center py-40 overflow-hidden">
       <div class="absolute inset-0 bg-black opacity-60 bg-opacity-40 bg-cover bg-center" style="background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/online-shopping-1869235_960_720.jpg');"></div>
       <div class="relative z-10 container mx-auto px-4 md:px-6">
         <h1 class="text-5xl md:text-6xl font-extrabold mb-6 text-purple-400 animate-fade-in">
@@ -12,10 +12,18 @@
         </p>
         <router-link
           to="/products"
-          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in text-lg"
+          class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in text-lg"
         >
           <i class="fas fa-store mr-2"></i> Ver Produtos
         </router-link>
+        <div class="mt-6 flex justify-center gap-4">
+          <span class="bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow-lg animate-bounce">
+            Frete grátis acima de R$ 150
+          </span>
+          <span class="bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-bold shadow-lg animate-pulse">
+            10% OFF na primeira compra!
+          </span>
+        </div>
       </div>
     </section>
 
@@ -25,26 +33,16 @@
         <i class="fas fa-th-large mr-2"></i>Categorias
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-          <i class="fas fa-user-astronaut text-5xl text-purple-400 mb-4"></i>
-          <h3 class="text-lg font-bold text-white">Avatares</h3>
-          <p class="text-gray-300 mt-2">Personalize seu avatar com acessórios únicos.</p>
-        </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-          <i class="fas fa-tshirt text-5xl text-purple-400 mb-4"></i>
-          <h3 class="text-lg font-bold text-white">Skins</h3>
-          <p class="text-gray-300 mt-2">Dê um toque especial ao seu estilo com nossas skins.</p>
-        </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-          <i class="fas fa-keyboard text-5xl text-purple-400 mb-4"></i>
-          <h3 class="text-lg font-bold text-white">Acessórios</h3>
-          <p class="text-gray-300 mt-2">Teclados, mouses e muito mais para completar seu setup.</p>
-        </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
-          <i class="fas fa-gift text-5xl text-purple-400 mb-4"></i>
-          <h3 class="text-lg font-bold text-white">Presentes</h3>
-          <p class="text-gray-300 mt-2">Encontre o presente perfeito para seus amigos geeks.</p>
-        </div>
+        <router-link
+          v-for="cat in categorias"
+          :key="cat.nome"
+          :to="`/products?category=${cat.value}`"
+          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-purple-500 transition duration-300 flex flex-col items-center cursor-pointer group"
+        >
+          <i :class="cat.icone + ' text-5xl text-purple-400 mb-4 group-hover:scale-110 transition'"></i>
+          <h3 class="text-lg font-bold text-white">{{ cat.nome }}</h3>
+          <p class="text-gray-300 mt-2">{{ cat.desc }}</p>
+        </router-link>
       </div>
     </section>
 
@@ -57,8 +55,14 @@
         <div
           v-for="produto in produtos"
           :key="produto._id"
-          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 relative"
         >
+          <span v-if="produto.novo" class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-10">
+            <i class="fas fa-star"></i> Novo
+          </span>
+          <span v-if="produto.promo" class="absolute top-2 right-2 bg-yellow-400 text-gray-900 text-xs px-2 py-1 rounded-full font-bold z-10">
+            <i class="fas fa-bolt"></i> Promoção
+          </span>
           <img
             :src="produto.image || '/camisa.jpg'"
             :alt="produto.name"
@@ -70,26 +74,22 @@
             <span class="text-green-500 font-bold text-lg">
               R$ {{ produto.price.toFixed(2) }}
             </span>
-            <span
-              class="bg-purple-600 text-white text-sm font-medium px-4 py-1 rounded-lg"
-            >
+            <span class="bg-purple-600 text-white text-sm font-medium px-4 py-1 rounded-lg">
               #{{ produto.category }}
-            </span>
-          </div>
-          <div class="mb-2">
-            <span v-if="produto.price >= 150" class="text-green-400 font-bold">
-              Frete Grátis
-            </span>
-            <span v-else class="text-gray-300">
-              Frete: R$ 19,90
             </span>
           </div>
           <router-link
             :to="`/product/${produto._id}`"
-            class="block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300"
+            class="block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300 mb-2"
           >
             Ver Detalhes
           </router-link>
+          <button
+            @click="addToCart(produto)"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+          >
+            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+          </button>
         </div>
       </div>
     </section>
@@ -154,6 +154,30 @@
       </p>
     </section>
 
+    <!-- Seção "Depoimentos" -->
+    <section class="container mx-auto py-16 px-4 md:px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 mb-6">
+        <i class="fas fa-comments mr-2"></i>O que dizem nossos clientes
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg"> 
+          <i class="fas fa-user-circle text-4xl text-purple-400 mb-2"></i>
+          <p class="text-gray-300 mb-2">"Produtos incríveis, entrega rápida e atendimento excelente!"</p>
+          <span class="text-purple-400 font-bold">Ana P.</span>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <i class="fas fa-user-circle text-4xl text-purple-400 mb-2"></i>
+          <p class="text-gray-300 mb-2">"Amei minha compra, voltarei com certeza!"</p>
+          <span class="text-purple-400 font-bold">Carlos M.</span>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <i class="fas fa-user-circle text-4xl text-purple-400 mb-2"></i>
+          <p class="text-gray-300 mb-2">"Atendimento ao cliente excepcional, me senti valorizado como cliente."</p>
+          <span class="text-purple-400 font-bold">Fernanda S.</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Botão para voltar ao topo -->
     <button
       v-show="showScrollButton"
@@ -178,6 +202,12 @@ export default {
   data() {
     return {
       produtos: [], // Lista de produtos
+      categorias: [
+  { nome: "Avatares", value: "avatares", icone: "fas fa-user-astronaut", desc: "Personalize seu avatar com acessórios únicos." },
+  { nome: "Skins", value: "skins", icone: "fas fa-tshirt", desc: "Dê um toque especial ao seu estilo com nossas skins." },
+  { nome: "Acessórios", value: "acessorios", icone: "fas fa-keyboard", desc: "Teclados, mouses e muito mais para completar seu setup." },
+  { nome: "Presentes", value: "presentes", icone: "fas fa-gift", desc: "Encontre o presente perfeito para seus amigos geeks." }
+], // Lista de categorias
       loading: true, // Estado de carregamento
       error: null, // Estado de erro
       showScrollButton: false

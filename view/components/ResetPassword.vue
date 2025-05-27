@@ -23,11 +23,21 @@
           </div>
           <button
             type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-5 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-xl"
+            :disabled="loading"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-5 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-xl flex items-center justify-center gap-2"
           >
+            <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
             <i class="fas fa-paper-plane mr-3"></i> Enviar Link de Redefinição
           </button>
         </form>
+        <div v-if="resetSuccess" class="mt-4 flex items-center gap-2 text-green-400 bg-green-900/40 px-4 py-3 rounded-lg animate-pulse">
+          <i class="fas fa-check-circle"></i>
+          {{ resetSuccess }}
+        </div>
+        <div v-if="resetError" class="mt-4 flex items-center gap-2 text-red-400 bg-red-900/40 px-4 py-3 rounded-lg animate-pulse">
+          <i class="fas fa-exclamation-triangle"></i>
+          {{ resetError }}
+        </div>
         <div class="mt-8 text-center">
           <p class="text-gray-400 text-lg">
             Lembrou sua senha? 
@@ -44,14 +54,26 @@
     data() {
       return {
         email: "",
+        loading: false,
+        resetSuccess: "",
+        resetError: "",
       };
     },
     methods: {
-      handleResetPassword() {
-        // Simula o envio do link de redefinição de senha
-        console.log(`Link de redefinição enviado para: ${this.email}`);
-        alert("Um link de redefinição de senha foi enviado para o seu email.");
-        this.$emit("navigate", "login"); // Redireciona para a página de login após o envio
+      async handleResetPassword() {
+        this.loading = true;
+        this.resetSuccess = "";
+        this.resetError = "";
+        try {
+          // ...envio do email...
+          this.resetSuccess = "Um link de redefinição de senha foi enviado para o seu email.";
+          setTimeout(() => {
+            this.$router.push("/confirm-reset");
+          }, 2000); // Aguarda 2 segundos para mostrar o feedback antes de redirecionar
+        } catch (error) {
+          this.resetError = "Erro ao enviar o link. Tente novamente.";
+        }
+        this.loading = false;
       },
     },
   };

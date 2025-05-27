@@ -15,6 +15,7 @@ import EditProduto from './pages/editProduto.vue';
 import ProductList from './pages/ProductList.vue'; // Corrigido o caminho
 import Cart from './components/Cart.vue';
 import Checkout from './pages/Checkout.vue';
+import ConfirmReset from './components/ConfirmReset.vue';
 
 // Define as rotas
 const routes = [
@@ -25,7 +26,7 @@ const routes = [
   { path: '/register', name: 'Register', component: Register },
   { path: '/edit-user', name: 'EditUser', component: EditUser },
   { path: '/reset-password', name: 'ResetPassword', component: ResetPassword },
-  { path: '/profile', name: 'Profile', component: Profile },
+  { path: '/profile', name: 'Profile', component: Profile, meta: { requiresAuth: true } },
   { path: '/products', name: 'Products', component: ProductList }, // Rota para a lista de produtos
   { path: '/product/:id', name: 'SingleProduto', component: SingleProduto }, // Rota para o produto único
   { path: '/admin/products', name: 'AdminProducts', component: AdminProducts },
@@ -33,12 +34,27 @@ const routes = [
   { path: '/admin/products/edit/:id', name: 'EditProduct', component: EditProduto, props: true },
   { path: '/cart', name: 'Cart', component: Cart },
   { path: '/checkout', name: 'Checkout', component: Checkout },
+  { path: '/confirm-reset', name: 'ConfirmReset', component: ConfirmReset },
 ];
 
 // Cria o roteador
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Navigation Guard global
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = !!localStorage.getItem('token');
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isLoggedIn) {
+      next('/login');
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

@@ -23,7 +23,7 @@
         </p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <div class="bg-gradient-to-r from-purple-900/60 to-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-purple-500 mb-4">
           <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center">
             <i class="fas fa-id-card mr-2"></i> Informações Pessoais
           </h2>
@@ -31,7 +31,7 @@
           <p class="text-gray-300 mb-2"><i class="fas fa-phone mr-2"></i> Telefone: {{ userData.telephone }}</p>
           <p class="text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> Endereço: {{ userData.address }}</p>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <div class="bg-gradient-to-r from-purple-900/60 to-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-purple-500 mb-4">
           <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center">
             <i class="fas fa-map mr-2"></i> Localização
           </h2>

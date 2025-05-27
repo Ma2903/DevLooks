@@ -2,7 +2,10 @@
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
     <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
       <div class="text-center mb-10">
-        <h1 class="text-5xl font-extrabold text-purple-400 mt-6">Adicionar Produto</h1>
+        <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center gap-3">
+          <i class="fas fa-plus-circle"></i>
+          Adicionar Produto
+        </h1>
         <p class="text-gray-400 mt-3 text-lg">Preencha os campos abaixo para adicionar um novo produto</p>
       </div>
       <form @submit.prevent="adicionarProduto">
@@ -34,25 +37,25 @@
               ></textarea>
             </div>
           </div>
-            <div>
+          <div>
             <label for="preco" class="block text-sm font-medium text-gray-300 mb-2">Preço</label>
             <div class="relative">
               <i class="fas fa-dollar-sign absolute left-3 top-3 text-gray-400 mt-2"></i>
               <input
-              type="number"
-              id="preco"
-              v-model="produto.preco"
-              step="0.01"
-              min="0"
-              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Digite o preço do produto"
-              required
+                type="number"
+                id="preco"
+                v-model="produto.preco"
+                step="0.01"
+                min="0"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Digite o preço do produto"
+                required
               />
             </div>
           </div>
           <div>
             <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">Imagem do Produto</label>
-            <div class="relative">
+            <div class="relative flex flex-col gap-2">
               <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
               <input
                 type="file"
@@ -60,6 +63,13 @@
                 @change="onFileChange"
                 class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Importe a imagem do produto"
+                accept="image/*"
+              />
+              <img
+                v-if="previewUrl"
+                :src="previewUrl"
+                alt="Pré-visualização"
+                class="w-24 h-24 mt-2 rounded-lg border-2 border-purple-400 object-cover shadow"
               />
             </div>
           </div>
@@ -71,6 +81,7 @@
                 type="number"
                 id="estoque"
                 v-model="produto.estoque"
+                min="0"
                 class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Digite o estoque do produto"
                 required
@@ -98,9 +109,9 @@
         </div>
         <button
           type="submit"
-          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8"
+          class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
         >
-          <i class="fas fa-plus-circle mr-2"></i> Adicionar Produto
+          <i class="fas fa-plus-circle"></i> Adicionar Produto
         </button>
       </form>
     </div>
@@ -109,7 +120,7 @@
 
 <script>
 import axios from 'axios';
-import Swal from 'sweetalert2'; // Adicione esta linha
+import Swal from 'sweetalert2';
 
 export default {
   data() {
@@ -120,14 +131,24 @@ export default {
         preco: null,
         imagem: null,
         estoque: null,
-        categoria: '', 
+        categoria: '',
       },
+      previewUrl: null,
     };
   },
   methods: {
     onFileChange(event) {
       const file = event.target.files[0];
       this.produto.imagem = file;
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          this.previewUrl = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.previewUrl = null;
+      }
     },
     async adicionarProduto() {
       try {
@@ -145,8 +166,6 @@ export default {
           },
         });
 
-        console.log('Produto adicionado:', response.data);
-        // Substitua o alert por SweetAlert e redirecionamento
         Swal.fire({
           icon: "success",
           title: "Sucesso",
@@ -157,7 +176,6 @@ export default {
           this.$router.push("/admin/products");
         });
       } catch (error) {
-        console.error("Erro ao adicionar o produto:", error.response?.data || error);
         Swal.fire({
           icon: "error",
           title: "Erro",
@@ -184,6 +202,6 @@ button:hover {
 
 input::placeholder,
 textarea::placeholder {
-  color: #9CA3AF; /* Cor do placeholder */
+  color: #9CA3AF;
 }
 </style>

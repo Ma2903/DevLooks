@@ -1,25 +1,176 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-gray-200">
     <div class="container mx-auto py-16 px-4">
-      <h1 class="text-4xl font-bold text-purple-400 text-center mb-10">
+      <h1 class="text-4xl font-bold text-purple-400 text-center mb-10 flex items-center justify-center gap-3">
+        <i class="fas fa-credit-card text-purple-500"></i>
         Finalizar Compra
       </h1>
-      <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-6">Resumo do Pedido</h2>
-        <p class="text-lg text-gray-300 mb-4">
-          Total de Itens: {{ totalItems }}
-        </p>
-        <p class="text-lg text-gray-300 mb-4">
-          Total: R$ {{ totalPrice.toFixed(2) }}
-        </p>
-        <div class="mt-6">
-          <p class="text-gray-300 mb-4">
-            Esta é uma página de exemplo para o processo de checkout. Futuramente, será integrada com uma API de pagamento.
+      <div class="bg-gray-800 p-8 rounded-lg shadow-lg border-2 border-purple-500 max-w-lg mx-auto">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+          <i class="fas fa-receipt text-purple-400"></i>
+          Resumo do Pedido
+        </h2>
+        <div class="mb-4 flex flex-col gap-2">
+          <p class="text-lg text-gray-300 flex items-center gap-2">
+            <i class="fas fa-list-ol"></i>
+            Total de Itens: <span class="font-bold">{{ totalItems }}</span>
           </p>
+          <p class="text-lg text-gray-300 flex items-center gap-2">
+            <i class="fas fa-money-bill-wave"></i>
+            Total: <span class="font-bold text-green-400">R$ {{ totalPrice.toFixed(2) }}</span>
+          </p>
+        </div>
+        <hr class="border-purple-700 mb-6" />
+
+        <!-- Formulário de Pagamento -->
+        <form @submit.prevent class="flex flex-col gap-6">
+          <h3 class="text-xl font-bold text-purple-400 flex items-center gap-2 mb-2">
+            <i class="fas fa-wallet"></i>
+            Escolha o método de pagamento
+          </h3>
+          <div class="flex flex-col gap-3">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" v-model="metodo" value="pix" class="accent-purple-600" />
+              <i class="fas fa-qrcode text-green-400"></i>
+              <span>PIX</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" v-model="metodo" value="credito" class="accent-purple-600" />
+              <i class="fas fa-credit-card text-blue-400"></i>
+              <span>Cartão de Crédito</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" v-model="metodo" value="debito" class="accent-purple-600" />
+              <i class="fas fa-credit-card text-yellow-400"></i>
+              <span>Cartão de Débito</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" v-model="metodo" value="boleto" class="accent-purple-600" />
+              <i class="fas fa-barcode text-gray-300"></i>
+              <span>Boleto Bancário</span>
+            </label>
+          </div>
+
+          <!-- PIX -->
+          <div v-if="metodo === 'pix'" class="bg-gray-900 border border-green-400 rounded-lg p-4 flex flex-col items-center gap-2">
+            <i class="fas fa-qrcode text-4xl text-green-400"></i>
+            <span class="text-green-400 font-bold">Chave PIX:</span>
+            <span class="text-gray-200 select-all">compras@lojadev.com.br</span>
+            <span class="text-xs text-gray-400">(Simulação: copie a chave para pagar no app do seu banco)</span>
+          </div>
+
+          <!-- Cartão de Crédito -->
+          <div v-if="metodo === 'credito'" class="bg-gray-900 border border-blue-400 rounded-lg p-4 flex flex-col gap-4">
+            <div class="flex gap-2 items-center">
+              <div class="relative flex-1">
+                <i class="fas fa-credit-card absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
+                <input
+                  type="text"
+                  maxlength="19"
+                  placeholder="Número do cartão"
+                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div class="relative w-28">
+                <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
+                <input
+                  type="text"
+                  maxlength="5"
+                  placeholder="MM/AA"
+                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div class="relative w-20">
+                <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
+                <input
+                  type="text"
+                  maxlength="4"
+                  placeholder="CVV"
+                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+            <div class="relative">
+              <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
+              <input
+                type="text"
+                placeholder="Nome impresso no cartão"
+                class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div class="flex gap-2 items-center">
+              <div class="relative flex-1">
+                <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
+                <input
+                  type="text"
+                  maxlength="11"
+                  placeholder="CPF do titular"
+                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div class="relative w-40">
+                <i class="fas fa-coins absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
+                <select
+                  v-model="parcelas"
+                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option :value="1">1x sem juros</option>
+                  <option :value="2">2x sem juros</option>
+                  <option :value="3">3x com juros (2,99% a.m.)</option>
+                  <option :value="4">4x com juros (2,99% a.m.)</option>
+                  <option :value="5">5x com juros (2,99% a.m.)</option>
+                  <option :value="6">6x com juros (2,99% a.m.)</option>
+                  <option :value="7">7x com juros (2,99% a.m.)</option>
+                  <option :value="8">8x com juros (2,99% a.m.)</option>
+                  <option :value="9">9x com juros (2,99% a.m.)</option>
+                  <option :value="10">10x com juros (2,99% a.m.)</option>
+                  <option :value="11">11x com juros (2,99% a.m.)</option>
+                  <option :value="12">12x com juros (2,99% a.m.)</option>
+                </select>
+              </div>
+            </div>
+            <div v-if="parcelas > 2" class="text-xs text-yellow-400 flex items-center gap-1 mt-1">
+              <i class="fas fa-exclamation-triangle"></i>
+              Parcelas acima de 2x terão juros de 2,99% ao mês.
+            </div>
+          </div>
+
+          <!-- Cartão de Débito -->
+          <div v-if="metodo === 'debito'" class="bg-gray-900 border border-yellow-400 rounded-lg p-4 flex flex-col gap-3">
+            <div class="flex gap-2">
+              <input type="text" maxlength="19" placeholder="Número do cartão" class="flex-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+              <input type="text" maxlength="5" placeholder="Validade (MM/AA)" class="w-28 px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+              <input type="text" maxlength="4" placeholder="CVV" class="w-20 px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+            </div>
+            <input type="text" placeholder="Nome impresso no cartão" class="px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+            <input type="text" maxlength="11" placeholder="CPF do titular" class="px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+          </div>
+
+          <!-- Boleto Bancário -->
+          <div v-if="metodo === 'boleto'" class="bg-gray-900 border border-gray-400 rounded-lg p-4 flex flex-col items-center gap-2">
+            <i class="fas fa-barcode text-4xl text-gray-300"></i>
+            <span class="text-gray-200 font-bold">Boleto gerado!</span>
+            <span class="text-xs text-gray-400">(Simulação: o boleto seria gerado e enviado por e-mail)</span>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 mt-2"
+            disabled
+            title="Funcionalidade de pagamento em breve"
+          >
+            <i class="fas fa-lock"></i>
+            Finalizar Pagamento (em breve)
+          </button>
+        </form>
+
+        <hr class="border-purple-700 my-6" />
+        <div class="mt-2">
           <router-link
             to="/products"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
+            class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center gap-2"
           >
+            <i class="fas fa-store"></i>
             Voltar para a Loja
           </router-link>
         </div>
@@ -31,6 +182,12 @@
 <script>
 export default {
   name: "Checkout",
+  data() {
+    return {
+      metodo: "pix",
+      parcelas: 1
+    };
+  },
   computed: {
     totalItems() {
       const cart = localStorage.getItem("cart");
@@ -56,7 +213,15 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-button:hover {
+button:hover, .router-link-active:hover {
   transform: scale(1.05);
+}
+
+hr {
+  border-top-width: 2px;
+}
+input[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 </style>
