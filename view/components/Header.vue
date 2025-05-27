@@ -41,8 +41,16 @@
             </router-link>
           </li>
 
-          <!-- Botão Ver Produtos -->
-          <li>
+          <!-- Botão Ver Produtos ou Gerenciar Produtos -->
+          <li v-if="userType === 'admin'">
+            <router-link
+              to="/admin/products"
+              class="hover:text-purple-500 flex items-center space-x-1"
+            >
+              <i class="fas fa-cogs"></i><span>Gerenciar Produtos</span>
+            </router-link>
+          </li>
+          <li v-else>
             <router-link
               to="/products"
               class="hover:text-purple-500 flex items-center space-x-1"
@@ -89,35 +97,43 @@
     </div>
   </header>
 </template>
-
 <script>
 export default {
   name: "Header",
   data() {
     return {
       menuOpen: false,
-      isLoggedIn: !!localStorage.getItem("token"), // Verifica se o usuário está logado
+      isLoggedIn: !!localStorage.getItem("token"),
+      userType: "user",
     };
   },
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen;
     },
-    verificarLogin() {
+    atualizarUserType() {
+      let userDataRaw = localStorage.getItem("userData");
+      let userData = {};
+      if (userDataRaw && userDataRaw !== "undefined") {
+        userData = JSON.parse(userDataRaw);
+      }
+      this.userType = userData.role || (userData.user && userData.user.role) || "user";
       this.isLoggedIn = !!localStorage.getItem("token");
+      console.log("userType Header:", this.userType);
     },
   },
-  mounted() {
-    // Verifica o login ao carregar o componente
-    this.verificarLogin();
-
-    // Adiciona um listener para mudanças no localStorage
-    window.addEventListener("storage", this.verificarLogin);
+  created() {
+    this.atualizarUserType();
+    window.addEventListener("storage", this.atualizarUserType);
   },
   beforeDestroy() {
-    // Remove o listener ao destruir o componente
-    window.removeEventListener("storage", this.verificarLogin);
+    window.removeEventListener("storage", this.atualizarUserType);
   },
+  watch: {
+    $route() {
+      this.atualizarUserType();
+    }
+  }
 };
 </script>
 

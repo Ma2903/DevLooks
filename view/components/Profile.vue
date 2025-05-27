@@ -151,6 +151,8 @@ export default {
       });
 
       this.userData = res.data;
+      localStorage.setItem("userData", JSON.stringify(this.userData));
+      window.dispatchEvent(new Event("storage"));
 
     } catch (err) {
       console.error("Erro ao validar o token:", err.response?.data || err.message);
@@ -196,18 +198,22 @@ export default {
       window.dispatchEvent(new Event("storage")); // Dispara o evento de mudança no localStorage
       this.$router.push("/login");
     },
-
-
     async checkNivel() {
-      const res = await axios.get(`/api/users/${this.userData._id}`, {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      });
-      if (res.role === 'admin') {
-        alert("Você é um administrador!");
-      } else {
-        alert("Você é um usuário comum.");
+      try {
+        const res = await axios.get(`/api/users/${this.userData._id}`, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        });
+        if (res.data && res.data.role) {
+          this.userData.role = res.data.role;
+          console.log("Nível do usuário:", this.userData.role);
+        } else {
+          console.warn("Nível do usuário não encontrado, definindo como 'user'");
+          this.userData.role = "user";
+        }
+      } catch (error) {
+        console.error("Erro ao verificar o nível do usuário:", error);
       }
     },
   },

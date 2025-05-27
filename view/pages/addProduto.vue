@@ -34,17 +34,19 @@
               ></textarea>
             </div>
           </div>
-          <div>
+            <div>
             <label for="preco" class="block text-sm font-medium text-gray-300 mb-2">Preço</label>
             <div class="relative">
               <i class="fas fa-dollar-sign absolute left-3 top-3 text-gray-400 mt-2"></i>
               <input
-                type="number"
-                id="preco"
-                v-model="produto.preco"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o preço do produto"
-                required
+              type="number"
+              id="preco"
+              v-model="produto.preco"
+              step="0.01"
+              min="0"
+              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Digite o preço do produto"
+              required
               />
             </div>
           </div>
@@ -107,6 +109,7 @@
 
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2'; // Adicione esta linha
 
 export default {
   data() {
@@ -124,7 +127,7 @@ export default {
   methods: {
     onFileChange(event) {
       const file = event.target.files[0];
-      this.produto.imagem = file; // Alterado para armazenar o arquivo diretamente
+      this.produto.imagem = file;
     },
     async adicionarProduto() {
       try {
@@ -143,18 +146,25 @@ export default {
         });
 
         console.log('Produto adicionado:', response.data);
-        alert('Produto adicionado com sucesso!');
-        this.produto = {
-          nome: '',
-          descricao: '',
-          preco: null,
-          imagem: null,
-          estoque: null,
-          categoria: '',
-        };
+        // Substitua o alert por SweetAlert e redirecionamento
+        Swal.fire({
+          icon: "success",
+          title: "Sucesso",
+          text: "Produto adicionado com sucesso!",
+          background: "#1F2937",
+          color: "#E5E7EB",
+        }).then(() => {
+          this.$router.push("/admin/products");
+        });
       } catch (error) {
         console.error("Erro ao adicionar o produto:", error.response?.data || error);
-        alert(`Erro ao adicionar o produto: ${error.response?.data?.error || "Erro desconhecido."}`);
+        Swal.fire({
+          icon: "error",
+          title: "Erro",
+          text: `Erro ao adicionar o produto: ${error.response?.data?.error || "Erro desconhecido."}`,
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
       }
     },
   },

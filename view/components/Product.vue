@@ -15,8 +15,16 @@
     
     <!-- Preço e Categoria -->
     <div class="px-4 pb-4 flex justify-between items-center">
-      <span class="text-lg font-semibold text-green-600">R${{ product.price | currency }}</span>
+      <span class="text-lg font-semibold text-green-600">R${{ product.price.toFixed(2) }}</span>
       <span class="bg-gray-200 text-gray-700 text-xs font-medium px-3 py-1 rounded-lg">#{{ product.category }}</span>
+    </div>
+    <div class="px-4 pb-2">
+      <span v-if="product.price >= 150" class="text-green-400 font-bold">
+        Frete Grátis
+      </span>
+      <span v-else class="text-gray-400">
+        Frete: R$ 19,90
+      </span>
     </div>
   </div>
 </template>

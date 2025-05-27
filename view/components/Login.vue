@@ -66,6 +66,7 @@
   
   <script>
   import axios from "axios";
+  import Swal from "sweetalert2";
   export default {
     name: "Login",
     data() {
@@ -85,14 +86,31 @@
             email: this.email,
             password: this.password,
           });
-          const token = response.data.token;
-          localStorage.setItem("token", token); // Armazena o token no localStorage
-          window.dispatchEvent(new Event("storage")); // Dispara o evento de mudança no localStorage
-          alert("Login bem-sucedido!");
-          this.$router.push("/profile"); // Redireciona para o perfil
+          console.log("Resposta do login:", response.data);
+          // Após login bem-sucedido
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userData", JSON.stringify(response.data.user));
+          window.dispatchEvent(new Event("storage"));
+          Swal.fire({
+            icon: 'success',
+            title: 'Login realizado com sucesso!',
+            showConfirmButton: false,
+            timer: 1500,
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
+          setTimeout(() => {
+            window.location.href = "/profile"; // ou "/" se preferir ir para a home
+          }, 1500);
         } catch (error) {
           console.error("Erro ao fazer login:", error.response?.data || error);
-          alert("Erro ao fazer login. Verifique suas credenciais.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao fazer login',
+            text: 'Verifique suas credenciais.',
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
         }
       }
     },

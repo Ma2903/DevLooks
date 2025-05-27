@@ -41,7 +41,9 @@
                 <input
                   type="number"
                   id="preco"
-                  v-model="produto.price"
+                  v-model.number="produto.price"
+                  step="0.01"
+                  min="0"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Digite o preço do produto"
                   required
@@ -85,7 +87,7 @@
               <div class="relative">
                 <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
                 <input
-                  type="url"
+                  type="text"
                   id="imagem"
                   v-model="produto.image"
                   class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -108,6 +110,7 @@
   <script>
   import ProductService from '../services/ProductService'; // Certifique-se de que o serviço está implementado corretamente
   import axios from "axios";
+  import Swal from "sweetalert2";
   export default {
     data() {
       return {
@@ -130,10 +133,24 @@
       async editarProduto() {
         try {
           await ProductService.updateProduto(this.produto); // Atualiza o produto
-          alert('Produto editado com sucesso!');
+          Swal.fire({
+            icon: "success",
+            title: "Sucesso",
+            text: "Produto editado com sucesso!",
+            background: "#1F2937",
+            color: "#E5E7EB",
+          }).then(() => {
+            this.$router.push("/admin/products");
+          });
         } catch (error) {
           console.error('Erro ao editar produto:', error);
-          alert('Erro ao editar produto.');
+          Swal.fire({
+            icon: "error",
+            title: "Erro",
+            text: "Erro ao editar produto.",
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
         }
       },
     },

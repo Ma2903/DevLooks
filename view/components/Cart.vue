@@ -21,6 +21,14 @@
                 <div>
                   <h2 class="text-lg font-bold text-white">{{ item.name }}</h2>
                   <p class="text-gray-300">Preço: R$ {{ item.price.toFixed(2) }}</p>
+                  <div class="mb-1">
+                    <span v-if="item.price >= 150" class="text-green-400 font-bold">
+                      Frete Grátis
+                    </span>
+                    <span v-else class="text-gray-300">
+                      Frete: R$ 19,90
+                    </span>
+                  </div>
                   <div class="flex items-center mt-2">
                     <button
                       @click="decreaseQuantity(item._id)"

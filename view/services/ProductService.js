@@ -1,4 +1,4 @@
-import axios from '@/services/main';
+import axios from "axios";
 
 const API_URL = '/api/products';
 
@@ -55,5 +55,9 @@ export default {
       console.error('Erro ao deletar produto:', error);
       throw error;
     }
+  },
+
+  async updateProduto(produto) {
+    return axios.put(`http://localhost:3000/api/products/${produto._id}`, produto);
   }
 };

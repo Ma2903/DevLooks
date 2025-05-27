@@ -27,6 +27,14 @@
               #{{ produto.category }}
             </span>
           </div>
+          <div class="mb-2">
+            <span v-if="produto.price >= 150" class="text-green-400 font-bold">
+              Frete Grátis
+            </span>
+            <span v-else class="text-gray-300">
+              Frete: R$ 19,90
+            </span>
+          </div>
           <router-link
             :to="`/product/${produto._id}`"
             class="block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300"

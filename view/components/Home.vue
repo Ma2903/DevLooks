@@ -50,13 +50,49 @@
 
     <!-- Seção "Produtos em Destaque" -->
     <section id="best-sellers" class="container mx-auto py-16 px-4 md:px-6">
-    <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 text-center mb-8">
-      <i class="fas fa-fire mr-2"></i>Mais Vendidos
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-      <Product v-for="produto in produtosMaisVendidos" :key="produto.id" :product="produto" />
-    </div>
-  </section>
+      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 text-center mb-8">
+        <i class="fas fa-fire mr-2"></i>Mais Vendidos
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div
+          v-for="produto in produtos"
+          :key="produto._id"
+          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+        >
+          <img
+            :src="produto.image || '/camisa.jpg'"
+            :alt="produto.name"
+            class="w-full h-48 object-cover rounded-lg mb-4"
+          />
+          <h2 class="text-lg font-bold text-white mb-2">{{ produto.name }}</h2>
+          <p class="text-gray-300 mb-4">{{ produto.description }}</p>
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-green-500 font-bold text-lg">
+              R$ {{ produto.price.toFixed(2) }}
+            </span>
+            <span
+              class="bg-purple-600 text-white text-sm font-medium px-4 py-1 rounded-lg"
+            >
+              #{{ produto.category }}
+            </span>
+          </div>
+          <div class="mb-2">
+            <span v-if="produto.price >= 150" class="text-green-400 font-bold">
+              Frete Grátis
+            </span>
+            <span v-else class="text-gray-300">
+              Frete: R$ 19,90
+            </span>
+          </div>
+          <router-link
+            :to="`/product/${produto._id}`"
+            class="block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300"
+          >
+            Ver Detalhes
+          </router-link>
+        </div>
+      </div>
+    </section>
 
     <!-- Seção "Benefícios" -->
     <section id="benefits" class="bg-gray-900 py-16">
