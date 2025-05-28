@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "nodemon backend/index.js",
+    "server": "npx tsx server/index.ts",
     "build": "vite build",
     "preview": "vite preview"
   },
