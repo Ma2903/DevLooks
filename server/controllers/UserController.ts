@@ -1,6 +1,8 @@
 import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/UserModel"; // Importamos a classe User
+// import User from "../models/UserModel"; // Importamos a classe User
+import { UserFactory } from "../factories/UserFactory";
+const User = UserFactory.getModel()
 
 class UserController {
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {

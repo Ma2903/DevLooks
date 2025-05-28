@@ -1,6 +1,8 @@
 import { Request, Response, RequestHandler } from "express";
-import Product from "../models/ProductModel";
+// import Product from "../models/ProductModel";
 import multer from "multer";
+import { ProductFactory } from "../factories/ProductFactory";
+const Product = ProductFactory.getModel();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
