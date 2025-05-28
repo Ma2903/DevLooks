@@ -1,0 +1,48 @@
+[{
+  "_id": {
+    "$oid": "67f416d6ff11416b7004222b"
+  },
+  "name": "Manoela Pinheiro da Silva",
+  "email": "manoela2903@outlook.com",
+  "cpf": "487.677.598-23",
+  "password": "0401",
+  "telephone": "(18) 99681-6585",
+  "address": "Rua Ângelo Salvatore, 125",
+  "cep": "19200-000",
+  "city": "Pirapozinho",
+  "state": "SP",
+  "country": "Brasil",
+  "role": "admin",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-07T18:17:58.390Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-07T18:17:58.391Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f5c2d5afa8a8d9eddff4fd"
+  },
+  "name": "João Pedro",
+  "email": "admin@admin",
+  "cpf": "520",
+  "password": "admin",
+  "telephone": "45",
+  "address": "aki",
+  "cep": "1",
+  "city": "ali",
+  "state": "ala",
+  "country": "arabia maldita",
+  "role": "user",
+  "status": "active",
+  "createdAt": {
+    "$date": "2025-04-09T00:44:05.640Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T00:44:05.641Z"
+  },
+  "__v": 0
+}]
