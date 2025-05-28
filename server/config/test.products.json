@@ -1,0 +1,72 @@
+[{
+  "_id": {
+    "$oid": "67c7500d9afe8eac47d99cb5"
+  },
+  "id": 2,
+  "name": "Camiseta Dev",
+  "image": "camisa.jpg",
+  "price": 99.99,
+  "category": "presentes",
+  "createdAt": {
+    "$date": "2025-05-27T02:04:53.970Z"
+  },
+  "description": "Camiseta para programadores.",
+  "stock": 20,
+  "updatedAt": {
+    "$date": "2025-05-27T02:04:53.970Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68351f12271fb4eb2c9f19ff"
+  },
+  "name": "Caneca Dev",
+  "description": "caneca dev de javascript",
+  "price": 79.99,
+  "category": "presentes",
+  "stock": 10,
+  "image": "public\\images\\products\\1748311826216-canecaJS.jfif",
+  "createdAt": {
+    "$date": "2025-05-27T02:10:26.301Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-27T02:10:26.301Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68352176271fb4eb2c9f1a1c"
+  },
+  "name": "Mousepad Dev",
+  "description": "mousepad dev",
+  "price": 159.99,
+  "category": "presentes",
+  "stock": 8,
+  "image": "public\\images\\products\\1748312438632-mousepaddev.jfif",
+  "createdAt": {
+    "$date": "2025-05-27T02:20:38.640Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-27T02:20:38.640Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6835218f271fb4eb2c9f1a1f"
+  },
+  "name": "Chaveiro Dev",
+  "description": "chaveiro dev",
+  "price": 15.99,
+  "category": "presentes",
+  "stock": 30,
+  "image": "public\\images\\products\\1748312463989-chaveirodev.jpg",
+  "createdAt": {
+    "$date": "2025-05-27T02:21:03.999Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-27T02:21:03.999Z"
+  },
+  "__v": 0
+}]
