@@ -1,9 +1,9 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
       <div class="m-10 bg-gray-900 p-20 rounded-3xl shadow-2xl w-full max-w-2xl">
         <div class="text-center mb-10">
-          <img src="../assets/logo_teste.jpg" alt="Logo" class="w-28 h-28 mx-auto rounded-full shadow-lg">
-          <h1 class="text-5xl font-extrabold text-purple-400 mt-6">Bem-vindo de Volta!</h1>
+          <img src="../assets/Logo.png" alt="Logo" class="w-28 h-28 mx-auto rounded-full shadow-lg">
+          <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6">Bem-vindo de Volta!</h1>
           <p class="text-gray-400 mt-3 text-lg">Faça login para continuar</p>
         </div>
         <form @submit.prevent="handleLogin">
@@ -17,8 +17,8 @@
                 id="email"
                 v-model="email"
                 aria-label="Email"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite seu email"
+                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
+                placeholder="Digite seu email (Ex: exemplo@email.com)"
                 required
               />
             </div>
@@ -32,8 +32,8 @@
                 id="password"
                 v-model="password"
                 aria-label="Senha"
-                class="w-full pl-10 pr-12 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite sua senha"
+                class="w-full pl-10 pr-12 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
+                placeholder="Digite sua senha (Ex: ********)"
                 required
               />
               <button
@@ -51,14 +51,14 @@
             {{ loginError }}
           </div>
           <div class="mb-8 text-right">
-          <router-link to="/reset-password" class="text-sm text-purple-400 hover:underline">
+          <router-link to="/reset-password" class="text-sm text-[#04d1b0] hover:underline">
             Esqueceu sua senha?
           </router-link>
         </div>
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg flex items-center justify-center gap-2"
+            class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg flex items-center justify-center gap-2"
           >
             <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
             <i class="fas fa-sign-in-alt mr-2"></i> Entrar
@@ -67,7 +67,7 @@
         <div class="mt-8 text-center">
             <p class="text-gray-400 text-lg">
                 Não tem uma conta? 
-                <router-link to="/register" class="text-purple-400 hover:underline">Cadastre-se</router-link>
+                <router-link to="/register" class="text-[#04d1b0] hover:underline">Cadastre-se</router-link>
             </p>
         </div>
       </div>

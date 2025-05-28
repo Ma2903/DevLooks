@@ -1,16 +1,16 @@
 <template>
-  <header class="bg-gray-900 text-white p-4 md:p-6 shadow-lg sticky top-0 z-50">
+  <header class="bg-[#04d1b0] text-white p-4 md:p-6 shadow-lg sticky top-0 z-50">
     <div class="container mx-auto flex flex-wrap justify-between items-center">
       <!-- Logo e Título -->
       <div class="flex items-center space-x-4">
         <img
-          src="../assets/logo_teste.jpg"
-          alt="Logo da Loja Geek"
+          src="../assets/favicon.png"
+          alt="Nova Logo do Sistema"
           class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-lg"
         />
         <div>
-          <h1 class="text-3xl md:text-4xl font-extrabold text-purple-400 tracking-wide font-poppins">
-            Loja Geek
+          <h1 class="text-3xl font-poppins font-bold tracking-wide">
+            <span class="text-[#04d1b0]">Dev</span><span class="text-[#4e44e1]">Looks</span>
           </h1>
         </div>
       </div>
@@ -18,14 +18,15 @@
       <!-- Navegação -->
       <nav
         :class="{'hidden': !menuOpen, 'block': menuOpen}"
-        class="w-full md:w-auto md:flex md:items-center md:space-x-6 text-lg md:text-xl mt-4 md:mt-0"
+        class="w-full md:w-auto md:flex md:items-center md:space-x-6 text-lg md:text-xl mt-4 md:mt-0 text-[#4e44e1]"
       >
         <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
           <!-- Botão Home (sempre visível) -->
           <li>
             <router-link
               to="/home"
-              class="hover:text-purple-400 flex items-center space-x-2 transition"
+              class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+              style="color: white !important;"
             >
               <i class="fas fa-home"></i><span>Home</span>
             </router-link>
@@ -35,7 +36,8 @@
           <li>
             <router-link
               to="/products"
-              class="hover:text-purple-400 flex items-center space-x-2 transition"
+              class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+              style="color: white !important;"
             >
               <i class="fas fa-store"></i><span>Produtos</span>
             </router-link>
@@ -47,7 +49,8 @@
             <li>
               <router-link
                 to="/create-avatar"
-                class="hover:text-purple-400 flex items-center space-x-2 transition"
+                class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+              style="color: white !important;"
               >
                 <i class="fas fa-user-astronaut"></i><span>Criar Avatar</span>
               </router-link>
@@ -57,7 +60,8 @@
             <li v-if="userType === 'admin'">
               <router-link
                 to="/admin/products"
-                class="hover:text-purple-400 flex items-center space-x-2 transition"
+               class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+              style="color: white !important;"
               >
                 <i class="fas fa-cogs"></i><span>Gerenciar Produtos</span>
               </router-link>
@@ -67,7 +71,8 @@
             <li v-if="userType !== 'admin'">
               <router-link
                 to="/cart"
-                class="hover:text-purple-400 flex items-center space-x-2 transition"
+                class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+              style="color: white !important;"
               >
                 <i class="fas fa-shopping-cart"></i>
                 <span>Carrinho</span>
@@ -78,7 +83,8 @@
             <li>
               <router-link
                 to="/profile"
-                class="hover:text-purple-400 flex items-center space-x-2 transition"
+                class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+                style="color: white !important;"
               >
                 <i class="fas fa-user"></i><span>Perfil</span>
               </router-link>
@@ -89,18 +95,14 @@
           <li v-if="!isLoggedIn">
             <router-link
               to="/login"
-              class="hover:text-purple-400 flex items-center space-x-2 transition"
+              class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+              style="color: white !important;"
             >
               <i class="fas fa-sign-in-alt"></i><span>Entrar</span>
             </router-link>
           </li>
         </ul>
       </nav>
-
-      <!-- Menu Toggle Button -->
-      <button @click="toggleMenu" class="md:hidden text-2xl focus:outline-none transition">
-        <i :class="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
-      </button>
     </div>
   </header>
 </template>
@@ -164,12 +166,10 @@ a {
 }
 
 a:hover {
-  color: #a78bfa;
   transform: scale(1.07);
 }
 
 button:hover {
   transform: scale(1.1);
-  color: #a78bfa;
 }
 </style>

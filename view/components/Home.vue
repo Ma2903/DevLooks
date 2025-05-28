@@ -1,26 +1,26 @@
 <template>
   <div class="bg-gray-900 min-h-screen font-mono text-gray-200 relative">
     <!-- Banner de Boas-Vindas -->
-    <section id="home" class="relative bg-gradient-to-r from-purple-800 to-black text-white text-center py-40 overflow-hidden">
+    <section id="home" class="relative bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white text-center py-40 overflow-hidden">
       <div class="absolute inset-0 bg-black opacity-60 bg-opacity-40 bg-cover bg-center" style="background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/online-shopping-1869235_960_720.jpg');"></div>
       <div class="relative z-10 container mx-auto px-4 md:px-6">
-        <h1 class="text-5xl md:text-6xl font-extrabold mb-6 text-purple-400 animate-fade-in">
+        <h1 class="text-5xl md:text-6xl font-extrabold mb-6 text-[#04d1b0] animate-fade-in">
           <i class="fas fa-shopping-cart mr-2"></i>Bem-vindo à Loja Geek
         </h1>
-        <p class="text-lg md:text-xl mb-8 animate-fade-in">
+        <p class="text-lg md:text-xl mb-8 text-gray-200 animate-fade-in">
           Descubra produtos exclusivos para personalizar seu estilo e mostrar sua paixão por tecnologia!
         </p>
         <router-link
           to="/products"
-          class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in text-lg"
+          class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in text-lg"
         >
           <i class="fas fa-store mr-2"></i> Ver Produtos
         </router-link>
         <div class="mt-6 flex justify-center gap-4">
-          <span class="bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow-lg animate-bounce">
+          <span class="bg-[#04d1b0] text-white px-4 py-2 rounded-full font-bold shadow-lg animate-bounce">
             Frete grátis acima de R$ 150
           </span>
-          <span class="bg-yellow-400 text-gray-900 px-4 py-2 rounded-full font-bold shadow-lg animate-pulse">
+          <span class="bg-[#4e44e1] text-white px-4 py-2 rounded-full font-bold shadow-lg animate-pulse">
             10% OFF na primeira compra!
           </span>
         </div>
@@ -29,7 +29,7 @@
 
     <!-- Seção "Categorias" -->
     <section id="categories" class="container mx-auto py-16 px-4 md:px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 mb-6">
+      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
         <i class="fas fa-th-large mr-2"></i>Categorias
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -37,9 +37,9 @@
           v-for="cat in categorias"
           :key="cat.nome"
           :to="`/products?category=${cat.value}`"
-          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-purple-500 transition duration-300 flex flex-col items-center cursor-pointer group"
+          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-[#04d1b0] transition duration-300 flex flex-col items-center cursor-pointer group"
         >
-          <i :class="cat.icone + ' text-5xl text-purple-400 mb-4 group-hover:scale-110 transition'"></i>
+          <i :class="cat.icone + ' text-5xl text-[#04d1b0] mb-4 group-hover:scale-110 transition'"></i>
           <h3 class="text-lg font-bold text-white">{{ cat.nome }}</h3>
           <p class="text-gray-300 mt-2">{{ cat.desc }}</p>
         </router-link>
@@ -48,7 +48,7 @@
 
     <!-- Seção "Produtos em Destaque" -->
     <section id="best-sellers" class="container mx-auto py-16 px-4 md:px-6">
-      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 text-center mb-8">
+      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] text-center mb-8">
         <i class="fas fa-fire mr-2"></i>Mais Vendidos
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -57,10 +57,10 @@
           :key="produto._id"
           class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 relative"
         >
-          <span v-if="produto.novo" class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-10">
+          <span v-if="produto.novo" class="absolute top-2 left-2 bg-[#04d1b0] text-white text-xs px-2 py-1 rounded-full font-bold z-10">
             <i class="fas fa-star"></i> Novo
           </span>
-          <span v-if="produto.promo" class="absolute top-2 right-2 bg-yellow-400 text-gray-900 text-xs px-2 py-1 rounded-full font-bold z-10">
+          <span v-if="produto.promo" class="absolute top-2 right-2 bg-[#4e44e1] text-white text-xs px-2 py-1 rounded-full font-bold z-10">
             <i class="fas fa-bolt"></i> Promoção
           </span>
           <img
@@ -71,22 +71,22 @@
           <h2 class="text-lg font-bold text-white mb-2">{{ produto.name }}</h2>
           <p class="text-gray-300 mb-4">{{ produto.description }}</p>
           <div class="flex justify-between items-center mb-4">
-            <span class="text-green-500 font-bold text-lg">
+            <span class="text-[#04d1b0] font-bold text-lg">
               R$ {{ produto.price.toFixed(2) }}
             </span>
-            <span class="bg-purple-600 text-white text-sm font-medium px-4 py-1 rounded-lg">
+            <span class="bg-[#4e44e1] text-white text-sm font-medium px-4 py-1 rounded-lg">
               #{{ produto.category }}
             </span>
           </div>
           <router-link
             :to="`/product/${produto._id}`"
-            class="block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300 mb-2"
+            class="block bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300 mb-2"
           >
             Ver Detalhes
           </router-link>
           <button
             @click="addToCart(produto)"
-            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+            class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
           >
             <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
           </button>
@@ -98,17 +98,17 @@
     <section id="benefits" class="bg-gray-900 py-16">
       <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         <div>
-          <i class="fas fa-shipping-fast text-5xl text-purple-400 mb-4"></i>
+          <i class="fas fa-shipping-fast text-5xl text-[#04d1b0] mb-4"></i>
           <h3 class="text-lg font-bold text-white">Frete Grátis</h3>
           <p class="text-gray-300">Para compras acima de R$ 150,00.</p>
         </div>
         <div>
-          <i class="fas fa-sync-alt text-5xl text-purple-400 mb-4"></i>
+          <i class="fas fa-sync-alt text-5xl text-[#04d1b0] mb-4"></i>
           <h3 class="text-lg font-bold text-white">Devolução Fácil</h3>
           <p class="text-gray-300">30 dias para devolução sem custo.</p>
         </div>
         <div>
-          <i class="fas fa-lock text-5xl text-purple-400 mb-4"></i>
+          <i class="fas fa-lock text-5xl text-[#04d1b0] mb-4"></i>
           <h3 class="text-lg font-bold text-white">Pagamento Seguro</h3>
           <p class="text-gray-300">Seus dados protegidos com criptografia.</p>
         </div>
@@ -116,14 +116,14 @@
     </section>
 
     <!-- Seção de Newsletter -->
-    <div class="bg-purple-800 py-8 mt-8 text-center rounded-lg">
+    <div class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] py-8 mt-8 text-center rounded-lg">
       <h3 class="text-2xl font-bold text-white mb-4">
         <i class="fas fa-envelope mr-2"></i>Inscreva-se na nossa Newsletter
       </h3>
       <p class="text-gray-200 mb-6">Receba novidades, promoções e ofertas exclusivas diretamente no seu email!</p>
       <router-link
         to="/register"
-        class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+        class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
       >
         <i class="fas fa-user-plus mr-2"></i> Inscrever-se
       </router-link>
@@ -131,17 +131,17 @@
 
     <!-- Seção "Sobre Nós" -->
     <section id="about" class="container mx-auto py-16 px-4 md:px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 mb-6">
+      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
         <i class="fas fa-info-circle mr-2"></i>Sobre Nós
       </h2>
       <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
-        Bem-vindo à <span class="text-purple-400 font-bold">Loja Geek</span>, o lugar perfeito para os apaixonados por tecnologia, cultura pop e personalização. Nossa missão é oferecer produtos exclusivos e de alta qualidade que combinem estilo, funcionalidade e inovação.
+        Bem-vindo à <span class="text-[#04d1b0] font-bold">Loja Geek</span>, o lugar perfeito para os apaixonados por tecnologia, cultura pop e personalização. Nossa missão é oferecer produtos exclusivos e de alta qualidade que combinem estilo, funcionalidade e inovação.
       </p>
       <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
         Desde avatares personalizados até acessórios únicos, trabalhamos para trazer o que há de mais moderno e criativo para o seu dia a dia. Seja para expressar sua paixão por tecnologia ou para presentear alguém especial, aqui você encontra tudo o que precisa.
       </p>
       <p class="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
-        Na <span class="text-purple-400 font-bold">Loja Geek</span>, valorizamos a experiência do cliente. Por isso, oferecemos:
+        Na <span class="text-[#04d1b0] font-bold">Loja Geek</span>, valorizamos a experiência do cliente. Por isso, oferecemos:
       </p>
       <ul class="text-lg md:text-xl text-gray-300 leading-relaxed list-disc list-inside mb-6">
         <li>Frete grátis para compras acima de R$ 150,00.</li>
@@ -156,24 +156,21 @@
 
     <!-- Seção "Depoimentos" -->
     <section class="container mx-auto py-16 px-4 md:px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-semibold text-purple-400 mb-6">
+      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
         <i class="fas fa-comments mr-2"></i>O que dizem nossos clientes
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg"> 
-          <i class="fas fa-user-circle text-4xl text-purple-400 mb-2"></i>
+          <i class="fas fa-user-circle text-4xl text-[#04d1b0] mb-2"></i>
           <p class="text-gray-300 mb-2">"Produtos incríveis, entrega rápida e atendimento excelente!"</p>
-          <span class="text-purple-400 font-bold">Ana P.</span>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-          <i class="fas fa-user-circle text-4xl text-purple-400 mb-2"></i>
-          <p class="text-gray-300 mb-2">"Amei minha compra, voltarei com certeza!"</p>
-          <span class="text-purple-400 font-bold">Carlos M.</span>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg"> 
+          <i class="fas fa-user-circle text-4xl text-[#04d1b0] mb-2"></i>
+          <p class="text-gray-300 mb-2">"A qualidade dos produtos é excepcional, recomendo a todos!"</p>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-          <i class="fas fa-user-circle text-4xl text-purple-400 mb-2"></i>
-          <p class="text-gray-300 mb-2">"Atendimento ao cliente excepcional, me senti valorizado como cliente."</p>
-          <span class="text-purple-400 font-bold">Fernanda S.</span>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg"> 
+          <i class="fas fa-user-circle text-4xl text-[#04d1b0] mb-2"></i>
+          <p class="text-gray-300 mb-2">"Minha loja favorita para itens geek, sempre inovando!"</p>
         </div>
       </div>
     </section>
@@ -182,7 +179,7 @@
     <button
       v-show="showScrollButton"
       @click="scrollToTop"
-      class="fixed bottom-4 right-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in"
+      class="fixed bottom-4 right-4 bg-[#04d1b0] hover:bg-[#4e44e1] text-white font-bold py-3 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in"
     >
       <i class="fas fa-arrow-up"></i>
     </button>
@@ -266,11 +263,11 @@ section {
 }
 
 section.bg-gradient-to-r {
-  background-image: linear-gradient(to right, #5B21B6, #111111);
+  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
 }
 
 section.bg-gradient-to-r .container h1 {
-  color: #9B4DFF;
+  color: #04d1b0;
 }
 
 section.bg-gradient-to-r .container p {
@@ -282,7 +279,7 @@ footer {
 }
 
 footer a:hover {
-  color: #9b4dff;
+  color: #04d1b0;
 }
 
 .fade-enter-active, .fade-leave-active {
