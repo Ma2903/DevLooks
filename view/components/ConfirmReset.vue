@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import Swal from "sweetalert2";
 
 export default {
@@ -97,17 +98,37 @@ export default {
         return;
       }
       this.loading = true;
-      setTimeout(() => {
-        this.loading = false;
-        Swal.fire({
-          icon: "success",
-          title: "Senha redefinida com sucesso!",
-          background: "#1F2937",
-          color: "#E5E7EB",
-        }).then(() => {
-          this.$router.push("/login");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = urlParams.get("hash");
+      const email = urlParams.get("email");
+
+      axios.post("/api/users/reset-password", {
+        code: this.code,
+        newPassword: this.newPassword,
+        hash,
+        email,
+      })
+        .then((response) => {
+          this.loading = false;
+          if (response.data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Senha redefinida com sucesso!",
+              background: "#1F2937",
+              color: "#E5E7EB",
+            }).then(() => {
+              this.$router.push("/login");
+          });
+          } else {
+            this.resetError = response.data.message || "Erro ao redefinir a senha.";
+          }
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.resetError = error.response?.data?.message || "Erro ao redefinir a senha.";
         });
-      }, 1200);
+      
     },
   },
 };

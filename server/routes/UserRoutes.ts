@@ -16,4 +16,8 @@ router.delete("/users/:id", verifyToken,UserController.deleteUser);
 router.post("/users/login", UserController.login);
 router.post("/users/me", verifyToken,UserController.getUserById );
 
+// Recuperar senha
+router.post("/users/forgot-password", UserController.forgotPassword);
+router.post("/users/reset-password", UserController.resetPassword);
+
 export default router;

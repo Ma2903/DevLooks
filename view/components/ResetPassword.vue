@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: "ResetPassword",
   data() {
@@ -64,15 +66,16 @@ export default {
       this.loading = true;
       this.resetSuccess = "";
       this.resetError = "";
-      try {
-        // ...envio do email...
-        this.resetSuccess = "Um link de redefinição de senha foi enviado para o seu email.";
-        setTimeout(() => {
-          this.$router.push("/confirm-reset");
-        }, 2000); // Aguarda 2 segundos para mostrar o feedback antes de redirecionar
-      } catch (error) {
-        this.resetError = "Erro ao enviar o link. Tente novamente.";
+      try{
+        axios.post('/api/users/forgot-password', { email: this.email })
+          .then(response => {
+            this.$router.push("/confirm-reset?hash=" + response.data.code + "&email=" + response.data.email);
+          });
+      }catch (error) {
+        this.resetError = "Erro ao enviar o link de redefinição. Verifique seu email.";
+        console.error("Erro ao enviar o link de redefinição:", error);
       }
+          // this.$router.push("/confirm-reset");ar
       this.loading = false;
     },
   },

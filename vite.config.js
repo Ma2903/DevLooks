@@ -13,6 +13,11 @@ export default defineConfig({
     vueDevTools(),
     tailwindcss(),
   ],
+  server:{
+    watch: {
+      ignored: ['**/server/**']
+    }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./view', import.meta.url))
