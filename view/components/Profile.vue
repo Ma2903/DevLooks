@@ -1,38 +1,38 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="bg-gray-900 p-16 rounded-3xl shadow-2xl w-full max-w-4xl">
       <div class="text-center mb-10 relative">
         <!-- Avatar com ícone de edição -->
         <div class="relative inline-block">
           <img
             src="./"
-            class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-purple-500"
+            class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-[#04d1b0]"
           />
           <router-link
             to="/create-avatar"
-            class="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 text-white font-bold p-2 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+            class="absolute bottom-0 right-0 bg-[#04d1b0] hover:bg-[#4e44e1] text-white font-bold p-2 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
           >
             <i class="fas fa-edit"></i>
           </router-link>
         </div>
-        <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center">
-          <i class="fas fa-user-circle text-6xl mr-3 text-purple-500"></i> {{ userData.name }}
+        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6 flex items-center justify-center">
+          <i class="fas fa-user-circle text-6xl mr-3 text-[#04d1b0]"></i> {{ userData.name }}
         </h1>
         <p class="text-gray-400 mt-3 text-lg flex items-center justify-center">
           <i class="fas fa-envelope mr-2"></i> {{ userData.email }}
         </p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-gradient-to-r from-purple-900/60 to-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-purple-500 mb-4">
-          <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center">
+        <div class="bg-gradient-to-r from-[#04d1b0]/20 to-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-[#04d1b0] mb-4">
+          <h2 class="text-xl font-bold text-[#04d1b0] mb-4 flex items-center">
             <i class="fas fa-id-card mr-2"></i> Informações Pessoais
           </h2>
           <p class="text-gray-300 mb-2"><i class="fas fa-id-badge mr-2"></i> CPF: {{ userData.cpf }}</p>
           <p class="text-gray-300 mb-2"><i class="fas fa-phone mr-2"></i> Telefone: {{ userData.telephone }}</p>
           <p class="text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> Endereço: {{ userData.address }}</p>
         </div>
-        <div class="bg-gradient-to-r from-purple-900/60 to-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-purple-500 mb-4">
-          <h2 class="text-xl font-bold text-purple-400 mb-4 flex items-center">
+        <div class="bg-gradient-to-r from-[#04d1b0]/20 to-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-[#04d1b0] mb-4">
+          <h2 class="text-xl font-bold text-[#04d1b0] mb-4 flex items-center">
             <i class="fas fa-map mr-2"></i> Localização
           </h2>
           <p class="text-gray-300 mb-2"><i class="fas fa-map-pin mr-2"></i> CEP: {{ userData.cep }}</p>
@@ -43,7 +43,7 @@
       <div class="flex justify-center space-x-4 mt-10">
         <router-link
           to="/edit-user"
-          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
+          class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
         >
           <i class="fas fa-edit mr-2"></i> Editar Dados
         </router-link>
@@ -96,7 +96,7 @@
     <!-- Modal de Confirmação de Logout -->
     <div v-if="showLogoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-purple-400 mb-4 text-center">Confirmação de Logout</h2>
+        <h2 class="text-2xl font-bold text-[#04d1b0] mb-4 text-center">Confirmação de Logout</h2>
         <p class="text-gray-300 mb-4 text-center">
           Tem certeza que deseja sair do sistema?
         </p>
@@ -109,7 +109,7 @@
           </button>
           <button
             @click="logout"
-            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+            class="bg-[#04d1b0] hover:bg-[#4e44e1] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
           >
             Confirmar
           </button>

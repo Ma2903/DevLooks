@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
       <div class="text-center mb-10">
-        <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center gap-3">
+        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6 flex items-center justify-center gap-3">
           <i class="fas fa-edit"></i>
           Editar Produto
         </h1>
@@ -217,12 +217,31 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-button:hover {
+button, .router-link-active {
+  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, background 0.2s;
+}
+button:hover, .router-link-active:hover {
+  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
   transform: scale(1.05);
 }
 
-input::placeholder,
-textarea::placeholder {
+input, textarea, select {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  font-family: 'Fira Code', monospace;
+}
+input:focus, textarea:focus, select:focus {
+  border: 2px solid #04d1b0;
+}
+
+input::placeholder, textarea::placeholder {
   color: #9CA3AF;
 }
 </style>

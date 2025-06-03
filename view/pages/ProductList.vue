@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-gray-200">
+  <div class="min-h-screen bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="container mx-auto py-16 px-4">
-      <h1 class="text-4xl font-bold text-purple-400 text-center mb-10 flex items-center justify-center gap-3">
-        <i class="fas fa-th-list text-5xl text-purple-500"></i>
+      <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-10 flex items-center justify-center gap-3">
+        <i class="fas fa-th-list text-5xl text-[#04d1b0]"></i>
         Produtos Disponíveis
       </h1>
       <Search-bar
@@ -47,13 +47,13 @@
               R$ {{ produto.price.toFixed(2) }}
             </span>
             <span
-              class="bg-purple-600 text-white text-sm font-medium px-4 py-1 rounded-lg"
+              class="bg-[#04d1b0] text-white text-sm font-medium px-4 py-1 rounded-lg"
             >
               #{{ produto.category }}
             </span>
           </div>
           <div class="mb-2">
-            <span v-if="produto.price >= 150" class="text-green-400 font-bold">
+            <span v-if="produto.price >= 150" class="text-[#04d1b0] font-bold">
               Frete Grátis
             </span>
             <span v-else class="text-gray-300">
@@ -62,13 +62,13 @@
           </div>
           <router-link
             :to="`/product/${produto._id}`"
-            class="block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300"
+            class="block bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300"
           >
             Ver Detalhes
           </router-link>
           <button
             @click="addToCart(produto)"
-            class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+            class="w-full mt-3 bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
           >
             <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
           </button>
@@ -151,15 +151,32 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-img {
-  transition: transform 0.3s ease;
+button, .router-link-active {
+  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, background 0.2s;
 }
-
-img:hover {
+button:hover, .router-link-active:hover {
+  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
   transform: scale(1.05);
 }
 
-button:hover {
-  transform: scale(1.05);
+.bg-gray-800 {
+  background: #23272f;
+  border-radius: 0.75rem;
+}
+
+input, select {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  font-family: 'Fira Code', monospace;
+}
+input:focus, select:focus {
+  border: 2px solid #04d1b0;
 }
 </style>

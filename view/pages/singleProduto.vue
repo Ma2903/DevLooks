@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl flex flex-col md:flex-row">
       <!-- Imagem do Produto -->
       <div
@@ -34,12 +34,12 @@
       <!-- Detalhes do Produto -->
       <div class="w-full md:w-1/2 flex flex-col justify-between">
         <div>
-          <h1 class="text-4xl font-extrabold text-purple-400 mb-4 flex items-center gap-2">
-            <i class="fas fa-box-open"></i> {{ product.name }}
+          <h1 class="text-4xl font-extrabold text-[#04d1b0] mb-4 flex items-center gap-2">
+            <i class="fas fa-box-open text-[#04d1b0]"></i> {{ product.name }}
           </h1>
           <div class="flex items-center gap-3 mb-2">
-            <span class="bg-gray-700 text-gray-300 text-xs font-medium px-3 py-1 rounded-lg flex items-center gap-1">
-              <i class="fas fa-tag text-purple-400"></i> {{ product.category }}
+            <span class="bg-[#23272f] text-[#04d1b0] text-xs font-medium px-3 py-1 rounded-lg flex items-center gap-1">
+              <i class="fas fa-tag"></i> {{ product.category }}
             </span>
             <span class="flex items-center gap-1 text-yellow-400 text-sm">
               <i class="fas fa-star"></i>
@@ -55,11 +55,11 @@
 
         <!-- Preço e Estoque -->
         <div class="flex items-center gap-4 mb-6">
-          <span class="text-3xl font-bold text-green-500 flex items-center gap-2">
+          <span class="text-3xl font-bold text-[#04d1b0] flex items-center gap-2">
             <i class="fas fa-money-bill-wave"></i> R${{ product.price }}
           </span>
           <span
-            :class="product.stock < 5 ? 'bg-red-600' : 'bg-green-600'"
+            :class="product.stock < 5 ? 'bg-red-600' : 'bg-[#04d1b0]'"
             class="text-white text-xs font-semibold px-3 py-1 rounded-lg flex items-center gap-1"
           >
             <i class="fas fa-boxes"></i> {{ product.stock }} em estoque
@@ -97,13 +97,13 @@
         <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
           <router-link
             to="/products"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 justify-center"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 justify-center"
           >
             <i class="fas fa-arrow-left"></i> Voltar para a Loja
           </router-link>
           <button
             @click="addToCart(product)"
-            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 justify-center"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 justify-center"
           >
             <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
           </button>
@@ -200,25 +200,27 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-button:hover {
+button, .router-link-active {
+  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, background 0.2s;
+}
+button:hover, .router-link-active:hover {
+  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
   transform: scale(1.05);
 }
 
-img {
+input[type="number"] {
+  background: #1f2937;
+  color: #e5e7eb;
   border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  font-family: 'Fira Code', monospace;
 }
-
-h1 {
-  font-size: 2.5rem;
-}
-
-p {
-  font-size: 1.125rem;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+input[type="number"]:focus {
+  border: 2px solid #04d1b0;
 }
 </style>

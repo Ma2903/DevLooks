@@ -1,8 +1,8 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-gray-200">
     <div class="container mx-auto py-16 px-4">
-      <h1 class="text-4xl font-bold text-purple-400 text-center mb-10 flex items-center justify-center gap-3">
-        <i class="fas fa-shopping-cart text-purple-500"></i>
+      <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-10 flex items-center justify-center gap-3">
+        <i class="fas fa-shopping-cart text-[#04d1b0]"></i>
         Carrinho de Compras
       </h1>
 
@@ -12,30 +12,30 @@
           <div
             v-for="item in cartItems"
             :key="item._id"
-            class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-700 hover:border-purple-500 transition"
+            class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-700 hover:border-[#04d1b0] transition"
           >
             <div class="flex items-center gap-6">
               <div class="relative">
                 <img
                   :src="item.image || '@/camisa.jpg'"
                   alt="Produto"
-                  class="w-24 h-24 object-cover rounded-lg border-2 border-purple-500 shadow"
+                  class="w-24 h-24 object-cover rounded-lg border-2 border-[#04d1b0] shadow"
                 />
-                <span class="absolute -top-2 -right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
+                <span class="absolute -top-2 -right-2 bg-[#04d1b0] text-white text-xs px-2 py-1 rounded-full shadow flex items-center gap-1">
                   <i class="fas fa-box"></i> {{ item.quantity }}
                 </span>
               </div>
               <div class="flex-1">
                 <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                  <i class="fas fa-tshirt text-purple-400"></i>
+                  <i class="fas fa-tshirt text-[#04d1b0]"></i>
                   {{ item.name }}
                 </h2>
                 <p class="text-gray-300 flex items-center gap-1">
                   <i class="fas fa-tag"></i>
-                  Preço: <span class="font-bold text-green-400">R$ {{ item.price.toFixed(2) }}</span>
+                  Preço: <span class="font-bold text-[#04d1b0]">R$ {{ item.price.toFixed(2) }}</span>
                 </p>
                 <div class="mb-1 flex items-center gap-2">
-                  <span v-if="item.price >= 150" class="text-green-400 font-bold flex items-center gap-1">
+                  <span v-if="item.price >= 150" class="text-[#04d1b0] font-bold flex items-center gap-1">
                     <i class="fas fa-truck"></i> Frete Grátis
                   </span>
                   <span v-else class="text-gray-300 flex items-center gap-1">
@@ -53,7 +53,7 @@
                     type="number"
                     v-model.number="item.quantity"
                     min="1"
-                    class="w-12 text-center bg-gray-800 text-gray-200 text-lg font-bold mx-2 py-1 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-12 text-center bg-gray-800 text-gray-200 text-lg font-bold mx-2 py-1 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   />
                   <button
                     @click="increaseQuantity(item._id)"
@@ -75,9 +75,9 @@
         </div>
 
         <!-- Resumo do Carrinho -->
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-purple-500">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-[#04d1b0]">
           <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <i class="fas fa-receipt text-purple-400"></i>
+            <i class="fas fa-receipt text-[#04d1b0]"></i>
             Resumo do Pedido
           </h2>
           <div class="mb-4 flex flex-col gap-2">
@@ -87,14 +87,14 @@
             </p>
             <p class="text-lg text-gray-300 flex items-center gap-2">
               <i class="fas fa-money-bill-wave"></i>
-              Total: <span class="font-bold text-green-400">R$ {{ totalPrice.toFixed(2) }}</span>
+              Total: <span class="font-bold text-[#04d1b0]">R$ {{ totalPrice.toFixed(2) }}</span>
             </p>
           </div>
-          <hr class="border-purple-700 mb-4" />
+          <hr class="border-[#04d1b0] mb-4" />
           <!-- Cupom de desconto -->
-          <div class="mb-4 p-4 rounded-lg border-2 border-dashed border-purple-400 bg-gray-900 shadow flex flex-col gap-2">
+          <div class="mb-4 p-4 rounded-lg border-2 border-dashed border-[#04d1b0] bg-gray-900 shadow flex flex-col gap-2">
             <div class="flex items-center gap-2 mb-2">
-              <i class="fas fa-ticket-alt text-purple-400 text-xl"></i>
+              <i class="fas fa-ticket-alt text-[#04d1b0] text-xl"></i>
               <label for="cupom" class="text-gray-200 font-semibold text-lg">Cupom de Desconto</label>
             </div>
             <div class="flex gap-2">
@@ -102,18 +102,18 @@
                 type="text"
                 id="cupom"
                 v-model="cupom"
-                class="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+                class="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-[#04d1b0] focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
                 placeholder="Digite seu cupom"
               />
               <button
                 @click="aplicarCupom"
-                class="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-2 px-5 rounded-lg shadow transition duration-300 flex items-center gap-1"
+                class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-5 rounded-lg shadow transition duration-300 flex items-center gap-1"
               >
                 <i class="fas fa-check"></i> Aplicar
               </button>
             </div>
             <transition name="fade">
-              <p v-if="cupomMensagem" class="mt-2 text-green-400 font-semibold flex items-center gap-1">
+              <p v-if="cupomMensagem" class="mt-2 text-[#04d1b0] font-semibold flex items-center gap-1">
                 <i class="fas fa-check-circle"></i> {{ cupomMensagem }}
               </p>
             </transition>
@@ -123,17 +123,17 @@
               </p>
             </transition>
           </div>
-          <p v-if="desconto > 0" class="text-lg text-green-400 mb-4 flex items-center gap-2">
+          <p v-if="desconto > 0" class="text-lg text-[#04d1b0] mb-4 flex items-center gap-2">
             <i class="fas fa-percentage"></i>
             Desconto aplicado: -R$ {{ desconto.toFixed(2) }}
           </p>
-          <p class="text-lg text-purple-400 mb-4 flex items-center gap-2" v-if="desconto > 0">
+          <p class="text-lg text-[#04d1b0] mb-4 flex items-center gap-2" v-if="desconto > 0">
             <i class="fas fa-coins"></i>
             Total com desconto: <span class="font-bold">R$ {{ (totalPrice - desconto).toFixed(2) }}</span>
           </p>
           <button
             @click="finalizarCompra"
-            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 mt-2"
+            class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 mt-2"
           >
             <i class="fas fa-credit-card"></i>
             Finalizar Compra
@@ -143,12 +143,12 @@
 
       <div v-else class="text-center">
         <p class="text-lg text-gray-300 flex items-center justify-center gap-2">
-          <i class="fas fa-shopping-basket text-2xl text-purple-400"></i>
+          <i class="fas fa-shopping-basket text-2xl text-[#04d1b0]"></i>
           Seu carrinho está vazio.
         </p>
         <router-link
           to="/products"
-          class="mt-4 inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center gap-2"
+          class="mt-4 inline-block bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center gap-2"
         >
           <i class="fas fa-store"></i>
           Ver Produtos

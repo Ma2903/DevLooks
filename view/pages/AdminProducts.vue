@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+  <div class="min-h-screen flex flex-col items-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
       <div class="text-center mb-10">
-        <h1 class="text-5xl font-extrabold text-purple-400 mt-6 flex items-center justify-center gap-3">
-          <i class="fas fa-cogs text-purple-500"></i>
+        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6 flex items-center justify-center gap-3">
+          <i class="fas fa-cogs text-[#04d1b0]"></i>
           Gerenciar Produtos
         </h1>
         <p class="text-gray-400 mt-3 text-lg">Adicione, edite ou exclua produtos do seu ecommerce</p>
@@ -11,7 +11,7 @@
       <div class="flex justify-end mb-6">
         <router-link
           to="/admin/products/add"
-          class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2"
+          class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2"
         >
           <i class="fas fa-plus-circle"></i> Adicionar Produto
         </router-link>
@@ -19,7 +19,7 @@
       <div class="overflow-x-auto rounded-lg shadow-lg">
         <table class="w-full bg-gray-800 rounded-lg">
           <thead>
-            <tr class="bg-gray-700 text-gray-300">
+            <tr class="bg-[#23272f] text-[#04d1b0]">
               <th class="py-4 px-6"><i class="fas fa-tag mr-2"></i>Nome</th>
               <th class="py-4 px-6"><i class="fas fa-align-left mr-2"></i>Descrição</th>
               <th class="py-4 px-6"><i class="fas fa-dollar-sign mr-2"></i>Preço</th>
@@ -32,21 +32,21 @@
             <tr
               v-for="produto in produtos"
               :key="produto._id"
-              class="border-b border-gray-700 hover:bg-gray-700 transition"
+              class="border-b border-[#04d1b0]/30 hover:bg-[#23272f] transition"
             >
               <td class="py-4 px-6 font-semibold flex items-center gap-2">
-                <i class="fas fa-box text-purple-400"></i>
+                <i class="fas fa-box text-[#04d1b0]"></i>
                 {{ produto.name }}
               </td>
               <td class="py-4 px-6 text-gray-300 truncate max-w-xs">{{ produto.description }}</td>
-              <td class="py-4 px-6 text-green-400 font-bold">R$ {{ produto.price ? produto.price.toFixed(2) : 'N/A' }}</td>
+              <td class="py-4 px-6 text-[#04d1b0] font-bold">R$ {{ produto.price ? produto.price.toFixed(2) : 'N/A' }}</td>
               <td class="py-4 px-6">
-                <span class="bg-purple-700 text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
+                <span class="bg-[#4e44e1] text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
                   <i class="fas fa-tag"></i> {{ produto.category }}
                 </span>
               </td>
               <td class="py-4 px-6">
-                <span :class="produto.stock < 5 ? 'bg-red-600' : 'bg-green-600'"
+                <span :class="produto.stock < 5 ? 'bg-red-600' : 'bg-[#04d1b0]'"
                   class="text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
                   <i class="fas fa-boxes"></i> {{ produto.stock }}
                 </span>
@@ -54,7 +54,7 @@
               <td class="py-4 px-6 flex flex-col md:flex-row gap-2">
                 <button
                   @click="handleEdit(produto._id)"
-                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 flex items-center gap-2"
+                  class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 flex items-center gap-2"
                 >
                   <i class="fas fa-edit"></i> Editar
                 </button>
@@ -83,8 +83,8 @@ export default {
       produtos: [],
       showDeleteModal: false,
       produtoSelecionado: null,
-      imageFile: null, // Armazena o arquivo de imagem selecionado
-      previewUrl: null, // Armazena a URL da imagem para pré-visualização
+      imageFile: null,
+      previewUrl: null,
     };
   },
   methods: {
@@ -146,7 +146,6 @@ export default {
     },
     async deletarProduto() {
       try {
-        console.log("Tentando excluir o produto com ID:", this.produtoSelecionado._id); // Log para depuração
         await axios.delete(`/api/products/${this.produtoSelecionado._id}`);
         this.produtos = this.produtos.filter(p => p._id !== this.produtoSelecionado._id);
         this.cancelarExclusao();
@@ -158,7 +157,7 @@ export default {
           color: "#E5E7EB",
         });
       } catch (error) {
-        console.error("Erro ao excluir produto:", error.response || error); // Log detalhado do erro
+        console.error("Erro ao excluir produto:", error.response || error);
         Swal.fire({
           icon: "error",
           title: "Erro",
@@ -171,8 +170,6 @@ export default {
     onFileChange(event) {
       const file = event.target.files[0];
       this.imageFile = file;
-
-      // Cria uma URL de pré-visualização para a imagem selecionada
       if (file) {
         this.previewUrl = URL.createObjectURL(file);
       } else {
@@ -186,7 +183,7 @@ export default {
       formData.append("price", this.price);
       formData.append("category", this.category);
       formData.append("stock", this.stock);
-      formData.append("image", this.imageFile); // Adiciona a imagem ao formulário
+      formData.append("image", this.imageFile);
 
       try {
         await axios.post("/api/products", formData, {
@@ -197,8 +194,8 @@ export default {
           title: "Sucesso",
           text: "Produto cadastrado com sucesso!",
         });
-        this.carregarProdutos(); // Recarrega a lista de produtos
-        this.limparCampos(); // Limpa os campos do formulário
+        this.carregarProdutos();
+        this.limparCampos();
       } catch (error) {
         console.error("Erro ao cadastrar produto:", error);
         Swal.fire({
@@ -215,7 +212,7 @@ export default {
       this.category = "";
       this.stock = null;
       this.imageFile = null;
-      this.previewUrl = null; // Limpa a URL da pré-visualização
+      this.previewUrl = null;
     },
   },
   mounted() {
@@ -231,7 +228,15 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
-button:hover {
+button, .router-link-active {
+  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, background 0.2s;
+}
+button:hover, .router-link-active:hover {
+  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
   transform: scale(1.05);
 }
 
@@ -246,12 +251,12 @@ th, td {
 }
 
 th {
-  background-color: #4a5568;
-  color: white;
+  background-color: #23272f;
+  color: #04d1b0;
   min-width: 150px;
 }
 
 tr:hover {
-  background-color: #2d3748;
+  background-color: #23272f;
 }
 </style>

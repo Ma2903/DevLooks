@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="bg-gray-900 p-12 rounded-3xl shadow-2xl w-full max-w-xl">
       <div class="text-center mb-8">
-        <i class="fas fa-key text-5xl text-purple-400 mb-4"></i>
-        <h1 class="text-3xl font-extrabold text-purple-400 mb-2">Redefinir Senha</h1>
+        <i class="fas fa-key text-5xl text-[#04d1b0] mb-4"></i>
+        <h1 class="text-3xl font-extrabold text-[#04d1b0] mb-2">Redefinir Senha</h1>
         <p class="text-gray-400">Digite o código recebido no seu email e crie uma nova senha.</p>
       </div>
       <form @submit.prevent="handleConfirmReset">
@@ -15,7 +15,7 @@
               type="text"
               id="code"
               v-model="code"
-              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
               placeholder="Digite o código recebido"
               required
             />
@@ -29,7 +29,7 @@
               :type="showPassword ? 'text' : 'password'"
               id="newPassword"
               v-model="newPassword"
-              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
               placeholder="Digite a nova senha"
               required
             />
@@ -51,7 +51,7 @@
               :type="showPassword ? 'text' : 'password'"
               id="confirmPassword"
               v-model="confirmPassword"
-              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
               placeholder="Confirme a nova senha"
               required
             />
@@ -64,7 +64,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg flex items-center justify-center gap-2"
+          class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg flex items-center justify-center gap-2"
         >
           <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
           <i class="fas fa-check mr-2"></i> Concluir

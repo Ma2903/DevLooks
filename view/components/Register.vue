@@ -1,9 +1,9 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
       <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
         <div class="text-center mb-10">
-          <img src="../assets/logo_teste.jpg" alt="Logo" class="w-28 h-28 mx-auto rounded-full shadow-lg">
-          <h1 class="text-5xl font-extrabold text-purple-400 mt-6">Crie sua Conta</h1>
+          <img src="../assets/Logo.png" alt="Logo" class="w-28 h-28 mx-auto rounded-full shadow-lg">
+          <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6">Crie sua Conta</h1>
           <p class="text-gray-400 mt-3 text-lg">Preencha os campos abaixo para se cadastrar</p>
         </div>
         <form @submit.prevent="handleRegister">
@@ -16,7 +16,7 @@
                   type="text"
                   id="name"
                   v-model="name"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu nome completo"
                   required
                 />
@@ -30,7 +30,7 @@
                   type="email"
                   id="email"
                   v-model="email"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu email (ex: exemplo@email.com)"
                   required
                 />
@@ -44,7 +44,7 @@
                   type="text"
                   id="cpf"
                   v-model="cpf"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu CPF (somente números)"
                   required
                 />
@@ -58,7 +58,7 @@
                   type="text"
                   id="phone"
                   v-model="phone"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu telefone com DDD (ex: 11999999999)"
                   required
                 />
@@ -72,7 +72,7 @@
                   type="text"
                   id="address"
                   v-model="address"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu endereço completo"
                   required
                 />
@@ -86,7 +86,7 @@
                   type="text"
                   id="cep"
                   v-model="cep"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu CEP (ex: 12345678)"
                   required
                 />
@@ -100,7 +100,7 @@
                   type="text"
                   id="city"
                   v-model="city"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite sua cidade"
                   required
                 />
@@ -114,7 +114,7 @@
                   type="text"
                   id="state"
                   v-model="state"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu estado"
                   required
                 />
@@ -128,7 +128,7 @@
                   type="text"
                   id="country"
                   v-model="country"
-                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite seu país"
                   required
                 />
@@ -142,7 +142,7 @@
                   :type="showPassword ? 'text' : 'password'"
                   id="password"
                   v-model="password"
-                  class="w-full pl-10 pr-12 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  class="w-full pl-10 pr-12 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
                   placeholder="Digite uma senha forte"
                   required
                 />
@@ -159,7 +159,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
+            class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
           >
             <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
             <i class="fas fa-user-plus mr-2"></i> Cadastrar
@@ -172,7 +172,7 @@
         <div class="mt-8 text-center">
           <p class="text-gray-400 text-lg">
             Já tem uma conta? 
-            <router-link to="/login" class="text-purple-400 hover:underline">Voltar para o Login</router-link>
+            <router-link to="/login" class="text-[#04d1b0] hover:underline">Voltar para o Login</router-link>
           </p>
         </div>
       </div>

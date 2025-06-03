@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-gray-200">
+  <div class="min-h-screen bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="container mx-auto py-16 px-4">
-      <h1 class="text-4xl font-bold text-purple-400 text-center mb-10 flex items-center justify-center gap-3">
-        <i class="fas fa-credit-card text-purple-500"></i>
+      <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-10 flex items-center justify-center gap-3">
+        <i class="fas fa-credit-card text-[#04d1b0]"></i>
         Finalizar Compra
       </h1>
-      <div class="bg-gray-800 p-8 rounded-lg shadow-lg border-2 border-purple-500 max-w-lg mx-auto">
-        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <i class="fas fa-receipt text-purple-400"></i>
+      <div class="bg-gray-900 p-8 rounded-3xl shadow-2xl border-2 border-[#04d1b0] max-w-lg mx-auto">
+        <h2 class="text-2xl font-bold text-[#04d1b0] mb-6 flex items-center gap-2">
+          <i class="fas fa-receipt text-[#04d1b0]"></i>
           Resumo do Pedido
         </h2>
         <div class="mb-4 flex flex-col gap-2">
@@ -24,37 +24,37 @@
 
         <!-- Formulário de Pagamento -->
         <form @submit.prevent class="flex flex-col gap-6">
-          <h3 class="text-xl font-bold text-purple-400 flex items-center gap-2 mb-2">
+          <h3 class="text-xl font-bold text-[#04d1b0] flex items-center gap-2 mb-2">
             <i class="fas fa-wallet"></i>
             Escolha o método de pagamento
           </h3>
           <div class="flex flex-col gap-3">
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" v-model="metodo" value="pix" class="accent-purple-600" />
-              <i class="fas fa-qrcode text-green-400"></i>
+              <input type="radio" v-model="metodo" value="pix" class="accent-[#04d1b0]" />
+              <i class="fas fa-qrcode text-[#04d1b0]"></i>
               <span>PIX</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" v-model="metodo" value="credito" class="accent-purple-600" />
+              <input type="radio" v-model="metodo" value="credito" class="accent-[#04d1b0]" />
               <i class="fas fa-credit-card text-blue-400"></i>
               <span>Cartão de Crédito</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" v-model="metodo" value="debito" class="accent-purple-600" />
+              <input type="radio" v-model="metodo" value="debito" class="accent-[#04d1b0]" />
               <i class="fas fa-credit-card text-yellow-400"></i>
               <span>Cartão de Débito</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" v-model="metodo" value="boleto" class="accent-purple-600" />
+              <input type="radio" v-model="metodo" value="boleto" class="accent-[#04d1b0]" />
               <i class="fas fa-barcode text-gray-300"></i>
               <span>Boleto Bancário</span>
             </label>
           </div>
 
           <!-- PIX -->
-          <div v-if="metodo === 'pix'" class="bg-gray-900 border border-green-400 rounded-lg p-4 flex flex-col items-center gap-2">
-            <i class="fas fa-qrcode text-4xl text-green-400"></i>
-            <span class="text-green-400 font-bold">Chave PIX:</span>
+          <div v-if="metodo === 'pix'" class="bg-gray-900 border border-[#04d1b0] rounded-lg p-4 flex flex-col items-center gap-2">
+            <i class="fas fa-qrcode text-4xl text-[#04d1b0]"></i>
+            <span class="text-[#04d1b0] font-bold">Chave PIX:</span>
             <span class="text-gray-200 select-all">compras@lojadev.com.br</span>
             <span class="text-xs text-gray-400">(Simulação: copie a chave para pagar no app do seu banco)</span>
           </div>
@@ -155,7 +155,7 @@
 
           <button
             type="submit"
-            class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 mt-2"
+            class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 mt-2"
             disabled
             title="Funcionalidade de pagamento em breve"
           >
@@ -168,7 +168,7 @@
         <div class="mt-2">
           <router-link
             to="/products"
-            class="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center gap-2"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center gap-2"
           >
             <i class="fas fa-store"></i>
             Voltar para a Loja
@@ -213,15 +213,27 @@ body {
   font-family: 'Fira Code', monospace;
 }
 
+button, .router-link-active {
+  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, background 0.2s;
+}
 button:hover, .router-link-active:hover {
+  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
   transform: scale(1.05);
 }
 
-hr {
-  border-top-width: 2px;
+input, select {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  font-family: 'Fira Code', monospace;
 }
-input[disabled] {
-  opacity: 0.7;
-  cursor: not-allowed;
+input:focus, select:focus {
+  border: 2px solid #04d1b0;
 }
 </style>

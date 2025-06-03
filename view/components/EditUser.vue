@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-black text-gray-200">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
     <div class="m-10 bg-gray-900 p-10 md:p-20 rounded-3xl shadow-2xl w-full max-w-4xl">
       <div class="text-center mb-10">
-        <i class="fas fa-user-edit text-6xl text-purple-400 mb-4"></i>
-        <h1 class="text-5xl font-extrabold text-purple-400 mt-2 flex items-center justify-center gap-3">
+        <i class="fas fa-user-edit text-6xl text-[#04d1b0] mb-4"></i>
+        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-2 flex items-center justify-center gap-3">
           Editar Dados
         </h1>
         <p class="text-gray-400 mt-3 text-lg">Atualize suas informações abaixo</p>
@@ -139,13 +139,13 @@
         </div>
         <button
           type="submit"
-          class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
+          class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
         >
           <i class="fas fa-save mr-2"></i> Salvar Alterações
         </button>
       </form>
       <div class="mt-8 text-center">
-        <router-link to="/profile" class="text-purple-400 hover:underline text-lg flex items-center justify-center gap-2">
+        <router-link to="/profile" class="text-[#04d1b0] hover:underline text-lg flex items-center justify-center gap-2">
           <i class="fas fa-arrow-left"></i> Voltar ao Perfil
         </router-link>
       </div>
