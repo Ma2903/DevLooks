@@ -33,16 +33,15 @@
         <i class="fas fa-th-large mr-2"></i>Categorias
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <router-link
+        <div
           v-for="cat in categorias"
           :key="cat.nome"
-          :to="`/products?category=${cat.value}`"
-          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-[#04d1b0] transition duration-300 flex flex-col items-center cursor-pointer group"
+          class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-[#04d1b0] transition duration-300 flex flex-col items-center cursor-default group"
         >
           <i :class="cat.icone + ' text-5xl text-[#04d1b0] mb-4 group-hover:scale-110 transition'"></i>
           <h3 class="text-lg font-bold text-white">{{ cat.nome }}</h3>
           <p class="text-gray-300 mt-2">{{ cat.desc }}</p>
-        </router-link>
+        </div>
       </div>
     </section>
 

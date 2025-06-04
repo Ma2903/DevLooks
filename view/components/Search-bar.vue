@@ -11,20 +11,21 @@
         aria-label="Buscar produto"
       />
     </div>
-    <div class="relative w-full md:w-64">
+    <div class="relative w-full md:w-72">
       <i class="fas fa-th-list absolute left-4 top-1/2 transform -translate-y-1/2 text-[#04d1b0]"></i>
       <select
-        v-model="selectedCategory"
-        @change="emitSearch"
-        class="w-full pl-12 pr-4 py-3 bg-gray-900 text-gray-200 rounded-lg border border-[#04d1b0] focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
-        aria-label="Filtrar por categoria"
+      v-model="selectedCategory"
+      @change="emitSearch"
+      class="w-full pl-12 pr-10 py-3 bg-gray-900 text-gray-200 rounded-lg border border-[#04d1b0] focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition appearance-none"
+      aria-label="Filtrar por categoria"
       >
-        <option value="">Todas as categorias</option>
-        <option value="avatares">Avatares</option>
-        <option value="skins">Skins</option>
-        <option value="acessorios">Acessórios</option>
-        <option value="presentes">Presentes</option>
+      <option value="" class="text-gray-900 bg-gray-200">Todas as categorias</option>
+      <option value="avatares" class="text-gray-900 bg-gray-200">Avatares</option>
+      <option value="skins" class="text-gray-900 bg-gray-200">Skins</option>
+      <option value="acessorios" class="text-gray-900 bg-gray-200">Acessórios</option>
+      <option value="presentes" class="text-gray-900 bg-gray-200">Presentes</option>
       </select>
+      <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-[#04d1b0] pointer-events-none"></i>
     </div>
   </div>
 </template>
