@@ -6,6 +6,7 @@ import axios from 'axios';
 // import productRoutes from './routes/productsRoutes';
 import usersRoutes from './routes/UserRoutes';
 import productRoutes from './routes/ProductRoutes';
+import couponRoutes from './routes/CouponRoutes';
 
 import connectDB from "./config/database";
 
@@ -27,6 +28,7 @@ connectDB.getInstance();
 // app.use('/products',  productRoutes);
 app.use('/api', usersRoutes);
 app.use('/api', productRoutes);
+app.use('/api', couponRoutes);
 
 app.listen(port, () => {
     console.log(`API Rodando http://localhost:${port}`);

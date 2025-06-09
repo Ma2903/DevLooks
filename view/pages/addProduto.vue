@@ -1,118 +1,109 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
-    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
-      <div class="text-center mb-10">
-        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6 flex items-center justify-center gap-3">
-          <i class="fas fa-plus-circle"></i>
-          Adicionar Produto
-        </h1>
-        <p class="text-gray-400 mt-3 text-lg">Preencha os campos abaixo para adicionar um novo produto</p>
-      </div>
-      <form @submit.prevent="adicionarProduto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div class="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center py-12 px-4">
+    <div class="max-w-xl w-full">
+      <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-8 flex items-center justify-center gap-3">
+        <i class="fas fa-plus-circle"></i>
+        Adicionar Produto
+      </h1>
+
+      <form @submit.prevent="adicionarProduto" class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 space-y-6">
+        <div>
+          <label for="nome" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Nome do Produto</label>
+          <input
+            type="text"
+            id="nome"
+            v-model="produto.nome"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            placeholder="Digite o nome do produto"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="descricao" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Descrição</label>
+          <textarea
+            id="descricao"
+            v-model="produto.descricao"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            placeholder="Digite a descrição do produto"
+            required
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="nome" class="block text-sm font-medium text-gray-300 mb-2">Nome do Produto</label>
-            <div class="relative">
-              <i class="fas fa-box absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="text"
-                id="nome"
-                v-model="produto.nome"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o nome do produto"
-                required
-              />
-            </div>
+            <label for="preco" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Preço</label>
+            <input
+              type="number"
+              id="preco"
+              v-model="produto.preco"
+              step="0.01"
+              min="0"
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+              placeholder="Digite o preço do produto"
+              required
+            />
           </div>
+
           <div>
-            <label for="descricao" class="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
-            <div class="relative">
-              <i class="fas fa-align-left absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <textarea
-                id="descricao"
-                v-model="produto.descricao"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite a descrição do produto"
-                required
-              ></textarea>
-            </div>
-          </div>
-          <div>
-            <label for="preco" class="block text-sm font-medium text-gray-300 mb-2">Preço</label>
-            <div class="relative">
-              <i class="fas fa-dollar-sign absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="number"
-                id="preco"
-                v-model="produto.preco"
-                step="0.01"
-                min="0"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o preço do produto"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">Imagem do Produto</label>
-            <div class="relative flex flex-col gap-2">
-              <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="file"
-                id="imagem"
-                @change="onFileChange"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Importe a imagem do produto"
-                accept="image/*"
-              />
-              <img
-                v-if="previewUrl"
-                :src="previewUrl"
-                alt="Pré-visualização"
-                class="w-24 h-24 mt-2 rounded-lg border-2 border-purple-400 object-cover shadow"
-              />
-            </div>
-          </div>
-          <div>
-            <label for="estoque" class="block text-sm font-medium text-gray-300 mb-2">Estoque</label>
-            <div class="relative">
-              <i class="fas fa-boxes absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="number"
-                id="estoque"
-                v-model="produto.estoque"
-                min="0"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o estoque do produto"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label for="categoria" class="block text-sm font-medium text-gray-300 mb-2">Categoria</label>
-            <div class="relative">
-              <i class="fas fa-tags absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <select
-                id="categoria"
-                v-model="produto.categoria"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                required
-              >
-                <option value="" disabled>Selecione uma categoria</option>
-                <option value="avatares">Avatares</option>
-                <option value="skins">Skins</option>
-                <option value="acessorios">Acessórios</option>
-                <option value="presentes">Presentes</option>
-              </select>
-            </div>
+            <label for="estoque" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Estoque</label>
+            <input
+              type="number"
+              id="estoque"
+              v-model="produto.estoque"
+              min="0"
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+              placeholder="Digite o estoque do produto"
+              required
+            />
           </div>
         </div>
-        <button
-          type="submit"
-          class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
-        >
-          <i class="fas fa-plus-circle"></i> Adicionar Produto
-        </button>
+
+        <div>
+          <label for="categoria" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Categoria</label>
+          <select
+            id="categoria"
+            v-model="produto.categoria"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            required
+          >
+            <option value="" disabled>Selecione uma categoria</option>
+            <option value="avatares">Avatares</option>
+            <option value="skins">Skins</option>
+            <option value="acessorios">Acessórios</option>
+            <option value="presentes">Presentes</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="imagem" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Imagem do Produto</label>
+          <input
+            type="file"
+            id="imagem"
+            @change="onFileChange"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            accept="image/*"
+          />
+          <img
+            v-if="previewUrl"
+            :src="previewUrl"
+            alt="Pré-visualização"
+            class="w-24 h-24 mt-4 rounded-lg border-2 border-[#04d1b0] object-cover shadow"
+          />
+        </div>
+
+        <div class="flex justify-end pt-4 gap-4">
+          <router-link to="/admin/products" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition">
+            Cancelar
+          </router-link>
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition"
+          >
+            <i class="fas fa-save mr-2"></i>
+            Adicionar Produto
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -160,28 +151,28 @@ export default {
         formData.append('stock', this.produto.estoque);
         formData.append('category', this.produto.categoria);
 
-        const response = await axios.post('http://localhost:3000/api/products', formData, {
+        await axios.post('http://localhost:3000/api/products', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
 
         Swal.fire({
-          icon: "success",
-          title: "Sucesso",
-          text: "Produto adicionado com sucesso!",
-          background: "#1F2937",
-          color: "#E5E7EB",
+          icon: 'success',
+          title: 'Sucesso',
+          text: 'Produto adicionado com sucesso!',
+          background: '#1F2937',
+          color: '#E5E7EB',
         }).then(() => {
-          this.$router.push("/admin/products");
+          this.$router.push('/admin/products');
         });
       } catch (error) {
         Swal.fire({
-          icon: "error",
-          title: "Erro",
-          text: `Erro ao adicionar o produto: ${error.response?.data?.error || "Erro desconhecido."}`,
-          background: "#1F2937",
-          color: "#E5E7EB",
+          icon: 'error',
+          title: 'Erro',
+          text: `Erro ao adicionar o produto: ${error.response?.data?.error || 'Erro desconhecido.'}`,
+          background: '#1F2937',
+          color: '#E5E7EB',
         });
       }
     },
@@ -192,35 +183,8 @@ export default {
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-body {
-  font-family: 'Fira Code', monospace;
-}
-
-button, .router-link-active {
-  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
-  color: #fff;
-  font-weight: bold;
-  border-radius: 0.75rem;
-  transition: transform 0.2s, background 0.2s;
-}
-button:hover, .router-link-active:hover {
-  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
-  transform: scale(1.05);
-}
-
-input, textarea, select {
-  background: #1f2937;
-  color: #e5e7eb;
-  border-radius: 0.5rem;
-  border: none;
-  outline: none;
-  font-family: 'Fira Code', monospace;
-}
-input:focus, textarea:focus, select:focus {
-  border: 2px solid #04d1b0;
-}
-
-input::placeholder, textarea::placeholder {
-  color: #9CA3AF;
+/* Garante que o calendário do input de data também seja escuro em navegadores que suportam */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 </style>

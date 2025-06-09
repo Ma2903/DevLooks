@@ -132,12 +132,37 @@ export default {
       return icones[categoria] || "fas fa-box"; // Ícone padrão se a categoria não tiver ícone específico
     },
     addToCart(produto) {
-      // Lógica para adicionar o produto ao carrinho
-      console.log("Produto adicionado ao carrinho:", produto);
+      const cart = localStorage.getItem("cart");
+      const cartItems = cart ? JSON.parse(cart) : [];
+
+      const existingItem = cartItems.find((item) => item._id === produto._id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cartItems.push({ ...produto, quantity: 1 });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+
       Swal.fire({
+        title: "Produto Adicionado!",
+        text: `1 unidade de "${produto.name}" foi adicionada ao carrinho.`,
         icon: "success",
-        title: "Adicionado ao Carrinho",
-        text: `${produto.name} foi adicionado ao seu carrinho.`,
+        background: "#1a202c",
+        color: "#e2e8f0",
+        showCancelButton: true,
+        confirmButtonText: "Ir para o Carrinho",
+        cancelButtonText: "Continuar Comprando",
+        customClass: {
+          popup: "rounded-lg shadow-lg",
+          confirmButton: "bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mx-2",
+          cancelButton: "bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg mx-2",
+        },
+        buttonsStyling: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$router.push("/cart");
+        }
       });
     },
   },

@@ -1,132 +1,129 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
-    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
-      <div class="text-center mb-10">
-        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6 flex items-center justify-center gap-3">
-          <i class="fas fa-edit"></i>
-          Editar Produto
-        </h1>
-        <p class="text-gray-400 mt-3 text-lg">Atualize os campos abaixo para editar o produto</p>
-      </div>
-      <form @submit.prevent="editarProduto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div class="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center py-12 px-4">
+    <div class="max-w-xl w-full">
+      <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-8 flex items-center justify-center gap-3">
+        <i class="fas fa-edit"></i>
+        Editar Produto
+      </h1>
+
+      <form @submit.prevent="editarProduto" class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 space-y-6">
+        <div>
+          <label for="nome" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Nome do Produto</label>
+          <input
+            type="text"
+            id="nome"
+            v-model="produto.nome"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            placeholder="Digite o nome do produto"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="descricao" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Descrição</label>
+          <textarea
+            id="descricao"
+            v-model="produto.descricao"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            placeholder="Digite a descrição do produto"
+            required
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label for="nome" class="block text-sm font-medium text-gray-300 mb-2">Nome do Produto</label>
-            <div class="relative">
-              <i class="fas fa-box absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="text"
-                id="nome"
-                v-model="produto.nome"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o nome do produto"
-                required
-              />
-            </div>
+            <label for="preco" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Preço</label>
+            <input
+              type="number"
+              id="preco"
+              v-model="produto.preco"
+              step="0.01"
+              min="0"
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+              placeholder="Digite o preço do produto"
+              required
+            />
           </div>
+
           <div>
-            <label for="descricao" class="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
-            <div class="relative">
-              <i class="fas fa-align-left absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <textarea
-                id="descricao"
-                v-model="produto.descricao"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite a descrição do produto"
-                required
-              ></textarea>
-            </div>
-          </div>
-          <div>
-            <label for="preco" class="block text-sm font-medium text-gray-300 mb-2">Preço</label>
-            <div class="relative">
-              <i class="fas fa-dollar-sign absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="number"
-                id="preco"
-                v-model="produto.preco"
-                step="0.01"
-                min="0"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o preço do produto"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label for="imagem" class="block text-sm font-medium text-gray-300 mb-2">Imagem do Produto</label>
-            <div class="relative flex flex-col gap-2">
-              <i class="fas fa-image absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="file"
-                id="imagem"
-                @change="onFileChange"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Importe a imagem do produto"
-                accept="image/*"
-              />
-            </div>
-          </div>
-          <div>
-            <label for="estoque" class="block text-sm font-medium text-gray-300 mb-2">Estoque</label>
-            <div class="relative">
-              <i class="fas fa-boxes absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <input
-                type="number"
-                id="estoque"
-                v-model="produto.estoque"
-                min="0"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Digite o estoque do produto"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label for="categoria" class="block text-sm font-medium text-gray-300 mb-2">Categoria</label>
-            <div class="relative">
-              <i class="fas fa-tags absolute left-3 top-3 text-gray-400 mt-2"></i>
-              <select
-                id="categoria"
-                v-model="produto.categoria"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                required
-              >
-                <option value="" disabled>Selecione uma categoria</option>
-                <option value="avatares">Avatares</option>
-                <option value="skins">Skins</option>
-                <option value="acessorios">Acessórios</option>
-                <option value="presentes">Presentes</option>
-              </select>
-            </div>
+            <label for="estoque" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Estoque</label>
+            <input
+              type="number"
+              id="estoque"
+              v-model="produto.estoque"
+              min="0"
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+              placeholder="Digite o estoque do produto"
+              required
+            />
           </div>
         </div>
-        <button
-          type="submit"
-          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 text-lg mt-8 flex items-center justify-center gap-2"
-        >
-          <i class="fas fa-save"></i> Salvar Alterações
-        </button>
+
+        <div>
+          <label for="categoria" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Categoria</label>
+          <select
+            id="categoria"
+            v-model="produto.categoria"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            required
+          >
+            <option value="" disabled>Selecione uma categoria</option>
+            <option value="avatares">Avatares</option>
+            <option value="skins">Skins</option>
+            <option value="acessorios">Acessórios</option>
+            <option value="presentes">Presentes</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="imagem" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Imagem do Produto</label>
+          <input
+            type="file"
+            id="imagem"
+            @change="onFileChange"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            accept="image/*"
+          />
+          <img
+            v-if="previewUrl || produto.imagemUrl"
+            :src="previewUrl || produto.imagemUrl"
+            alt="Pré-visualização"
+            class="w-24 h-24 mt-4 rounded-lg border-2 border-[#04d1b0] object-cover shadow"
+          />
+        </div>
+
+        <div class="flex justify-end pt-4 gap-4">
+          <router-link to="/admin/products" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition">
+            Cancelar
+          </router-link>
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition"
+          >
+            <i class="fas fa-save mr-2"></i>
+            Salvar Alterações
+          </button>
+        </div>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import ProductService from '../services/ProductService';
 import axios from "axios";
 import Swal from "sweetalert2";
+
 export default {
   data() {
     return {
       produto: {
-        nome: '',
-        descricao: '',
+        nome: "",
+        descricao: "",
         preco: null,
         imagem: null,
-        imagemUrl: '',
+        imagemUrl: "",
         estoque: null,
-        categoria: '',
+        categoria: "",
       },
       previewUrl: null,
     };
@@ -134,10 +131,7 @@ export default {
   methods: {
     async fetchProduct(productId) {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/products/${productId}`
-        );
-        // Ajusta os campos para o padrão do formulário
+        const response = await axios.get(`http://localhost:3000/api/products/${productId}`);
         this.produto = {
           nome: response.data.name,
           descricao: response.data.description,
@@ -156,7 +150,7 @@ export default {
       this.produto.imagem = file;
       if (file) {
         const reader = new FileReader();
-        reader.onload = e => {
+        reader.onload = (e) => {
           this.previewUrl = e.target.result;
         };
         reader.readAsDataURL(file);
@@ -167,18 +161,18 @@ export default {
     async editarProduto() {
       try {
         const formData = new FormData();
-        formData.append('name', this.produto.nome);
-        formData.append('description', this.produto.descricao);
-        formData.append('price', this.produto.preco);
+        formData.append("name", this.produto.nome);
+        formData.append("description", this.produto.descricao);
+        formData.append("price", this.produto.preco);
         if (this.produto.imagem) {
-          formData.append('imagem', this.produto.imagem);
+          formData.append("imagem", this.produto.imagem);
         }
-        formData.append('stock', this.produto.estoque);
-        formData.append('category', this.produto.categoria);
+        formData.append("stock", this.produto.estoque);
+        formData.append("category", this.produto.categoria);
 
         await axios.put(`http://localhost:3000/api/products/${this.$route.params.id}`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
 
@@ -192,7 +186,6 @@ export default {
           this.$router.push("/admin/products");
         });
       } catch (error) {
-        console.error('Erro ao editar produto:', error);
         Swal.fire({
           icon: "error",
           title: "Erro",
@@ -213,35 +206,8 @@ export default {
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-body {
-  font-family: 'Fira Code', monospace;
-}
-
-button, .router-link-active {
-  background-image: linear-gradient(to right, #04d1b0, #4e44e1);
-  color: #fff;
-  font-weight: bold;
-  border-radius: 0.75rem;
-  transition: transform 0.2s, background 0.2s;
-}
-button:hover, .router-link-active:hover {
-  background-image: linear-gradient(to right, #03b89a, #3e3ab8);
-  transform: scale(1.05);
-}
-
-input, textarea, select {
-  background: #1f2937;
-  color: #e5e7eb;
-  border-radius: 0.5rem;
-  border: none;
-  outline: none;
-  font-family: 'Fira Code', monospace;
-}
-input:focus, textarea:focus, select:focus {
-  border: 2px solid #04d1b0;
-}
-
-input::placeholder, textarea::placeholder {
-  color: #9CA3AF;
+/* Garante que o calendário do input de data também seja escuro em navegadores que suportam */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 </style>

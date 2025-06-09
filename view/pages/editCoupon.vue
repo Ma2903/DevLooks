@@ -1,0 +1,157 @@
+<template>
+  <div class="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center py-12 px-4">
+    <div class="max-w-xl w-full">
+      <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-8 flex items-center justify-center gap-3">
+        <i class="fas fa-edit"></i>
+        Editar Cupom
+      </h1>
+
+      <form @submit.prevent="atualizarCupom" class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 space-y-6">
+        <div>
+          <label for="code" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Código do Cupom</label>
+          <input
+            v-model="form.code"
+            type="text"
+            id="code"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            placeholder="Ex: DEVSUPER15"
+            required
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="discountType" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Tipo</label>
+            <select
+              v-model="form.discountType"
+              id="discountType"
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+              required
+            >
+              <option value="percentage">Porcentagem (%)</option>
+              <option value="fixed">Valor Fixo (R$)</option>
+            </select>
+          </div>
+          <div>
+            <label for="discountValue" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Valor</label>
+            <input
+              v-model.number="form.discountValue"
+              type="number"
+              id="discountValue"
+              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+              step="0.01"
+              placeholder="Ex: 15"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="expirationDate" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Data de Expiração</label>
+          <input
+            v-model="form.expirationDate"
+            type="date"
+            id="expirationDate"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            required
+          />
+        </div>
+
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            v-model="form.isActive"
+            id="isActive"
+            class="h-5 w-5 bg-gray-700 border-gray-600 rounded text-[#04d1b0] focus:ring-[#04d1b0]"
+          />
+          <label for="isActive" class="ml-3 text-gray-300">Cupom Ativo</label>
+        </div>
+
+        <div class="flex justify-end pt-4 gap-4">
+          <router-link to="/admin/coupons" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition">
+            Cancelar
+          </router-link>
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition"
+          >
+            <i class="fas fa-save mr-2"></i>
+            Atualizar Cupom
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import CouponService from '@/services/CouponService';
+import Swal from 'sweetalert2';
+
+export default {
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const couponId = route.params.id;
+    const form = ref({
+      code: '',
+      discountType: 'percentage',
+      discountValue: null,
+      expirationDate: '',
+      isActive: true,
+    });
+
+    onMounted(async () => {
+      try {
+        const coupon = await CouponService.getCouponById(couponId);
+        form.value = {
+          ...coupon,
+          expirationDate: new Date(coupon.expirationDate).toISOString().split('T')[0],
+        };
+      } catch (error) {
+        Swal.fire({
+          title: 'Erro!',
+          text: 'Não foi possível carregar os dados do cupom.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb',
+        });
+      }
+    });
+
+    async function atualizarCupom() {
+      try {
+        await CouponService.updateCoupon(couponId, form.value);
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Cupom atualizado com sucesso!',
+          icon: 'success',
+          background: '#1f2937',
+          color: '#e5e7eb',
+        }).then(() => {
+          router.push('/admin/coupons');
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Erro!',
+          text: 'Não foi possível atualizar o cupom.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb',
+        });
+      }
+    }
+
+    return {
+      form,
+      atualizarCupom,
+    };
+  },
+};
+</script>
+
+<style scoped>
+@import '@fortawesome/fontawesome-free/css/all.css';
+</style>

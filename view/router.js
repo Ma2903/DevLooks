@@ -12,10 +12,13 @@ import SingleProduto from './pages/singleProduto.vue';
 import AdminProducts from './pages/AdminProducts.vue';
 import addProduto from './pages/addProduto.vue';
 import EditProduto from './pages/editProduto.vue';
-import ProductList from './pages/ProductList.vue'; // Corrigido o caminho
+import ProductList from './pages/ProductList.vue';
 import Cart from './components/Cart.vue';
 import Checkout from './pages/Checkout.vue';
 import ConfirmReset from './components/ConfirmReset.vue';
+import AdminCoupons from './pages/AdminCoupons.vue';
+import CouponForm from './pages/CouponForm.vue';
+import EditCoupon from './pages/EditCoupon.vue';
 
 // Define as rotas
 const routes = [
@@ -35,6 +38,9 @@ const routes = [
   { path: '/cart', name: 'Cart', component: Cart },
   { path: '/checkout', name: 'Checkout', component: Checkout },
   { path: '/confirm-reset', name: 'ConfirmReset', component: ConfirmReset },
+  { path: '/admin/coupons', name: 'AdminCoupons', component: AdminCoupons, meta: { requiresAuth: true } },
+  { path: '/admin/coupons/add', name: 'AddCoupon', component: CouponForm, meta: { requiresAuth: true } },
+  { path: '/admin/coupons/edit/:id', name: 'EditCoupon', component: EditCoupon, meta: { requiresAuth: true }, props: true },
 ];
 
 // Cria o roteador

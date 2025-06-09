@@ -45,12 +45,12 @@
 
           <!-- Os demais só aparecem se estiver logado -->
           <template v-if="isLoggedIn">
-            <!-- Botão Criar Avatar (todos logados) -->
-            <li>
+            <!-- Botão Criar Avatar (apenas clientes) -->
+            <li v-if="userType !== 'admin'">
               <router-link
                 to="/create-avatar"
                 class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
-              style="color: white !important;"
+                style="color: white !important;"
               >
                 <i class="fas fa-user-astronaut"></i><span>Criar Avatar</span>
               </router-link>
@@ -60,10 +60,21 @@
             <li v-if="userType === 'admin'">
               <router-link
                 to="/admin/products"
-               class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
-              style="color: white !important;"
+                class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+                style="color: white !important;"
               >
                 <i class="fas fa-cogs"></i><span>Gerenciar Produtos</span>
+              </router-link>
+            </li>
+
+            <!-- Botão Gerenciar Cupons (apenas admin) -->
+            <li v-if="userType === 'admin'">
+              <router-link
+                to="/admin/coupons"
+                class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
+                style="color: white !important;"
+              >
+                <i class="fas fa-tags"></i><span>Gerenciar Cupons</span>
               </router-link>
             </li>
 
@@ -72,7 +83,7 @@
               <router-link
                 to="/cart"
                 class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] hover:text-white flex items-center space-x-2 transition"
-              style="color: white !important;"
+                style="color: white !important;"
               >
                 <i class="fas fa-shopping-cart"></i>
                 <span>Carrinho</span>

@@ -189,6 +189,7 @@
 <script>
 import Product from './Product.vue';
 import ProductService from '../services/ProductService';
+import Swal from 'sweetalert2';
 
 export default {
   name: "Home",
@@ -199,11 +200,11 @@ export default {
     return {
       produtos: [], // Lista de produtos
       categorias: [
-  { nome: "Avatares", value: "avatares", icone: "fas fa-user-astronaut", desc: "Personalize seu avatar com acessórios únicos." },
-  { nome: "Skins", value: "skins", icone: "fas fa-tshirt", desc: "Dê um toque especial ao seu estilo com nossas skins." },
-  { nome: "Acessórios", value: "acessorios", icone: "fas fa-keyboard", desc: "Teclados, mouses e muito mais para completar seu setup." },
-  { nome: "Presentes", value: "presentes", icone: "fas fa-gift", desc: "Encontre o presente perfeito para seus amigos geeks." }
-], // Lista de categorias
+        { nome: "Avatares", value: "avatares", icone: "fas fa-user-astronaut", desc: "Personalize seu avatar com acessórios únicos." },
+        { nome: "Skins", value: "skins", icone: "fas fa-tshirt", desc: "Dê um toque especial ao seu estilo com nossas skins." },
+        { nome: "Acessórios", value: "acessorios", icone: "fas fa-keyboard", desc: "Teclados, mouses e muito mais para completar seu setup." },
+        { nome: "Presentes", value: "presentes", icone: "fas fa-gift", desc: "Encontre o presente perfeito para seus amigos geeks." }
+      ], // Lista de categorias
       loading: true, // Estado de carregamento
       error: null, // Estado de erro
       showScrollButton: false
@@ -221,6 +222,40 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    addToCart(produto) {
+      const cart = localStorage.getItem("cart");
+      const cartItems = cart ? JSON.parse(cart) : [];
+
+      const existingItem = cartItems.find((item) => item._id === produto._id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cartItems.push({ ...produto, quantity: 1 });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+
+      Swal.fire({
+        title: "Produto Adicionado!",
+        text: `1 unidade de "${produto.name}" foi adicionada ao carrinho.`,
+        icon: "success",
+        background: "#1a202c",
+        color: "#e2e8f0",
+        showCancelButton: true,
+        confirmButtonText: "Ir para o Carrinho",
+        cancelButtonText: "Continuar Comprando",
+        customClass: {
+          popup: "rounded-lg shadow-lg",
+          confirmButton: "bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg mx-2",
+          cancelButton: "bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg mx-2",
+        },
+        buttonsStyling: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$router.push("/cart");
+        }
+      });
     },
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
