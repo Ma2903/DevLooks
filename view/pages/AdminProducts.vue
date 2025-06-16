@@ -25,7 +25,7 @@
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Preço</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Categoria</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Estoque</th>
-                <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider">Ações</th> <!-- Altere para text-center -->
+                <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-700">
@@ -51,7 +51,7 @@
                     {{ produto.stock }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium flex items-center justify-center gap-4"> <!-- Altere para text-center -->
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium flex items-center justify-center gap-4">
                   <router-link :to="`/admin/products/edit/${produto._id}`" class="text-blue-400 hover:text-blue-300 transition flex items-center gap-1" title="Editar">
                     <i class="fas fa-edit"></i> <span>Editar</span>
                   </router-link>

@@ -25,7 +25,7 @@
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Valor</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Expira em</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Status</th>
-                <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider">Ações</th>
+                <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-700">
@@ -51,7 +51,7 @@
                     {{ coupon.isActive && new Date(coupon.expirationDate) >= new Date() ? 'Ativo' : 'Inativo' }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-4">
                   <router-link :to="`/admin/coupons/edit/${coupon._id}`" class="text-blue-400 hover:text-blue-300 transition" title="Editar">
                     <i class="fas fa-edit"></i> Editar
                   </router-link>
