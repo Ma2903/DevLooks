@@ -16,7 +16,7 @@
             <div class="flex items-center gap-6">
               <div class="relative">
                 <img
-                  :src="getImageUrl(item.image)"
+                  :src="item.image"
                   :alt="item.name"
                   class="w-24 h-24 object-cover rounded-lg border-2 border-[#04d1b0] shadow"
                 />

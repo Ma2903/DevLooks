@@ -197,10 +197,9 @@ export default {
     totalPrice() {
       const cart = localStorage.getItem("cart");
       const cartItems = cart ? JSON.parse(cart) : [];
-      return cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      );
+      const checkout = localStorage.getItem("checkoutData");
+      const checkoutItems = checkout ? JSON.parse(checkout) : [];
+      return checkoutItems.finalTotal
     },
   },
 };
