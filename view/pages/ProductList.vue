@@ -66,7 +66,8 @@
           >
             Ver Detalhes
           </router-link>
-          <button
+            <button
+            v-if="userType !== 'admin'"
             @click="addToCart(produto)"
             class="w-full mt-3 bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
           >
@@ -90,7 +91,8 @@ export default {
     return {
       produtos: [],
       search: "",
-      category: ""
+      category: "",
+      userType: "user",
     };
   },
   computed: {
@@ -107,6 +109,11 @@ export default {
   },
   async created() {
     await this.fetchProducts();
+    const userDataRaw = localStorage.getItem("userData");
+    if (userDataRaw && userDataRaw !== "undefined") {
+      const userData = JSON.parse(userDataRaw);
+      this.userType = userData.role || (userData.user && userData.user.role) || "user";
+    }
   },
   methods: {
     async fetchProducts() {

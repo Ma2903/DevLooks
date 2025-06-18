@@ -84,6 +84,7 @@
             Ver Detalhes
           </router-link>
           <button
+            v-if="userType !== 'admin'"
             @click="addToCart(produto)"
             class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
           >
@@ -207,7 +208,8 @@ export default {
       ], // Lista de categorias
       loading: true, // Estado de carregamento
       error: null, // Estado de erro
-      showScrollButton: false
+      showScrollButton: false,
+      userType: "user", // Valor padrão
     };
   },
   methods: {
@@ -273,6 +275,12 @@ export default {
   async mounted() {
     window.addEventListener('scroll', this.handleScroll);
     await this.fetchProducts(); // Chama o método para buscar os produtos
+
+     const userDataRaw = localStorage.getItem("userData");
+    if (userDataRaw && userDataRaw !== "undefined") {
+      const userData = JSON.parse(userDataRaw);
+      this.userType = userData.role || (userData.user && userData.user.role) || "user";
+    }
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);

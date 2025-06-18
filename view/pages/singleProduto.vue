@@ -102,11 +102,12 @@
             <i class="fas fa-arrow-left"></i> Voltar para a Loja
           </router-link>
           <button
-            @click="addToCart(product)"
-            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 justify-center"
-          >
-            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
-          </button>
+          v-if="userType !== 'admin'"
+          @click="addToCart(product)"
+          class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2 justify-center"
+        >
+          <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+        </button>
         </div>
       </div>
     </div>
@@ -129,6 +130,11 @@ export default {
   created() {
     const productId = this.$route.params.id;
     this.fetchProduct(productId);
+     const userDataRaw = localStorage.getItem("userData");
+    if (userDataRaw && userDataRaw !== "undefined") {
+      const userData = JSON.parse(userDataRaw);
+      this.userType = userData.role || (userData.user && userData.user.role) || "user";
+    }
   },
   methods: {
     async fetchProduct(productId) {
