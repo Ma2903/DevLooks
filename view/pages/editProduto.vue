@@ -159,42 +159,45 @@ export default {
       }
     },
     async editarProduto() {
-      try {
-        const formData = new FormData();
-        formData.append("name", this.produto.nome);
-        formData.append("description", this.produto.descricao);
-        formData.append("price", this.produto.preco);
-        if (this.produto.imagem) {
-          formData.append("imagem", this.produto.imagem);
-        }
-        formData.append("stock", this.produto.estoque);
-        formData.append("category", this.produto.categoria);
+  try {
+    const produtoData = {
+      name: this.produto.nome,
+      description: this.produto.descricao,
+      price: this.produto.preco,
+      stock: this.produto.estoque,
+      category: this.produto.categoria,
+    };
 
-        await axios.put(`http://localhost:3000/api/products/${this.$route.params.id}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+    // Adiciona a imagem apenas se ela existir
+    if (this.produto.imagem) {
+      produtoData.imagem = this.produto.imagem;
+    }
 
-        Swal.fire({
-          icon: "success",
-          title: "Sucesso",
-          text: "Produto editado com sucesso!",
-          background: "#1F2937",
-          color: "#E5E7EB",
-        }).then(() => {
-          this.$router.push("/admin/products");
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Erro",
-          text: "Erro ao editar produto.",
-          background: "#1F2937",
-          color: "#E5E7EB",
-        });
-      }
-    },
+    await axios.put(`http://localhost:3000/api/products/${this.$route.params.id}`, produtoData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    Swal.fire({
+      icon: "success",
+      title: "Sucesso",
+      text: "Produto editado com sucesso!",
+      background: "#1F2937",
+      color: "#E5E7EB",
+    }).then(() => {
+      this.$router.push("/admin/products");
+    });
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Erro",
+      text: "Erro ao editar produto.",
+      background: "#1F2937",
+      color: "#E5E7EB",
+    });
+  }
+  },
   },
   mounted() {
     const produtoId = this.$route.params.id;
