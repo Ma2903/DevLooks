@@ -24,6 +24,8 @@
       <option value="skins" class="text-gray-900 bg-gray-200">Skins</option>
       <option value="acessorios" class="text-gray-900 bg-gray-200">Acessórios</option>
       <option value="presentes" class="text-gray-900 bg-gray-200">Presentes</option>
+      <option value="camisetas" class="text-gray-900 bg-gray-200">Camisetas</option>
+      <option value="canecas" class="text-gray-900 bg-gray-200">Canecas</option>
       </select>
       <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-[#04d1b0] pointer-events-none"></i>
     </div>

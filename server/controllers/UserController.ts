@@ -1,40 +1,69 @@
+// server/controllers/UserController.ts
+
 import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-// import User from "../models/UserModel"; // Importamos a classe User
-import { UserFactory } from "../factories/UserFactory";
-import nodemailer from "nodemailer"
+import User from "../models/UserModel";
+import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
 
-const User = UserFactory.getModel()
+// Importa as chaves do nosso novo ponto central de configuração
+import { 
+    JWT_SECRET, 
+    CRYPTO_SECRET, 
+    MAIL_HOST, 
+    MAIL_PORT, 
+    MAIL_USER, 
+    MAIL_PASS 
+} from "../config/config";
 
-const chaveSecreta = 'abacaxi123'; // Chave secreta para criptografia e descriptografia
-// Função para criptografar
+// As declarações de process.env foram removidas daqui
+
 function criptografar(dado: string): string {
-    return encodeURIComponent(CryptoJS.AES.encrypt(dado, chaveSecreta).toString());
-  }
+    return encodeURIComponent(CryptoJS.AES.encrypt(dado, CRYPTO_SECRET).toString());
+}
   
-  // Função para descriptografar
-  function descriptografar(dadoCriptografado: string): string {
-    const bytes = CryptoJS.AES.decrypt(dadoCriptografado, chaveSecreta);
+function descriptografar(dadoCriptografado: string): string {
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(dadoCriptografado), CRYPTO_SECRET);
     return bytes.toString(CryptoJS.enc.Utf8);
-  }
+}
   
-
 class UserController {
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await User.create(req.body);
-            res.status(201).json(user);
+            const { password } = req.body;
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            const user = await User.create({
+                ...req.body,
+                password: hashedPassword,
+            });
+            const userResponse = user.toObject();
+            delete userResponse.password;
+            res.status(201).json(userResponse);
         } catch (error) {
-            res.status(500).json({ error: "Erro ao criar usuário." });
+            // VERIFICAÇÃO ADICIONADA
+            // O erro E11000 do MongoDB indica uma violação de chave única (unique)
+            if (error.code === 11000) {
+                // Retorna um erro 409 (Conflict) com uma mensagem específica
+                res.status(409).json({ error: "E-mail ou CPF já cadastrado." });
+            } else {
+                // Para todos os outros erros, mantém a mensagem genérica
+                console.error("Erro ao criar usuário:", error); // É bom manter o log no servidor
+                res.status(500).json({ error: "Ocorreu um erro inesperado ao criar o usuário." });
+            }
         }
     };
 
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const users = await User.findAll();
-            res.status(200).json(users);
+            const usersResponse = users.map(user => {
+                const userObj = user.toObject();
+                delete userObj.password;
+                return userObj;
+            });
+            res.status(200).json(usersResponse);
         } catch (error) {
             res.status(500).json({ error: "Erro ao buscar usuários." });
         }
@@ -47,7 +76,9 @@ class UserController {
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
             } else {
-                res.status(200).json(user);
+                const userResponse = user.toObject();
+                delete userResponse.password;
+                res.status(200).json(userResponse);
             }
         } catch (error) {
             res.status(500).json({ error: "Erro ao buscar usuário." });
@@ -56,11 +87,17 @@ class UserController {
 
     static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
+            if (req.body.password) {
+                const salt = await bcrypt.genSalt(10);
+                req.body.password = await bcrypt.hash(req.body.password, salt);
+            }
             const user = await User.update(req.params.id, req.body);
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
             } else {
-                res.status(200).json(user);
+                const userResponse = user.toObject();
+                delete userResponse.password;
+                res.status(200).json(userResponse);
             }
         } catch (error) {
             res.status(500).json({ error: "Erro ao atualizar usuário." });
@@ -79,18 +116,23 @@ class UserController {
             res.status(500).json({ error: "Erro ao deletar usuário." });
         }
     };
-
+    
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Certifique-se de que a chave está configurada
         try {
             const { email, password } = req.body;
             const user = await User.findByEmail(email);
-            if (!user || user.password !== password) {
+
+            if (!user || !bcrypt.compareSync(password, user.password)) {
                 res.status(401).json({ error: "Credenciais inválidas." });
-            } else {
-                const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "5h" });
-                res.status(200).json({ message: "Login bem-sucedido.", token: token });
+                return;
             }
+            
+            const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "5h" });
+            
+            const userResponse = user.toObject();
+            delete userResponse.password;
+
+            res.status(200).json({ message: "Login bem-sucedido.", token, user: userResponse });
         } catch (error) {
             res.status(500).json({ error: "Erro ao fazer login." });
         }
@@ -102,47 +144,59 @@ class UserController {
             const user = await User.findByEmail(email);
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
-            } else {
-                const code = Math.floor(100000 + Math.random() * 900000).toString(); // Gera um código de 6 dígitos
-                const transporter = nodemailer.createTransport({
-                    host: "smtp.gmail.com", // Substitua pelo seu servidor SMTP
-                    port: 587, // Porta do servidor SMTP para conexão segura
-                    secure: false, // false para 587 (SMTP seguro com STARTTLS)
-                    auth: {
-                        user: "godlolpro32@gmail.com", // Seu usuário SMTP
-                        pass: "ieil edjw hbcu tnqc", // Sua senha SMTP
-                    },
-                });
-
-                await transporter.sendMail({
-                    from: "no-reply@devlooks.com", // your email
-                    to: "godlolpro32@gmail.com", // the email address you want to send an email to
-                    subject: "Código de Recuperação de Senha", // The title or subject of the email
-                    html: `<p>Seu código de recuperação de senha é: <strong>${code}</strong></p>` // Sending the code as HTML
-                });
-                res.status(200).json({ message: "Instruções de recuperação de senha enviadas para o e-mail.", code:bcrypt.hashSync(code, 10) , email:criptografar(user.email) });
+                return;
             }
+
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const transporter = nodemailer.createTransport({
+                host: MAIL_HOST,
+                port: parseInt(MAIL_PORT || '587'),
+                secure: false,
+                auth: {
+                    user: MAIL_USER,
+                    pass: MAIL_PASS,
+                },
+            });
+
+            await transporter.sendMail({
+                from: '"DevLooks" <no-reply@devlooks.com>',
+                to: email,
+                subject: "Código de Recuperação de Senha",
+                html: `<p>Seu código de recuperação de senha é: <strong>${code}</strong></p>`
+            });
+            
+            res.status(200).json({ 
+                message: "Instruções de recuperação de senha enviadas para o e-mail.", 
+                code: bcrypt.hashSync(code, 10), 
+                email: criptografar(user.email) 
+            });
+
         } catch (error) {
-            res.status(500).json({ error: "Erro ao recuperar senha." , errorMessage: error.message });
+            console.error("Erro em forgotPassword:", error);
+            res.status(500).json({ error: "Erro ao recuperar senha.", errorMessage: error.message });
         }
     }
+
     static resetPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { email, code, newPassword, hash } = req.body;
         try {
             const user = await User.findByEmail(descriptografar(email));
             if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
+                res.status(404).json({ error: "Link de recuperação inválido ou expirado." });
+                return;
+            }
+
+            if (bcrypt.compareSync(code, hash)) {
+                const salt = await bcrypt.genSalt(10);
+                user.password = await bcrypt.hash(newPassword, salt);
+                await user.save();
+                res.status(200).json({ message: "Senha atualizada com sucesso.", success: true });
             } else {
-                if (bcrypt.compareSync(code, hash)) {
-                    user.password = newPassword; // Atualiza a senha do usuário
-                    await user.save(); // Salva as alterações no banco de dados
-                    res.status(200).json({ message: "Senha atualizada com sucesso.",success: true });
-                } else {
-                    res.status(400).json({ error: "Código de recuperação inválido." });
-                }
+                res.status(400).json({ error: "Código de recuperação inválido." });
             }
         } catch (error) {
-            res.status(500).json({ error: "Erro ao redefinir senha." , errorMessage: error.message });
+            console.error("Erro em resetPassword:", error);
+            res.status(500).json({ error: "Erro ao redefinir senha.", errorMessage: error.message });
         }
     }
 }

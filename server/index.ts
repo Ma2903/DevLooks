@@ -1,37 +1,41 @@
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import axios from 'axios';
+// server/index.ts
 
-// import productRoutes from './routes/productsRoutes';
+// Importa nossas variáveis já carregadas pelo novo arquivo de configuração
+import { PORT } from './config/config';
+
+import express from 'express';
+import cors from 'cors';
+import connectDB from "./config/database";
+
+// Importa as rotas
 import usersRoutes from './routes/UserRoutes';
 import productRoutes from './routes/ProductRoutes';
 import couponRoutes from './routes/CouponRoutes';
 
-import connectDB from "./config/database";
-
 const app = express();
-dotenv.config();
 
 const corsOptions = {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    // allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const port = process.env.PORT || 3000;
-
+// Conecta ao banco (usando a URI do config.ts)
 connectDB.getInstance();
-// app.use('/products',  productRoutes);
+
+// Usa a porta importada do nosso arquivo de configuração
+const port = PORT;
+
+// Configura as rotas da API
 app.use('/api', usersRoutes);
 app.use('/api', productRoutes);
 app.use('/api', couponRoutes);
 
-app.listen(port, () => {
-    console.log(`API Rodando http://localhost:${port}`);
-});
+app.use(express.static('public'));
 
-// npx tsx server/index.ts
+app.listen(port, () => {
+    console.log(`✅ API Rodando em http://localhost:${port}`);
+});

@@ -1,5 +1,8 @@
+// server/models/ProductModel.ts
+
 import { Schema, model, Document } from "mongoose";
 
+// A interface agora inclui um campo opcional para tamanhos
 export interface IProduct extends Document {
     name: string;
     description: string;
@@ -7,6 +10,7 @@ export interface IProduct extends Document {
     category: string;
     stock: number;
     image: string;
+    sizes?: string[]; // Campo opcional para tamanhos (ex: ['P', 'M', 'G'])
     createdAt: Date;
     updatedAt: Date;
 }
@@ -18,11 +22,12 @@ const ProductSchema = new Schema<IProduct>({
     category: { type: String, required: true },
     stock: { type: Number, required: true },
     image: { type: String, required: true },
+    sizes: { type: [String], required: false }, // Adicionado ao schema
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
 
-// Métodos estáticos para operações usadas no ProductController
+// Métodos estáticos para operações usadas no ProductController (permanecem os mesmos)
 ProductSchema.statics.findAll = async function () {
     return this.find();
 };

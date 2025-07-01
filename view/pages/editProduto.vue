@@ -9,86 +9,62 @@
       <form @submit.prevent="editarProduto" class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 space-y-6">
         <div>
           <label for="nome" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Nome do Produto</label>
-          <input
-            type="text"
-            id="nome"
-            v-model="produto.nome"
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
-            placeholder="Digite o nome do produto"
-            required
-          />
+          <input type="text" id="nome" v-model="produto.name" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" required />
         </div>
-
         <div>
           <label for="descricao" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Descrição</label>
-          <textarea
-            id="descricao"
-            v-model="produto.descricao"
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
-            placeholder="Digite a descrição do produto"
-            required
-          ></textarea>
+          <textarea id="descricao" v-model="produto.description" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" required></textarea>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label for="preco" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Preço</label>
-            <input
-              type="number"
-              id="preco"
-              v-model="produto.preco"
-              step="0.01"
-              min="0"
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
-              placeholder="Digite o preço do produto"
-              required
-            />
+            <input type="number" id="preco" v-model="produto.price" step="0.01" min="0" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" required />
           </div>
-
           <div>
             <label for="estoque" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Estoque</label>
-            <input
-              type="number"
-              id="estoque"
-              v-model="produto.estoque"
-              min="0"
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
-              placeholder="Digite o estoque do produto"
-              required
-            />
+            <input type="number" id="estoque" v-model="produto.stock" min="0" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" required />
           </div>
         </div>
-
         <div>
           <label for="categoria" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Categoria</label>
-          <select
-            id="categoria"
-            v-model="produto.categoria"
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
-            required
-          >
+          <select id="categoria" v-model="produto.category" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" required>
             <option value="" disabled>Selecione uma categoria</option>
-            <option value="avatares">Avatares</option>
-            <option value="skins">Skins</option>
+            <option value="camisetas">Camisetas</option>
+            <option value="canecas">Canecas</option>
             <option value="acessorios">Acessórios</option>
             <option value="presentes">Presentes</option>
+             <option value="avatares">Avatares</option>
+            <option value="skins">Skins</option>
           </select>
         </div>
-
+         <div v-if="produto.category === 'camisetas'">
+          <label class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Tamanhos Disponíveis</label>
+          <div class="flex flex-wrap gap-x-6 gap-y-2">
+            <div v-for="tamanho in todosOsTamanhos" :key="tamanho" class="flex items-center">
+              <input
+                type="checkbox"
+                :id="`size-${tamanho}`"
+                :value="tamanho"
+                v-model="produto.sizes"
+                class="h-5 w-5 bg-gray-700 border-gray-600 rounded text-[#04d1b0] focus:ring-[#04d1b0]"
+              />
+              <label :for="`size-${tamanho}`" class="ml-2 text-gray-300">{{ tamanho }}</label>
+            </div>
+          </div>
+        </div>
         <div>
-          <label for="imagem" class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Imagem do Produto</label>
+          <label class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Imagem do Produto</label>
+          <div v-if="produto.image && !previewUrl" class="mb-2">
+            <p class="text-xs text-gray-400 mb-1">Imagem Atual:</p>
+            <img :src="getImageUrl(produto.image)" alt="Imagem atual" class="w-24 h-24 rounded-lg border-2 border-gray-500 object-cover shadow"/>
+          </div>
+          <img v-if="previewUrl" :src="previewUrl" alt="Pré-visualização da nova imagem" class="w-24 h-24 mb-2 rounded-lg border-2 border-[#04d1b0] object-cover shadow"/>
           <input
             type="file"
             id="imagem"
             @change="onFileChange"
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition"
+            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg"
             accept="image/*"
-          />
-          <img
-            v-if="previewUrl || produto.imagemUrl"
-            :src="previewUrl || produto.imagemUrl"
-            alt="Pré-visualização"
-            class="w-24 h-24 mt-4 rounded-lg border-2 border-[#04d1b0] object-cover shadow"
           />
         </div>
 
@@ -96,10 +72,7 @@
           <router-link to="/admin/products" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition">
             Cancelar
           </router-link>
-          <button
-            type="submit"
-            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition"
-          >
+          <button type="submit" class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition">
             <i class="fas fa-save mr-2"></i>
             Salvar Alterações
           </button>
@@ -116,88 +89,89 @@ import Swal from "sweetalert2";
 export default {
   data() {
     return {
+      // Inicializa o produto com todos os campos esperados
       produto: {
-        nome: "",
-        descricao: "",
-        preco: null,
-        imagem: null,
-        imagemUrl: "",
-        estoque: null,
-        categoria: "",
+        name: "",
+        description: "",
+        price: null,
+        image: null, // Guardará o caminho da imagem existente
+        stock: null,
+        category: "",
+        sizes: []
       },
-      previewUrl: null,
+      todosOsTamanhos: ['P', 'M', 'G', 'GG', 'XG'],
+      newImageFile: null, // Guarda o NOVO arquivo de imagem selecionado
+      previewUrl: null, // Guarda a URL de pré-visualização da NOVA imagem
     };
   },
   methods: {
+    // FUNÇÃO CORRIGIDA E PADRONIZADA
+    getImageUrl(imagePath) {
+      if (!imagePath) return '';
+      const cleanPath = imagePath.replace(/^public[\\/]/, '');
+      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
+    },
     async fetchProduct(productId) {
       try {
-        const response = await axios.get(`http://localhost:3000/api/products/${productId}`);
-        this.produto = {
-          nome: response.data.name,
-          descricao: response.data.description,
-          preco: response.data.price,
-          imagem: null,
-          imagemUrl: response.data.image,
-          estoque: response.data.stock,
-          categoria: response.data.category,
-        };
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:3000/api/products/${productId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        // Garante que 'sizes' seja sempre um array
+        response.data.sizes = response.data.sizes || [];
+        this.produto = response.data;
       } catch (error) {
         console.error("Erro ao carregar o produto:", error.message);
       }
     },
     onFileChange(event) {
       const file = event.target.files[0];
-      this.produto.imagem = file;
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.previewUrl = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
+      if (!file) {
+        this.newImageFile = null;
         this.previewUrl = null;
+        return;
       }
+      this.newImageFile = file;
+      this.previewUrl = URL.createObjectURL(file);
     },
     async editarProduto() {
-  try {
-    const produtoData = {
-      name: this.produto.nome,
-      description: this.produto.descricao,
-      price: this.produto.preco,
-      stock: this.produto.estoque,
-      category: this.produto.categoria,
-    };
+      try {
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
 
-    // Adiciona a imagem apenas se ela existir
-    if (this.produto.imagem) {
-      produtoData.imagem = this.produto.imagem;
-    }
+        // Anexa todos os dados de texto
+        formData.append('name', this.produto.name);
+        formData.append('description', this.produto.description);
+        formData.append('price', this.produto.price);
+        formData.append('stock', this.produto.stock);
+        formData.append('category', this.produto.category);
 
-    await axios.put(`http://localhost:3000/api/products/${this.$route.params.id}`, produtoData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+        // Anexa o array de tamanhos
+        if (this.produto.sizes && this.produto.sizes.length > 0) {
+          this.produto.sizes.forEach(size => formData.append('sizes', size));
+        } else {
+          formData.append('sizes', ''); // Envia vazio para limpar no banco
+        }
 
-    Swal.fire({
-      icon: "success",
-      title: "Sucesso",
-      text: "Produto editado com sucesso!",
-      background: "#1F2937",
-      color: "#E5E7EB",
-    }).then(() => {
-      this.$router.push("/admin/products");
-    });
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Erro ao editar produto.",
-      background: "#1F2937",
-      color: "#E5E7EB",
-    });
-  }
-  },
+        // Anexa a NOVA imagem SOMENTE se uma foi selecionada
+        if (this.newImageFile) {
+          formData.append('imagem', this.newImageFile);
+        }
+
+        await axios.put(`http://localhost:3000/api/products/${this.$route.params.id}`, formData, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        Swal.fire({ icon: "success", title: "Sucesso!", text: "Produto editado com sucesso!", background: "#1F2937", color: "#E5E7EB" })
+          .then(() => {
+            this.$router.push("/admin/products");
+          });
+      } catch (error) {
+        Swal.fire({ icon: "error", title: "Erro", text: "Erro ao editar produto.", background: "#1F2937", color: "#E5E7EB" });
+      }
+    },
   },
   mounted() {
     const produtoId = this.$route.params.id;
@@ -208,9 +182,4 @@ export default {
 
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
-
-/* Garante que o calendário do input de data também seja escuro em navegadores que suportam */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-}
 </style>

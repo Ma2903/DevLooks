@@ -72,7 +72,25 @@
             <option value="skins">Skins</option>
             <option value="acessorios">Acessórios</option>
             <option value="presentes">Presentes</option>
+            <option value="camisetas">Camisetas</option>
+            <option value="canecas">Canecas</option>
           </select>
+        </div>
+
+        <div v-if="produto.categoria === 'camisetas'">
+          <label class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Tamanhos Disponíveis</label>
+          <div class="flex flex-wrap gap-x-6 gap-y-2">
+            <div v-for="tamanho in todosOsTamanhos" :key="tamanho" class="flex items-center">
+              <input
+                type="checkbox"
+                :id="`size-${tamanho}`"
+                :value="tamanho"
+                v-model="produto.sizes"
+                class="h-5 w-5 bg-gray-700 border-gray-600 rounded text-[#04d1b0] focus:ring-[#04d1b0]"
+              />
+              <label :for="`size-${tamanho}`" class="ml-2 text-gray-300">{{ tamanho }}</label>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -123,23 +141,19 @@ export default {
         imagem: null,
         estoque: null,
         categoria: '',
+        sizes: [],
       },
+      todosOsTamanhos: ['P', 'M', 'G', 'GG', 'XG'],
       previewUrl: null,
     };
   },
   methods: {
     onFileChange(event) {
       const file = event.target.files[0];
+      if (!file) return;
+      
       this.produto.imagem = file;
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          this.previewUrl = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        this.previewUrl = null;
-      }
+      this.previewUrl = URL.createObjectURL(file);
     },
     async adicionarProduto() {
       try {
@@ -147,13 +161,26 @@ export default {
         formData.append('name', this.produto.nome);
         formData.append('description', this.produto.descricao);
         formData.append('price', this.produto.preco);
-        formData.append('imagem', this.produto.imagem);
         formData.append('stock', this.produto.estoque);
         formData.append('category', this.produto.categoria);
 
+        if (this.produto.imagem) {
+          formData.append('imagem', this.produto.imagem);
+        }
+
+        if (this.produto.categoria === 'camisetas' && this.produto.sizes.length > 0) {
+          this.produto.sizes.forEach(size => {
+            formData.append('sizes', size);
+          });
+        }
+        
+        // Pega o token do localStorage para autenticar a requisição
+        const token = localStorage.getItem('token');
+
         await axios.post('http://localhost:3000/api/products', formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            // ADICIONA O HEADER DE AUTENTICAÇÃO
+            'Authorization': `Bearer ${token}`,
           },
         });
 
@@ -170,7 +197,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'Erro',
-          text: `Erro ao adicionar o produto: ${error.response?.data?.error || 'Erro desconhecido.'}`,
+          text: `Erro ao adicionar o produto: ${error.response?.data?.error || 'Verifique os dados e tente novamente.'}`,
           background: '#1F2937',
           color: '#E5E7EB',
         });
@@ -183,7 +210,6 @@ export default {
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-/* Garante que o calendário do input de data também seja escuro em navegadores que suportam */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }

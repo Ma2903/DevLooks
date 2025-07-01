@@ -8,21 +8,22 @@
         </div>
         <form @submit.prevent="handleLogin">
           <div class="mb-8">
-            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-            <div class="relative flex">
-              <i class="fas fa-envelope absolute left-3 mt-5 text-gray-400"></i>
-              <input
-                ref="emailInput"
-                type="email"
-                id="email"
-                v-model="email"
-                aria-label="Email"
-                class="w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]"
-                placeholder="Digite seu email (Ex: exemplo@email.com)"
-                required
-              />
-            </div>
+  <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+          <div class="relative flex">
+            <i class="fas fa-envelope absolute left-3 mt-5 text-gray-400"></i>
+            <input
+              ref="emailInput"
+              type="email"
+              id="email"
+              v-model="email"
+              @blur="validateEmail"  aria-label="Email"
+              :class="['w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2', emailError ? 'ring-2 ring-red-500' : 'focus:ring-[#04d1b0]']"
+              placeholder="Digite seu email (Ex: exemplo@email.com)"
+              required
+            />
           </div>
+          <span v-if="emailError" class="text-red-400 text-sm mt-1">{{ emailError }}</span>
+        </div>
           <div class="mb-8">
             <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
             <div class="relative">
@@ -74,67 +75,87 @@
     </div>
   </template>
   
-  <script>
-  import axios from "axios";
-  import Swal from "sweetalert2";
-  export default {
-    name: "Login",
-    data() {
-      return {
-        email: "",
-        password: "",
-        showPassword: false,
-        loading: false,
-        loginError: "",
-      };
-    },
-    mounted() {
-      this.$refs.emailInput.focus();
-    },
-    methods: {
-      togglePasswordVisibility() {
-        this.showPassword = !this.showPassword;
+ <script>
+    import axios from "axios";
+    import Swal from "sweetalert2";
+
+    export default {
+      name: "Login",
+      data() {
+        return {
+          email: "",
+          password: "",
+          showPassword: false,
+          loading: false,
+          loginError: "",
+          emailError: "", // <-- NOVO: Guarda a mensagem de erro do e-mail
+        };
       },
-      async handleLogin() {
-        this.loading = true;
-        this.loginError = "";
-        try {
-          const response = await axios.post("/api/users/login", {
-            email: this.email,
-            password: this.password,
-          });
-          console.log("Resposta do login:", response.data);
-          // Após login bem-sucedido
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("userData", JSON.stringify(response.data.user));
-          window.dispatchEvent(new Event("storage"));
-          Swal.fire({
-            icon: 'success',
-            title: 'Login realizado com sucesso!',
-            showConfirmButton: false,
-            timer: 1500,
-            background: "#1F2937",
-            color: "#E5E7EB",
-          });
-          setTimeout(() => {
-            window.location.href = "/profile"; // ou "/" se preferir ir para a home
-          }, 1500);
-        } catch (error) {
-          this.loginError = "Verifique suas credenciais.";
-          console.error("Erro ao fazer login:", error.response?.data || error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro ao fazer login',
-            text: 'Verifique suas credenciais.',
-            background: "#1F2937",
-            color: "#E5E7EB",
-          });
+      mounted() {
+        this.$refs.emailInput.focus();
+      },
+      methods: {
+        // NOVO: Método para validar o e-mail
+        validateEmail() {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!this.email) {
+            this.emailError = "O campo de e-mail é obrigatório.";
+          } else if (!emailRegex.test(this.email)) {
+            this.emailError = "Por favor, insira um formato de e-mail válido.";
+          } else {
+            this.emailError = "";
+          }
+        },
+        togglePasswordVisibility() {
+          this.showPassword = !this.showPassword;
+        },
+        async handleLogin() {
+          // Executa a validação antes de tentar o login
+          this.validateEmail();
+          if (this.emailError) {
+            return; // Impede o envio se houver erro
+          }
+
+          this.loading = true;
+          this.loginError = "";
+          try {
+            const response = await axios.post("/api/users/login", {
+              email: this.email,
+              password: this.password,
+            });
+            
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("userData", JSON.stringify(response.data.user));
+            window.dispatchEvent(new Event("storage"));
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Login realizado com sucesso!',
+              showConfirmButton: false,
+              timer: 1500,
+              background: "#1F2937",
+              color: "#E5E7EB",
+            });
+            setTimeout(() => {
+              this.$router.push("/profile");
+            }, 1500);
+
+          } catch (error) {
+            this.loginError = "Verifique suas credenciais.";
+            console.error("Erro ao fazer login:", error.response?.data || error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro ao fazer login',
+              text: 'Verifique suas credenciais.',
+              background: "#1F2937",
+              color: "#E5E7EB",
+            });
+          }
+          this.loading = false;
         }
-        this.loading = false;
-      }
-    },
-  };
-  </script>
+      },
+    };
+    </script>
   
   <style scoped>
   @import '@fortawesome/fontawesome-free/css/all.css';

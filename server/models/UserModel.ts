@@ -8,6 +8,9 @@ export interface IUser extends Document {
     password: string;
     telephone: string;
     address: string;
+    number?: string;
+    complement?: string;
+    bairro?: string;
     cep: string;
     city: string;
     state: string;
@@ -27,6 +30,9 @@ class User {
         password: { type: String, required: true },
         telephone: { type: String, required: true },
         address: { type: String, required: true },
+        number: { type: String, required: false },
+        complement: { type: String, required: false },
+        bairro: { type: String, required: false },
         cep: { type: String, required: true },
         city: { type: String, required: true },
         state: { type: String, required: true },

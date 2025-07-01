@@ -28,6 +28,7 @@
             :src="produto.image || '@/camisa.jpg'"
             :alt="produto.name"
             class="w-full h-48 object-cover rounded-lg mb-4"
+             loading="lazy"
           />
           <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
             <i :class="categoriaIcone(produto.category)"></i>
