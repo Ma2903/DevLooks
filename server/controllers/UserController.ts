@@ -7,28 +7,27 @@ import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
 
-// Importa as chaves do nosso novo ponto central de configuração
-import { 
-    JWT_SECRET, 
-    CRYPTO_SECRET, 
-    MAIL_HOST, 
-    MAIL_PORT, 
-    MAIL_USER, 
-    MAIL_PASS 
+import {
+    JWT_SECRET,
+    CRYPTO_SECRET,
+    MAIL_HOST,
+    MAIL_PORT,
+    MAIL_USER,
+    MAIL_PASS
 } from "../config/config";
-
-// As declarações de process.env foram removidas daqui
 
 function criptografar(dado: string): string {
     return encodeURIComponent(CryptoJS.AES.encrypt(dado, CRYPTO_SECRET).toString());
 }
-  
+
 function descriptografar(dadoCriptografado: string): string {
     const bytes = CryptoJS.AES.decrypt(decodeURIComponent(dadoCriptografado), CRYPTO_SECRET);
     return bytes.toString(CryptoJS.enc.Utf8);
 }
-  
+
 class UserController {
+    // ... createUser, getAllUsers, etc. (seus métodos existentes)
+
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { password } = req.body;
@@ -42,14 +41,10 @@ class UserController {
             delete userResponse.password;
             res.status(201).json(userResponse);
         } catch (error) {
-            // VERIFICAÇÃO ADICIONADA
-            // O erro E11000 do MongoDB indica uma violação de chave única (unique)
             if (error.code === 11000) {
-                // Retorna um erro 409 (Conflict) com uma mensagem específica
                 res.status(409).json({ error: "E-mail ou CPF já cadastrado." });
             } else {
-                // Para todos os outros erros, mantém a mensagem genérica
-                console.error("Erro ao criar usuário:", error); // É bom manter o log no servidor
+                console.error("Erro ao criar usuário:", error);
                 res.status(500).json({ error: "Ocorreu um erro inesperado ao criar o usuário." });
             }
         }
@@ -138,6 +133,56 @@ class UserController {
         }
     };
 
+    // --- MÉTODO PARA SALVAR O AVATAR ---
+    static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const userId = req.user?.id; // Usando optional chaining por segurança
+        const { avatarUrl } = req.body;
+
+        if (!userId) {
+            res.status(401).json({ error: "Usuário não autenticado." });
+            return;
+        }
+
+        if (!avatarUrl) {
+            res.status(400).json({ error: "URL do avatar é obrigatória." });
+            return;
+        }
+
+        try {
+            const user = await User.findById(userId);
+
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+
+            if (user.hasCreatedAvatar) {
+                res.status(403).json({ error: "Você já criou seu avatar gratuito. Compre um novo slot na loja." });
+                return;
+            }
+
+            const updatedUser = await User.update(userId, { 
+                avatarUrl: avatarUrl,
+                hasCreatedAvatar: true
+            });
+
+            if (!updatedUser) {
+                res.status(404).json({ error: "Não foi possível atualizar o usuário." });
+                return;
+            }
+
+            const userResponse = updatedUser.toObject();
+            delete userResponse.password;
+
+            res.status(200).json({ message: "Avatar salvo com sucesso.", user: userResponse });
+
+        } catch (error) {
+            console.error("Erro ao salvar avatar:", error);
+            res.status(500).json({ error: "Erro interno ao salvar avatar." });
+        }
+    };
+
+    // ... forgotPassword e resetPassword
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;

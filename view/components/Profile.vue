@@ -4,12 +4,14 @@
       <div class="text-center mb-10 relative">
         <div class="relative inline-block">
           <img
-            src="../assets/Logo.png"
-            class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-[#04d1b0]"
+            :src="userData.avatarUrl || defaultAvatar"
+            alt="Avatar do Usuário"
+            class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-[#04d1b0] bg-gray-700 object-cover"
           />
           <router-link
             to="/create-avatar"
             class="absolute bottom-0 right-0 bg-[#04d1b0] hover:bg-[#4e44e1] text-white font-bold p-2 rounded-full shadow-lg transition"
+            title="Editar Avatar"
           >
             <i class="fas fa-edit"></i>
           </router-link>
@@ -68,12 +70,14 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
+import defaultAvatar from '@/assets/Logo.png'; // Importa a imagem padrão
 
 export default {
   data() {
     return {
       userData: {},
       token: localStorage.getItem("token"),
+      defaultAvatar: defaultAvatar, // Adiciona a imagem padrão aos dados
     };
   },
   async mounted() {
@@ -86,6 +90,7 @@ export default {
         headers: { Authorization: `Bearer ${this.token}` },
       });
       this.userData = res.data;
+      // Garante que a informação mais recente esteja no localStorage
       localStorage.setItem("userData", JSON.stringify(this.userData));
       window.dispatchEvent(new Event("storage"));
     } catch (err) {
@@ -156,7 +161,7 @@ export default {
             background: "#1F2937",
             color: "#E5E7EB"
         });
-        this.logout(); // Reutiliza a função de logout para limpar e redirecionar
+        this.logout();
       } catch (err) {
         Swal.fire({
             title: 'Erro!',

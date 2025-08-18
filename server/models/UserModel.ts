@@ -17,6 +17,8 @@ export interface IUser extends Document {
     country: string;
     role: string;
     status: string;
+    avatarUrl?: string;
+    hasCreatedAvatar?: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -39,6 +41,12 @@ class User {
         country: { type: String, required: true },
         role: { type: String, default: "user" },
         status: { type: String, default: "active" },
+
+        // >>>>>>>>>>>> LINHAS QUE FALTAVAM <<<<<<<<<<<<
+        avatarUrl: { type: String, required: false, default: null },
+        hasCreatedAvatar: { type: Boolean, default: false },
+        // >>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<
+
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
     });
