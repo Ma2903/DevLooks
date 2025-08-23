@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
-    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl flex flex-col md:flex-row">
+    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl flex flex-col md:flex-row" v-if="product && product.name">
       <div class="w-full md:w-1/2 h-96 flex flex-col items-center justify-center overflow-hidden bg-gray-800 rounded-lg mb-6 md:mb-0 md:mr-6 p-4">
         <div class="relative group w-full h-72 flex items-center justify-center">
           <img
@@ -65,7 +65,7 @@
           <router-link to="/products" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
             <i class="fas fa-arrow-left"></i> Voltar
           </router-link>
-          <button v-if="userType !== 'admin'" @click="addToCart(product)" class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
+          <button v-if="userType !== 'admin'" @click="addToCart" class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
             <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
           </button>
         </div>
@@ -75,7 +75,8 @@
 </template>
 
 <script>
-import axios from "axios";
+// --- A CORREÇÃO PRINCIPAL ESTÁ AQUI ---
+import axios from "@/services/main.js"; // Importa a instância configurada do Axios!
 import Swal from "sweetalert2";
 
 export default {
@@ -105,44 +106,68 @@ export default {
     },
     async fetchProduct(productId) {
       try {
-        const response = await axios.get(`http://localhost:3000/api/products/${productId}`);
+        const response = await axios.get(`/api/products/${productId}`);
         this.product = response.data;
       } catch (error) {
         console.error("Erro ao carregar o produto:", error.message);
+        Swal.fire({
+          title: 'Erro!',
+          text: 'Não foi possível encontrar os detalhes deste produto.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        }).then(() => {
+            this.$router.push('/products');
+        });
       }
     },
     selectSize(size) {
       this.selectedSize = size;
     },
-    addToCart(product) {
-      if (product.category === 'camisetas' && !this.selectedSize) {
+    async addToCart() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+          Swal.fire({ title: 'Login Necessário', text: 'Você precisa fazer login para adicionar itens ao carrinho.', icon: 'info', background: "#1F2937", color: "#E5E7EB" })
+              .then(() => this.$router.push('/login'));
+          return;
+      }
+
+      if (this.product.category === 'camisetas' && !this.selectedSize) {
         Swal.fire({ icon: 'warning', title: 'Tamanho não selecionado', text: 'Por favor, selecione um tamanho.', background: "#1F2937", color: "#E5E7EB" });
         return;
       }
-      const cart = localStorage.getItem("cart");
-      const cartItems = cart ? JSON.parse(cart) : [];
-      const itemIdentifier = product._id + (this.selectedSize || '');
-      const existingItem = cartItems.find((item) => (item._id + (item.selectedSize || '')) === itemIdentifier);
-      if (existingItem) {
-        existingItem.quantity += this.quantity;
-      } else {
-        cartItems.push({ ...product, quantity: this.quantity, selectedSize: this.selectedSize });
+
+      try {
+          const cartItem = {
+              productId: this.product._id,
+              quantity: this.quantity,
+              selectedSize: this.selectedSize,
+              name: this.product.name,
+              price: this.product.price,
+              image: this.product.image
+          };
+
+          await axios.post('/api/cart/add', cartItem, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          Swal.fire({
+              title: "Produto Adicionado!",
+              text: `${this.quantity}x "${this.product.name}" (Tamanho: ${this.selectedSize || 'Único'}) adicionado.`,
+              icon: "success",
+              background: "#1F2937",
+              color: "#E5E7EB",
+              showCancelButton: true,
+              confirmButtonText: "Ir para o Carrinho",
+              cancelButtonText: "Continuar Comprando",
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  this.$router.push("/cart");
+              }
+          });
+      } catch (error) {
+          Swal.fire({ title: 'Erro', text: 'Não foi possível adicionar o item ao carrinho.', icon: 'error', background: "#1F2937", color: "#E5E7EB" });
       }
-      localStorage.setItem("cart", JSON.stringify(cartItems));
-      Swal.fire({
-        title: "Produto Adicionado!",
-        text: `${this.quantity}x "${product.name}" (Tamanho: ${this.selectedSize || 'Único'}) adicionado.`,
-        icon: "success",
-        background: "#1F2937",
-        color: "#E5E7EB",
-        showCancelButton: true,
-        confirmButtonText: "Ir para o Carrinho",
-        cancelButtonText: "Continuar Comprando",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.$router.push("/cart");
-        }
-      });
     },
     increaseQuantity() {
       if (this.quantity < this.product.stock) this.quantity++;

@@ -22,7 +22,6 @@
         </div>
         <hr class="border-purple-700 mb-6" />
 
-        <!-- Formulário de Pagamento -->
         <form @submit.prevent class="flex flex-col gap-6">
           <h3 class="text-xl font-bold text-[#04d1b0] flex items-center gap-2 mb-2">
             <i class="fas fa-wallet"></i>
@@ -51,7 +50,6 @@
             </label>
           </div>
 
-          <!-- PIX -->
           <div v-if="metodo === 'pix'" class="bg-gray-900 border border-[#04d1b0] rounded-lg p-4 flex flex-col items-center gap-2">
             <i class="fas fa-qrcode text-4xl text-[#04d1b0]"></i>
             <span class="text-[#04d1b0] font-bold">Chave PIX:</span>
@@ -59,61 +57,33 @@
             <span class="text-xs text-gray-400">(Simulação: copie a chave para pagar no app do seu banco)</span>
           </div>
 
-          <!-- Cartão de Crédito -->
           <div v-if="metodo === 'credito'" class="bg-gray-900 border border-blue-400 rounded-lg p-4 flex flex-col gap-4">
             <div class="flex gap-2 items-center">
               <div class="relative flex-1">
                 <i class="fas fa-credit-card absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
-                <input
-                  type="text"
-                  maxlength="19"
-                  placeholder="Número do cartão"
-                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
+                <input type="text" maxlength="19" placeholder="Número do cartão" class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400" />
               </div>
               <div class="relative w-28">
                 <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
-                <input
-                  type="text"
-                  maxlength="5"
-                  placeholder="MM/AA"
-                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
+                <input type="text" maxlength="5" placeholder="MM/AA" class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400" />
               </div>
               <div class="relative w-20">
                 <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
-                <input
-                  type="text"
-                  maxlength="4"
-                  placeholder="CVV"
-                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
+                <input type="text" maxlength="4" placeholder="CVV" class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400" />
               </div>
             </div>
             <div class="relative">
               <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
-              <input
-                type="text"
-                placeholder="Nome impresso no cartão"
-                class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
+              <input type="text" placeholder="Nome impresso no cartão" class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
             <div class="flex gap-2 items-center">
               <div class="relative flex-1">
                 <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
-                <input
-                  type="text"
-                  maxlength="11"
-                  placeholder="CPF do titular"
-                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
+                <input type="text" maxlength="11" placeholder="CPF do titular" class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400" />
               </div>
               <div class="relative w-40">
                 <i class="fas fa-coins absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
-                <select
-                  v-model="parcelas"
-                  class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
+                <select v-model="parcelas" class="pl-10 pr-3 py-2 w-full rounded-lg bg-gray-800 text-gray-200 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <option :value="1">1x sem juros</option>
                   <option :value="2">2x sem juros</option>
                   <option :value="3">3x com juros (2,99% a.m.)</option>
@@ -135,7 +105,6 @@
             </div>
           </div>
 
-          <!-- Cartão de Débito -->
           <div v-if="metodo === 'debito'" class="bg-gray-900 border border-yellow-400 rounded-lg p-4 flex flex-col gap-3">
             <div class="flex gap-2">
               <input type="text" maxlength="19" placeholder="Número do cartão" class="flex-1 px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
@@ -146,7 +115,6 @@
             <input type="text" maxlength="11" placeholder="CPF do titular" class="px-3 py-2 rounded-lg bg-gray-800 text-gray-200 border border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
           </div>
 
-          <!-- Boleto Bancário -->
           <div v-if="metodo === 'boleto'" class="bg-gray-900 border border-gray-400 rounded-lg p-4 flex flex-col items-center gap-2">
             <i class="fas fa-barcode text-4xl text-gray-300"></i>
             <span class="text-gray-200 font-bold">Boleto gerado!</span>
@@ -154,13 +122,12 @@
           </div>
 
           <button
-            type="submit"
+            type="button"
+            @click="finalizePurchase"
             class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 mt-2"
-            disabled
-            title="Funcionalidade de pagamento em breve"
           >
-            <i class="fas fa-lock"></i>
-            Finalizar Pagamento (em breve)
+            <i class="fas fa-check-circle"></i>
+            Finalizar Pagamento
           </button>
         </form>
 
@@ -180,27 +147,77 @@
 </template>
 
 <script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 export default {
   name: "Checkout",
   data() {
     return {
       metodo: "pix",
-      parcelas: 1
+      parcelas: 1,
+      totalItems: 0,
+      totalPrice: 0,
     };
   },
-  computed: {
-    totalItems() {
-      const cart = localStorage.getItem("cart");
-      const cartItems = cart ? JSON.parse(cart) : [];
-      return cartItems.reduce((total, item) => total + item.quantity, 0);
+  created() {
+    this.loadCheckoutData();
+  },
+  methods: {
+    loadCheckoutData() {
+      const checkoutData = localStorage.getItem("checkoutData");
+      if (checkoutData) {
+        const data = JSON.parse(checkoutData);
+        this.totalItems = data.cartItems.reduce((total, item) => total + item.quantity, 0);
+        this.totalPrice = data.finalTotal || 0;
+      }
     },
-    totalPrice() {
-      const cart = localStorage.getItem("cart");
-      const cartItems = cart ? JSON.parse(cart) : [];
-      const checkout = localStorage.getItem("checkoutData");
-      const checkoutItems = checkout ? JSON.parse(checkout) : [];
-      return checkoutItems.finalTotal
-    },
+    async finalizePurchase() {
+      const token = localStorage.getItem('token');
+      const checkoutData = localStorage.getItem("checkoutData");
+
+      if (!token || !checkoutData) {
+        Swal.fire({ title: 'Erro', text: 'Informações da compra ou de login não encontradas.', icon: 'error', background: "#1F2937", color: "#E5E7EB" });
+        return;
+      }
+
+      const { cartItems } = JSON.parse(checkoutData);
+
+      try {
+        const response = await axios.post('/api/orders/checkout',
+          { cartItems },
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+
+        localStorage.removeItem('cart');
+        localStorage.removeItem('checkoutData');
+        window.dispatchEvent(new Event('storage'));
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Compra Realizada!',
+          text: response.data.message,
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+
+        const hasAvatarSlot = cartItems.some(item => item.category === 'avatares');
+        if (hasAvatarSlot) {
+          this.$router.push('/create-avatar');
+        } else {
+          this.$router.push('/profile');
+        }
+
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro na Compra',
+          text: error.response?.data?.error || 'Não foi possível finalizar a sua compra.',
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+      }
+    }
   },
 };
 </script>
@@ -208,31 +225,11 @@ export default {
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-body {
-  font-family: 'Fira Code', monospace;
-}
-
+/* Estilos adicionais */
 button, .router-link-active {
   background-image: linear-gradient(to right, #04d1b0, #4e44e1);
-  color: #fff;
-  font-weight: bold;
-  border-radius: 0.75rem;
-  transition: transform 0.2s, background 0.2s;
 }
 button:hover, .router-link-active:hover {
   background-image: linear-gradient(to right, #03b89a, #3e3ab8);
-  transform: scale(1.05);
-}
-
-input, select {
-  background: #1f2937;
-  color: #e5e7eb;
-  border-radius: 0.5rem;
-  border: none;
-  outline: none;
-  font-family: 'Fira Code', monospace;
-}
-input:focus, select:focus {
-  border: 2px solid #04d1b0;
 }
 </style>

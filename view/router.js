@@ -18,7 +18,7 @@ import Checkout from './pages/Checkout.vue';
 import ConfirmReset from './components/ConfirmReset.vue';
 import AdminCoupons from './pages/AdminCoupons.vue';
 import CouponForm from './pages/CouponForm.vue';
-import EditCoupon from './pages/EditCoupon.vue';
+import EditCoupon from './pages/editCoupon.vue';
 
 // Define as rotas
 const routes = [
@@ -31,7 +31,10 @@ const routes = [
   { path: '/reset-password', name: 'ResetPassword', component: ResetPassword },
   { path: '/profile', name: 'Profile', component: Profile, meta: { requiresAuth: true } },
   { path: '/products', name: 'Products', component: ProductList }, // Rota para a lista de produtos
-  { path: '/product/:id', name: 'SingleProduto', component: SingleProduto }, // Rota para o produto único
+  
+  // --- A CORREÇÃO ESTÁ AQUI ---
+  { path: '/products/:id', name: 'SingleProduto', component: SingleProduto }, // Rota para o produto único (corrigida)
+
   { path: '/admin/products', name: 'AdminProducts', component: AdminProducts },
   { path: '/admin/products/add', name: 'AddProduct', component: addProduto },
   { path: '/admin/products/edit/:id', name: 'EditProduct', component: EditProduto, props: true },

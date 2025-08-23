@@ -1,5 +1,13 @@
 import { Schema, model, Document } from "mongoose";
 
+interface ICartItem {
+    productId: Schema.Types.ObjectId;
+    quantity: number;
+    selectedSize?: string;
+    name: string;
+    price: number;
+    image: string;
+}
 // Interface para tipagem do usuário
 export interface IUser extends Document {
     name: string;
@@ -19,12 +27,22 @@ export interface IUser extends Document {
     status: string;
     avatarUrl?: string;
     hasCreatedAvatar?: boolean;
+    cart: ICartItem[];
     createdAt: Date;
     updatedAt: Date;
 }
 
 // Criando a classe User que encapsula o Schema e métodos
 class User {
+     private static cartItemSchema = new Schema<ICartItem>({
+        productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+        quantity: { type: Number, required: true, min: 1 },
+        selectedSize: { type: String },
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        image: { type: String, required: true },
+    }, { _id: false });
+
     private static schema = new Schema<IUser>({
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
@@ -41,12 +59,9 @@ class User {
         country: { type: String, required: true },
         role: { type: String, default: "user" },
         status: { type: String, default: "active" },
-
-        // >>>>>>>>>>>> LINHAS QUE FALTAVAM <<<<<<<<<<<<
         avatarUrl: { type: String, required: false, default: null },
         hasCreatedAvatar: { type: Boolean, default: false },
-        // >>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<
-
+        cart: { type: [User.cartItemSchema], default: [] },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
     });

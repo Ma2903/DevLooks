@@ -8,7 +8,7 @@
 
       <div v-if="cartItems.length > 0" class="flex flex-col lg:flex-row gap-8">
         <div class="w-full lg:w-2/3">
-          <div v-for="(item, index) in cartItems" :key="item._id + (item.selectedSize || '')" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-700 hover:border-[#04d1b0] transition">
+          <div v-for="(item, index) in cartItems" :key="item.productId + (item.selectedSize || '')" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-700 hover:border-[#04d1b0] transition">
             <div class="flex items-center gap-6">
               <div class="relative">
                 <img :src="getImageUrl(item.image)" :alt="item.name" class="w-24 h-24 object-cover rounded-lg border-2 border-[#04d1b0] shadow"/>
@@ -24,9 +24,9 @@
                   Preço: <span class="font-bold text-[#04d1b0]">R$ {{ item.price.toFixed(2) }}</span>
                 </p>
                 <div class="flex items-center mt-4 gap-2">
-                  <button @click="decreaseQuantity(index)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg"><i class="fas fa-minus"></i></button>
+                  <button @click="updateItemQuantity(index, item.quantity - 1)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg"><i class="fas fa-minus"></i></button>
                   <span class="w-12 text-center text-gray-200 text-lg font-bold mx-2 py-1 px-2">{{ item.quantity }}</span>
-                  <button @click="increaseQuantity(index)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg"><i class="fas fa-plus"></i></button>
+                  <button @click="updateItemQuantity(index, item.quantity + 1)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg"><i class="fas fa-plus"></i></button>
                 </div>
               </div>
               <button @click="confirmRemoveFromCart(index)" class="ml-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-trash-alt"></i></button>
@@ -68,6 +68,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CouponService from '@/services/CouponService';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const router = useRouter();
@@ -75,32 +76,53 @@ const cartItems = ref([]);
 const couponCodeInput = ref('');
 const appliedCoupon = ref(null);
 
-function loadCartFromLocalStorage() {
-  const cart = localStorage.getItem("cart");
-  cartItems.value = cart ? JSON.parse(cart) : [];
+// --- NOVAS FUNÇÕES DE API ---
+
+async function fetchCart() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        // Se não há token, limpa o carrinho para evitar mostrar dados antigos
+        cartItems.value = [];
+        return;
+    }
+    try {
+        const response = await axios.get('/api/cart', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        cartItems.value = response.data;
+    } catch (error) {
+        console.error("Erro ao buscar carrinho:", error);
+        cartItems.value = []; // Limpa em caso de erro
+    }
 }
 
-function saveCartToLocalStorage() {
-  localStorage.setItem("cart", JSON.stringify(cartItems.value));
+async function updateCartOnServer(newCart) {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.put('/api/cart/update', { cartItems: newCart }, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        cartItems.value = response.data; // Atualiza o estado local com a resposta do servidor
+    } catch (error) {
+        Swal.fire({ title: 'Erro', text: 'Não foi possível atualizar o carrinho.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });
+    }
 }
 
-function increaseQuantity(index) {
-  cartItems.value[index].quantity++;
-  saveCartToLocalStorage();
-}
-
-function decreaseQuantity(index) {
-  if (cartItems.value[index].quantity > 1) {
-    cartItems.value[index].quantity--;
-    saveCartToLocalStorage();
-  }
+async function updateItemQuantity(index, newQuantity) {
+    const updatedCart = JSON.parse(JSON.stringify(cartItems.value)); // Cria uma cópia profunda
+    if (newQuantity > 0) {
+        updatedCart[index].quantity = newQuantity;
+    } else {
+        updatedCart.splice(index, 1); // Remove se a quantidade for 0 ou menor
+    }
+    await updateCartOnServer(updatedCart);
 }
 
 function confirmRemoveFromCart(index) {
     const item = cartItems.value[index];
     Swal.fire({
         title: 'Remover Item',
-        text: `Remover "${item.name}" (Tamanho: ${item.selectedSize || 'Único'})?`,
+        text: `Remover "${item.name}"?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33', cancelButtonColor: '#6B7280',
@@ -108,14 +130,15 @@ function confirmRemoveFromCart(index) {
         background: '#1f2937', color: '#e5e7eb'
     }).then((result) => {
         if (result.isConfirmed) {
-            cartItems.value.splice(index, 1);
-            saveCartToLocalStorage();
-            handleApplyCoupon(true);
+            updateItemQuantity(index, 0); // Define a quantidade como 0 para remover
         }
     });
 }
 
+// --- Funções existentes que permanecem ---
+
 async function handleApplyCoupon(isSilent = false) {
+  // (Esta função não precisa de alterações)
   if (!couponCodeInput.value.trim()) {
     appliedCoupon.value = null;
     return;
@@ -137,8 +160,8 @@ function getImageUrl(imagePath) {
 }
 
 function goToCheckout() {
+    // (Esta função não precisa de alterações)
     const token = localStorage.getItem('token');
-
     if (!token) {
         Swal.fire({
             title: 'Login Necessário',
@@ -160,7 +183,6 @@ function goToCheckout() {
         });
         return;
     }
-
     localStorage.setItem('checkoutData', JSON.stringify({
         cartItems: cartItems.value,
         appliedCoupon: appliedCoupon.value,
@@ -181,7 +203,7 @@ const discountAmount = computed(() => {
 });
 const finalTotal = computed(() => Math.max(0, subtotal.value - discountAmount.value));
 
-onMounted(loadCartFromLocalStorage);
+onMounted(fetchCart);
 </script>
 
 <style scoped>
