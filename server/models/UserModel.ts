@@ -57,7 +57,7 @@ class User {
         city: { type: String, required: true },
         state: { type: String, required: true },
         country: { type: String, required: true },
-        role: { type: String, default: "user" },
+        role: { type: String, default: "user", enum: ['user', 'admin', 'owner'] },
         status: { type: String, default: "active" },
         avatarUrl: { type: String, required: false, default: null },
         hasCreatedAvatar: { type: Boolean, default: false },

@@ -25,20 +25,26 @@
           <li>
             <router-link to="/products" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-store"></i><span>Produtos</span></router-link>
           </li>
-          <li v-if="userType !== 'admin'">
+          <li v-if="userType === 'user'">
             <router-link to="/cart" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-shopping-cart"></i><span>Carrinho</span></router-link>
           </li>
 
           <template v-if="isLoggedIn">
-            <li v-if="userType !== 'admin'">
+            <li v-if="userType === 'user'">
               <router-link to="/create-avatar" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-user-astronaut"></i><span>Criar Avatar</span></router-link>
             </li>
-            <li v-if="userType === 'admin'">
-              <router-link to="/admin/products" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-cogs"></i><span>Gerenciar Produtos</span></router-link>
+            
+            <li v-if="userType === 'admin' || userType === 'owner'">
+              <router-link to="/admin/products" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-cogs"></i><span>Gerir Produtos</span></router-link>
             </li>
-            <li v-if="userType === 'admin'">
-              <router-link to="/admin/coupons" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-tags"></i><span>Gerenciar Cupons</span></router-link>
+            <li v-if="userType === 'admin' || userType === 'owner'">
+              <router-link to="/admin/coupons" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-tags"></i><span>Gerir Cupões</span></router-link>
             </li>
+
+            <li v-if="userType === 'owner'">
+              <router-link to="/admin/users" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-users"></i><span>Gerir Utilizadores</span></router-link>
+            </li>
+            
             <li>
               <router-link to="/profile" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-user"></i><span>Perfil</span></router-link>
             </li>
@@ -75,7 +81,6 @@ export default {
         const userData = JSON.parse(userDataRaw);
         this.userType = userData.role || "user";
       } else {
-        // Para garantir que usuários não logados também não vejam o link de admin
         this.userType = 'guest'; 
       }
     },
@@ -83,7 +88,6 @@ export default {
   created() {
     this.atualizarUserType();
     window.addEventListener("storage", this.atualizarUserType);
-    // Adiciona um listener para um evento personalizado que pode ser disparado no login/logout
     window.addEventListener("login-update", this.atualizarUserType);
   },
   beforeUnmount() {
@@ -102,6 +106,7 @@ export default {
 @import '@fortawesome/fontawesome-free/css/all.css';
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
+/* O seu CSS permanece igual */
 header {
   background-color: #1a202c;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -120,5 +125,4 @@ a:hover {
 button:hover {
   transform: scale(1.1);
 }
-/* A classe .nav-link que usava @apply foi removida */
 </style>

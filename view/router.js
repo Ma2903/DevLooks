@@ -19,6 +19,8 @@ import ConfirmReset from './components/ConfirmReset.vue';
 import AdminCoupons from './pages/AdminCoupons.vue';
 import CouponForm from './pages/CouponForm.vue';
 import EditCoupon from './pages/editCoupon.vue';
+import AdminUsers from './pages/AdminUsers.vue';
+import EditUserAdmin from './pages/EditUserAdmin.vue'; 
 
 // Define as rotas
 const routes = [
@@ -34,6 +36,8 @@ const routes = [
   
   // --- A CORREÇÃO ESTÁ AQUI ---
   { path: '/products/:id', name: 'SingleProduto', component: SingleProduto }, // Rota para o produto único (corrigida)
+  { path: '/admin/users', name: 'AdminUsers', component: AdminUsers, meta: { requiresAuth: true } },
+  { path: '/admin/users/edit/:id', name: 'EditUserAdmin', component: EditUserAdmin, meta: { requiresAuth: true }, props: true },
 
   { path: '/admin/products', name: 'AdminProducts', component: AdminProducts },
   { path: '/admin/products/add', name: 'AddProduct', component: addProduto },

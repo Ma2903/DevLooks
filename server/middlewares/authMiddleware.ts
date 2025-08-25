@@ -41,8 +41,22 @@ export const verifyAdmin = (req: Request, res: Response, next: NextFunction): vo
         return;
     }
 
-    if (req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && req.user.role !== 'owner') {
         res.status(403).json({ message: "Acesso proibido. Você não tem permissão de administrador." });
+        return;
+    }
+    
+    next();
+};
+
+export const verifyOwner = (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+        res.status(401).json({ message: "Acesso negado. Token não encontrado ou inválido." });
+        return;
+    }
+
+    if (req.user.role !== 'owner') {
+        res.status(403).json({ message: "Acesso proibido. Apenas o proprietário pode realizar esta ação." });
         return;
     }
     

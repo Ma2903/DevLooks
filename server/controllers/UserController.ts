@@ -7,13 +7,15 @@ import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
 
+// Importa a nova variável de ambiente
 import {
     JWT_SECRET,
     CRYPTO_SECRET,
     MAIL_HOST,
     MAIL_PORT,
     MAIL_USER,
-    MAIL_PASS
+    MAIL_PASS,
+    OWNER_EMAIL
 } from "../config/config";
 
 function criptografar(dado: string): string {
@@ -26,7 +28,6 @@ function descriptografar(dadoCriptografado: string): string {
 }
 
 class UserController {
-    // ... createUser, getAllUsers, etc. (seus métodos existentes)
 
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -82,6 +83,13 @@ class UserController {
 
     static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
+            const userToUpdate = await User.findById(req.params.id);
+            if (userToUpdate && userToUpdate.email === OWNER_EMAIL) {
+                // CORREÇÃO: Removido o 'return'
+                res.status(403).json({ error: "A conta do proprietário original não pode ser modificada." });
+                return; // Usamos return aqui para parar a execução, mas sem retornar o valor de res.json()
+            }
+
             if (req.body.password) {
                 const salt = await bcrypt.genSalt(10);
                 req.body.password = await bcrypt.hash(req.body.password, salt);
@@ -101,6 +109,13 @@ class UserController {
 
     static deleteUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
+            const userToDelete = await User.findById(req.params.id);
+            if (userToDelete && userToDelete.email === OWNER_EMAIL) {
+                // CORREÇÃO: Removido o 'return'
+                res.status(403).json({ error: "A conta do proprietário original não pode ser apagada." });
+                return; // Usamos return aqui para parar a execução
+            }
+            
             const user = await User.delete(req.params.id);
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
@@ -133,9 +148,8 @@ class UserController {
         }
     };
 
-    // --- MÉTODO PARA SALVAR O AVATAR ---
     static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const userId = req.user?.id; // Usando optional chaining por segurança
+        const userId = req.user?.id;
         const { avatarUrl } = req.body;
 
         if (!userId) {
@@ -150,7 +164,6 @@ class UserController {
 
         try {
             const user = await User.findById(userId);
-
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
@@ -182,7 +195,6 @@ class UserController {
         }
     };
 
-    // ... forgotPassword e resetPassword
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import UserController from "../controllers/UserController";
-import { verifyToken } from "../middlewares/authMiddleware";
+import { verifyToken, verifyAdmin, verifyOwner } from "../middlewares/authMiddleware";
 import { validate } from "../middlewares/validationMiddleware";
 import { createUserSchema } from "../validators/userValidator";
 
@@ -21,10 +21,10 @@ router.post("/users/reset-password", UserController.resetPassword);
 router.put("/users/avatar", verifyToken, UserController.saveAvatar);
 
 // Rotas de Usuário (CRUD)
-router.get("/users", UserController.getAllUsers);
-router.get("/users/:id", UserController.getUserById);
-router.put("/users/:id", verifyToken, UserController.updateUser); // A rota genérica vem depois
-router.delete("/users/:id", verifyToken, UserController.deleteUser);
+router.get("/users", verifyToken, verifyOwner, UserController.getAllUsers);
+router.get("/users/:id", verifyToken, verifyOwner, UserController.getUserById);
+router.put("/users/:id", verifyToken, verifyOwner, UserController.updateUser);
+router.delete("/users/:id", verifyToken, verifyOwner, UserController.deleteUser);
 
 
 export default router;
