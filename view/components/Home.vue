@@ -78,7 +78,7 @@
             </span>
           </div>
           <router-link
-            :to="`/product/${produto._id}`"
+            :to="`/products/${produto._id}`"
             class="block bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300 mb-2"
           >
             Ver Detalhes

@@ -38,7 +38,7 @@
               <router-link to="/admin/products" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-cogs"></i><span>Gerir Produtos</span></router-link>
             </li>
             <li v-if="userType === 'admin' || userType === 'owner'">
-              <router-link to="/admin/coupons" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-tags"></i><span>Gerir Cupões</span></router-link>
+              <router-link to="/admin/coupons" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-tags"></i><span>Gerir Cupons</span></router-link>
             </li>
 
             <li v-if="userType === 'owner'">
