@@ -13,6 +13,7 @@ import productRoutes from './routes/ProductRoutes';
 import couponRoutes from './routes/CouponRoutes';
 import orderRoutes from './routes/OrderRoutes';
 import cartRoutes from './routes/CartRoutes';
+import adminRoutes from './routes/AdminRoutes';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api', productRoutes);
 app.use('/api', couponRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
+app.use('/api', adminRoutes);
 
 app.use(express.static('public'));
 
