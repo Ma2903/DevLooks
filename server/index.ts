@@ -1,8 +1,6 @@
 // Ficheiro: DevLooks-main/server/index.ts
 
-// Importa nossas variáveis já carregadas pelo novo arquivo de configuração
 import { PORT } from './config/config';
-
 import express from 'express';
 import cors from 'cors';
 import connectDB from "./config/database";
@@ -13,6 +11,7 @@ import productRoutes from './routes/ProductRoutes';
 import couponRoutes from './routes/CouponRoutes';
 import orderRoutes from './routes/OrderRoutes';
 import cartRoutes from './routes/CartRoutes';
+import shippingRoutes from './routes/ShippingRoutes'; // IMPORTAR A NOVA ROTA
 
 const app = express();
 
@@ -25,10 +24,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Conecta ao banco (usando a URI do config.ts)
 connectDB.getInstance();
 
-// Usa a porta importada do nosso arquivo de configuração
 const port = PORT;
 
 // Configura as rotas da API
@@ -37,6 +34,7 @@ app.use('/api', productRoutes);
 app.use('/api', couponRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
+app.use('/api', shippingRoutes); // USAR A NOVA ROTA
 
 app.use(express.static('public'));
 

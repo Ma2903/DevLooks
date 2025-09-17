@@ -2,7 +2,7 @@
 
 import { Schema, model, Document } from "mongoose";
 
-// A interface agora inclui um campo opcional para tamanhos
+// Interface para a tipagem do Produto
 export interface IProduct extends Document {
     name: string;
     description: string;
@@ -10,11 +10,12 @@ export interface IProduct extends Document {
     category: string;
     stock: number;
     image: string;
-    sizes?: string[]; // Campo opcional para tamanhos (ex: ['P', 'M', 'G'])
+    sizes?: string[];
     createdAt: Date;
     updatedAt: Date;
 }
 
+// Schema do Produto
 const ProductSchema = new Schema<IProduct>({
     name: { type: String, required: true },
     description: { type: String, required: true },
@@ -22,28 +23,12 @@ const ProductSchema = new Schema<IProduct>({
     category: { type: String, required: true },
     stock: { type: Number, required: true },
     image: { type: String, required: true },
-    sizes: { type: [String], required: false }, // Adicionado ao schema
+    sizes: { type: [String], required: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
 
-// Métodos estáticos para operações usadas no ProductController (permanecem os mesmos)
-ProductSchema.statics.findAll = async function () {
-    return this.find();
-};
+// Cria e exporta o Model diretamente
+const ProductModel = model<IProduct>("Product", ProductSchema);
 
-ProductSchema.statics.findById = async function (id: string) {
-    return this.findOne({ _id: id });
-};
-
-ProductSchema.statics.findByIdAndUpdate = async function (id: string, update: Partial<IProduct>, options: object) {
-    return this.findOneAndUpdate({ _id: id }, update, options);
-};
-
-ProductSchema.statics.findByIdAndDelete = async function (id: string) {
-    return this.findOneAndDelete({ _id: id });
-};
-
-const Product = model<IProduct>("Product", ProductSchema);
-
-export default Product;
+export default ProductModel;

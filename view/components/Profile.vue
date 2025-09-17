@@ -50,6 +50,12 @@
         >
           <i class="fas fa-edit mr-2"></i> Editar Dados
         </router-link>
+        <router-link
+          to="/order-history"
+          class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-3 px-6 rounded-lg shadow-lg"
+        >
+          <i class="fas fa-history mr-2"></i> Histórico de Compras
+        </router-link>
         <button
           @click="confirmDelete"
           class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg"

@@ -2,12 +2,11 @@
 
 import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/UserModel";
+import User from "../models/UserModel"; // Importa o model do Mongoose diretamente
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
 
-// Importa a nova variável de ambiente
 import {
     JWT_SECRET,
     CRYPTO_SECRET,
@@ -34,10 +33,13 @@ class UserController {
             const { password } = req.body;
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
+            
+            // CORREÇÃO: Usa o método padrão do Mongoose
             const user = await User.create({
                 ...req.body,
                 password: hashedPassword,
             });
+
             const userResponse = user.toObject();
             delete userResponse.password;
             res.status(201).json(userResponse);
@@ -53,7 +55,8 @@ class UserController {
 
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const users = await User.findAll();
+            // CORREÇÃO: Usa 'find()' em vez do antigo 'findAll()'
+            const users = await User.find();
             const usersResponse = users.map(user => {
                 const userObj = user.toObject();
                 delete userObj.password;
@@ -68,6 +71,7 @@ class UserController {
     static getUserById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         let id = req.params.id || req.user.id;
         try {
+            // CORREÇÃO: 'findById' já é o método padrão, está correto
             const user = await User.findById(id);
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
@@ -85,16 +89,18 @@ class UserController {
         try {
             const userToUpdate = await User.findById(req.params.id);
             if (userToUpdate && userToUpdate.email === OWNER_EMAIL) {
-                // CORREÇÃO: Removido o 'return'
                 res.status(403).json({ error: "A conta do proprietário original não pode ser modificada." });
-                return; // Usamos return aqui para parar a execução, mas sem retornar o valor de res.json()
+                return;
             }
 
             if (req.body.password) {
                 const salt = await bcrypt.genSalt(10);
                 req.body.password = await bcrypt.hash(req.body.password, salt);
             }
-            const user = await User.update(req.params.id, req.body);
+
+            // CORREÇÃO: Usa 'findByIdAndUpdate' em vez do antigo 'update'
+            const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
             } else {
@@ -111,12 +117,13 @@ class UserController {
         try {
             const userToDelete = await User.findById(req.params.id);
             if (userToDelete && userToDelete.email === OWNER_EMAIL) {
-                // CORREÇÃO: Removido o 'return'
                 res.status(403).json({ error: "A conta do proprietário original não pode ser apagada." });
-                return; // Usamos return aqui para parar a execução
+                return;
             }
             
-            const user = await User.delete(req.params.id);
+            // CORREÇÃO: Usa 'findByIdAndDelete' em vez do antigo 'delete'
+            const user = await User.findByIdAndDelete(req.params.id);
+            
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
             } else {
@@ -130,7 +137,8 @@ class UserController {
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
-            const user = await User.findByEmail(email);
+            // CORREÇÃO: Usa 'findOne' em vez do antigo 'findByEmail'
+            const user = await User.findOne({ email: email });
 
             if (!user || !bcrypt.compareSync(password, user.password)) {
                 res.status(401).json({ error: "Credenciais inválidas." });
@@ -156,7 +164,6 @@ class UserController {
             res.status(401).json({ error: "Usuário não autenticado." });
             return;
         }
-
         if (!avatarUrl) {
             res.status(400).json({ error: "URL do avatar é obrigatória." });
             return;
@@ -168,16 +175,15 @@ class UserController {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-
             if (user.hasCreatedAvatar) {
                 res.status(403).json({ error: "Você já criou seu avatar gratuito. Compre um novo slot na loja." });
                 return;
             }
 
-            const updatedUser = await User.update(userId, { 
+            const updatedUser = await User.findByIdAndUpdate(userId, { 
                 avatarUrl: avatarUrl,
                 hasCreatedAvatar: true
-            });
+            }, { new: true });
 
             if (!updatedUser) {
                 res.status(404).json({ error: "Não foi possível atualizar o usuário." });
@@ -186,11 +192,8 @@ class UserController {
 
             const userResponse = updatedUser.toObject();
             delete userResponse.password;
-
             res.status(200).json({ message: "Avatar salvo com sucesso.", user: userResponse });
-
         } catch (error) {
-            console.error("Erro ao salvar avatar:", error);
             res.status(500).json({ error: "Erro interno ao salvar avatar." });
         }
     };
@@ -198,7 +201,8 @@ class UserController {
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;
-            const user = await User.findByEmail(email);
+            // CORREÇÃO: Usa 'findOne' em vez do antigo 'findByEmail'
+            const user = await User.findOne({ email: email });
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
@@ -237,7 +241,8 @@ class UserController {
     static resetPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { email, code, newPassword, hash } = req.body;
         try {
-            const user = await User.findByEmail(descriptografar(email));
+            // CORREÇÃO: Usa 'findOne' em vez do antigo 'findByEmail'
+            const user = await User.findOne({ email: descriptografar(email) });
             if (!user) {
                 res.status(404).json({ error: "Link de recuperação inválido ou expirado." });
                 return;

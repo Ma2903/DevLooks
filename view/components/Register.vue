@@ -13,123 +13,259 @@
             <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome Completo</label>
             <div class="relative">
               <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="name" v-model="form.name" @blur="validateField('name')" 
-                     :class="['w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent', errors.name ? 'focus:ring-red-500 ring-red-500' : 'focus:ring-[#04d1b0]']" 
-                     placeholder="Digite seu nome completo" required />
+              <input 
+                type="text" 
+                id="name" 
+                v-model="form.name" 
+                placeholder="Digite seu nome completo" 
+                class="input-style pl-10" 
+                required>
             </div>
-            <span v-if="errors.name" class="text-red-400 text-sm mt-1">{{ errors.name }}</span>
           </div>
+
           <div>
             <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
             <div class="relative">
               <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="email" id="email" v-model="form.email" @blur="validateField('email')" 
-                     :class="['w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent', errors.email ? 'focus:ring-red-500 ring-red-500' : 'focus:ring-[#04d1b0]']" 
-                     placeholder="exemplo@email.com" required />
+              <input 
+                type="email" 
+                id="email" 
+                v-model="form.email" 
+                placeholder="exemplo@email.com" 
+                class="input-style pl-10" 
+                required>
             </div>
-            <span v-if="errors.email" class="text-red-400 text-sm mt-1">{{ errors.email }}</span>
           </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                :type="passwordFieldType" 
+                id="password" 
+                v-model="form.password" 
+                placeholder="Crie uma senha forte" 
+                class="input-style pl-10 pr-10" 
+                required>
+              <button 
+                type="button" 
+                @click="togglePasswordVisibility('password')" 
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none">
+                <i :class="passwordIsVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-300 mb-2">Confirmar Senha</label>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                :type="confirmPasswordFieldType" 
+                id="confirmPassword" 
+                v-model="form.confirmPassword" 
+                placeholder="Confirme sua senha" 
+                class="input-style pl-10 pr-10" 
+                required>
+              <button 
+                type="button" 
+                @click="togglePasswordVisibility('confirm')" 
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none">
+                <i :class="confirmPasswordIsVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+          
           <div>
             <label for="cpf" class="block text-sm font-medium text-gray-300 mb-2">CPF</label>
             <div class="relative">
               <i class="fas fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="cpf" v-model="form.cpf" @blur="validateField('cpf')" 
-                     :class="['w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent', errors.cpf ? 'focus:ring-red-500 ring-red-500' : 'focus:ring-[#04d1b0]']" 
-                     placeholder="000.000.000-00" required />
+              <input 
+                type="text" 
+                id="cpf" 
+                v-model="form.cpf" 
+                @input="formatCpf" 
+                placeholder="000.000.000-00" 
+                class="input-style pl-10" 
+                maxlength="14" 
+                required>
             </div>
-            <span v-if="errors.cpf" class="text-red-400 text-sm mt-1">{{ errors.cpf }}</span>
           </div>
+          
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
             <div class="relative">
               <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="phone" v-model="form.phone" 
-                     class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0]" 
-                     placeholder="(11) 99999-9999" required />
+              <input 
+                type="tel" 
+                id="phone" 
+                v-model="form.phone" 
+                @input="formatPhone" 
+                placeholder="(00) 00000-0000" 
+                class="input-style pl-10" 
+                maxlength="15" 
+                required>
             </div>
           </div>
-           <div>
-            <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
+
+          <div class="md:col-span-2">
+            <hr class="border-gray-700 my-4">
+            <p class="text-lg font-semibold text-center text-[#04d1b0]">Endereço</p>
+          </div>
+
+          <div class="relative md:col-span-2">
+            <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
             <div class="relative">
-              <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password" @blur="validateField('password')" 
-                     :class="['w-full pl-10 pr-12 py-4 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent', errors.password ? 'focus:ring-red-500 ring-red-500' : 'focus:ring-[#04d1b0]']" 
-                     placeholder="Mínimo 6 caracteres" required />
-              <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i></button>
+              <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="cep" 
+                v-model="form.cep" 
+                @input="formatCep" 
+                @blur="fetchAddressByCep" 
+                placeholder="00000-000" 
+                class="input-style pl-10 pr-10" 
+                maxlength="9" 
+                required>
+              <i v-if="isCepLoading" class="fas fa-spinner fa-spin absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
-            <span v-if="errors.password" class="text-red-400 text-sm mt-1">{{ errors.password }}</span>
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
+            <div class="relative">
+              <i class="fas fa-home absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="address" 
+                v-model="form.address" 
+                placeholder="Sua rua ou avenida" 
+                class="input-style pl-10" 
+                :disabled="isCepLoading" 
+                required>
+            </div>
           </div>
 
           <div>
-            <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
+            <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
             <div class="relative">
-              <i class="fas fa-map-pin absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="cep" v-model="form.cep" 
-                     class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0]" 
-                     placeholder="00000-000" required />
+              <i class="fas fa-hashtag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="number" 
+                v-model="form.number" 
+                placeholder="Ex: 123" 
+                class="input-style pl-10" 
+                required>
             </div>
           </div>
+
           <div>
-            <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
-            <input type="text" id="address" v-model="form.address" 
-                   class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg cursor-not-allowed" 
-                   placeholder="Preenchido pelo CEP" readonly />
+            <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento (opcional)</label>
+            <div class="relative">
+              <i class="fas fa-building absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="complement" 
+                v-model="form.complement" 
+                placeholder="Apto, Bloco, etc." 
+                class="input-style pl-10">
+            </div>
           </div>
-          <div class="grid grid-cols-2 gap-x-4">
-              <div>
-                <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
-                <input type="text" id="number" v-model="form.number" 
-                       class="w-full pl-4 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" 
-                       placeholder="Ex: 123" required />
-              </div>
-              <div>
-                <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento</label>
-                <input type="text" id="complement" v-model="form.complement" 
-                       class="w-full pl-4 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" 
-                       placeholder="Apto, Bloco, etc."/>
-              </div>
-          </div>
+          
           <div>
             <label for="bairro" class="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
-            <input type="text" id="bairro" v-model="form.bairro" 
-                   class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg cursor-not-allowed" 
-                   placeholder="Preenchido pelo CEP" readonly />
-          </div>
-          <div class="grid grid-cols-2 gap-x-4">
-            <div>
-              <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
-              <input type="text" id="city" v-model="form.city" 
-                     class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg cursor-not-allowed" 
-                     placeholder="Preenchido pelo CEP" readonly />
-            </div>
-            <div>
-              <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-              <input type="text" id="state" v-model="form.state" 
-                     class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg cursor-not-allowed" 
-                     placeholder="Preenchido pelo CEP" readonly />
+            <div class="relative">
+              <i class="fas fa-map-signs absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="bairro" 
+                v-model="form.bairro" 
+                placeholder="Seu bairro" 
+                class="input-style pl-10" 
+                :disabled="isCepLoading" 
+                required>
             </div>
           </div>
+          
+          <div>
+            <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
+            <div class="relative">
+              <i class="fas fa-city absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="city" 
+                v-model="form.city" 
+                placeholder="Sua cidade" 
+                class="input-style pl-10" 
+                :disabled="isCepLoading" 
+                required>
+            </div>
+          </div>
+          
+          <div>
+            <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado (UF)</label>
+            <div class="relative">
+              <i class="fas fa-flag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="state" 
+                v-model="form.state" 
+                placeholder="UF" 
+                class="input-style pl-10" 
+                maxlength="2"
+                :disabled="isCepLoading" 
+                required>
+            </div>
+          </div>
+
           <div>
             <label for="country" class="block text-sm font-medium text-gray-300 mb-2">País</label>
-            <input type="text" id="country" v-model="form.country" 
-                   class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg cursor-not-allowed" 
-                   placeholder="Preenchido pelo CEP" readonly />
+            <div class="relative">
+              <i class="fas fa-globe-americas absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input 
+                type="text" 
+                id="country" 
+                v-model="form.country" 
+                class="input-style pl-10 bg-gray-700" 
+                readonly>
+            </div>
           </div>
         </div>
-        <button type="submit" :disabled="loading" class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-4 mt-8 rounded-lg shadow-lg">
-          <span v-if="loading" class="animate-spin mr-2"><i class="fas fa-spinner"></i></span>
-          <i class="fas fa-user-plus mr-2"></i> Cadastrar
-        </button>
+        
+        <div class="mt-10 text-center">
+          <button 
+            type="submit" 
+            class="w-full md:w-auto bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-12 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" 
+            :disabled="loading">
+            <span v-if="loading">
+              <i class="fas fa-spinner fa-spin mr-2"></i>
+              Registrando...
+            </span>
+            <span v-else>
+              <i class="fas fa-user-plus mr-2"></i>
+              Registrar
+            </span>
+          </button>
+        </div>
+        
+        <div class="mt-6 text-center">
+          <p class="text-gray-400">
+            Já tem uma conta? 
+            <router-link to="/login" class="text-[#04d1b0] hover:text-[#03b89a] font-medium transition-colors">
+              Faça login
+            </router-link>
+          </p>
+        </div>
       </form>
-      <div class="mt-8 text-center">
-        <p class="text-gray-400 text-lg">Já tem uma conta? <router-link to="/login" class="text-[#04d1b0] hover:underline">Faça login</router-link></p>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "@/services/main";
+import api from '@/services/main.js';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 
 export default {
@@ -137,79 +273,312 @@ export default {
   data() {
     return {
       form: {
-        name: "", email: "", cpf: "", phone: "",
-        address: "", number: "", complement: "", bairro: "", cep: "", city: "", state: "",
-        country: "Brasil", password: "",
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        cpf: '',
+        phone: '',
+        cep: '',
+        address: '',
+        number: '',
+        complement: '',
+        bairro: '',
+        city: '',
+        state: '',
+        country: 'Brasil',
       },
-      errors: { name: "", email: "", cpf: "", password: "" },
-      showPassword: false,
+      isCepLoading: false,
       loading: false,
+      passwordIsVisible: false,
+      confirmPasswordIsVisible: false,
     };
   },
-  watch: {
-    'form.cpf'(newValue) {
-      this.form.cpf = newValue.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2').slice(0, 14);
+  computed: {
+    passwordFieldType() {
+      return this.passwordIsVisible ? 'text' : 'password';
     },
-    'form.phone'(newValue) {
-      const digits = newValue.replace(/\D/g, '').slice(0, 11);
-      if (digits.length > 10) this.form.phone = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-      else if (digits.length > 6) this.form.phone = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-      else if (digits.length > 2) this.form.phone = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-      else this.form.phone = digits;
-    },
-    'form.cep'(newValue) {
-      const digits = newValue.replace(/\D/g, '').slice(0, 8);
-      this.form.cep = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
-      if (this.form.cep.length === 9) this.fetchAddressFromCep(this.form.cep);
+    confirmPasswordFieldType() {
+      return this.confirmPasswordIsVisible ? 'text' : 'password';
     }
   },
   methods: {
-    async fetchAddressFromCep(cep) {
-      try {
-        const response = await axios.get(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
-        if (response.data.erro) return;
-        this.form.address = response.data.logradouro;
-        this.form.bairro = response.data.bairro;
-        this.form.city = response.data.localidade;
-        this.form.state = response.data.uf;
-        this.form.country = "Brasil";
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
+    togglePasswordVisibility(field) {
+      if (field === 'password') {
+        this.passwordIsVisible = !this.passwordIsVisible;
+      } else if (field === 'confirm') {
+        this.confirmPasswordIsVisible = !this.confirmPasswordIsVisible;
       }
     },
-    validateField(field) {
-      this.errors[field] = '';
+    
+    formatCpf(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        this.form.cpf = value;
+      }
     },
+    
+    formatPhone(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+        value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+        this.form.phone = value;
+      }
+    },
+    
+    formatCep(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      if (value.length <= 8) {
+        value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+        this.form.cep = value;
+      }
+    },
+    
+    async fetchAddressByCep() {
+      if (!this.form.cep) return;
+      
+      const cep = this.form.cep.replace(/\D/g, '');
+      if (cep.length !== 8) {
+        return;
+      }
+      
+      this.isCepLoading = true;
+      try {
+        const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = response.data;
+        
+        if (data.erro) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'CEP não encontrado',
+            text: 'Por favor, verifique o CEP digitado.',
+            background: '#1F2937',
+            color: '#E5E7EB',
+            confirmButtonColor: '#04d1b0'
+          });
+          return;
+        }
+        
+        // Preenche os campos com os dados do ViaCEP
+        this.form.address = data.logradouro || '';
+        this.form.bairro = data.bairro || '';
+        this.form.city = data.localidade || '';
+        this.form.state = data.uf || '';
+        
+        // Mostra mensagem de sucesso
+        Swal.fire({
+          icon: 'success',
+          title: 'CEP encontrado!',
+          text: 'Endereço preenchido automaticamente.',
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao buscar CEP',
+          text: 'Não foi possível buscar o endereço. Tente novamente.',
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0'
+        });
+      } finally {
+        this.isCepLoading = false;
+      }
+    },
+    
+    validateForm() {
+      // Validação de senha
+      if (this.form.password.length < 6) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Senha muito curta',
+          text: 'A senha deve ter pelo menos 6 caracteres.',
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0'
+        });
+        return false;
+      }
+      
+      if (this.form.password !== this.form.confirmPassword) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Senhas não coincidem',
+          text: 'Por favor, verifique se as senhas digitadas são iguais.',
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0'
+        });
+        return false;
+      }
+      
+      // Validação de CPF (básica)
+      const cpf = this.form.cpf.replace(/\D/g, '');
+      if (cpf.length !== 11) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'CPF inválido',
+          text: 'Por favor, digite um CPF válido.',
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0'
+        });
+        return false;
+      }
+      
+      // Validação de telefone
+      const phone = this.form.phone.replace(/\D/g, '');
+      if (phone.length < 10 || phone.length > 11) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Telefone inválido',
+          text: 'Por favor, digite um telefone válido.',
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0'
+        });
+        return false;
+      }
+      
+      return true;
+    },
+    
     async handleRegister() {
+      if (!this.validateForm()) {
+        return;
+      }
+      
       this.loading = true;
       try {
-        // CORREÇÃO: Cria um novo objeto 'payload' para renomear 'phone' para 'telephone'
-        const payload = { ...this.form, telephone: this.form.phone };
-        delete payload.phone; // Remove a chave 'phone' antiga
-
-        await axios.post("/api/users", payload); // Envia o payload corrigido
+        // Prepara o payload para enviar ao backend
+        const payload = {
+          name: this.form.name,
+          email: this.form.email,
+          password: this.form.password,
+          cpf: this.form.cpf.replace(/\D/g, ''),
+          telephone: this.form.phone.replace(/\D/g, ''),
+          cep: this.form.cep.replace(/\D/g, ''),
+          address: this.form.address,
+          number: this.form.number,
+          complement: this.form.complement || '',
+          bairro: this.form.bairro,
+          city: this.form.city,
+          state: this.form.state,
+          country: this.form.country
+        };
         
-        await Swal.fire({
-          icon: 'success', title: 'Cadastro realizado!',
-          text: 'Você será redirecionado para o login.',
-          background: "#1F2937", color: "#E5E7EB",
-          timer: 2000, showConfirmButton: false,
-        });
-        this.$router.push("/login");
+        const response = await api.post('/api/users', payload);
+        
+        if (response.data) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Cadastro realizado com sucesso!',
+            text: 'Você será redirecionado para a página de login.',
+            background: '#1F2937',
+            color: '#E5E7EB',
+            confirmButtonColor: '#04d1b0',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          
+          this.$router.push('/login');
+        }
       } catch (error) {
+        console.error('Erro no cadastro:', error);
+        
+        let errorMessage = 'Não foi possível realizar o cadastro. Tente novamente.';
+        
+        if (error.response?.data?.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+        
         Swal.fire({
-          icon: 'error', title: 'Erro no Cadastro',
-          text: error.response?.data?.error || 'Não foi possível realizar o cadastro.',
-          background: "#1F2937", color: "#E5E7EB",
+          icon: 'error',
+          title: 'Erro no Cadastro',
+          text: errorMessage,
+          background: '#1F2937',
+          color: '#E5E7EB',
+          confirmButtonColor: '#04d1b0'
         });
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
-@import '@fortawesome/fontawesome-free/css/all.css';
+.input-style {
+  width: 100%;
+  background-color: #1f2937;
+  border: 2px solid #374151;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  transition: all 0.3s ease-in-out;
+  font-size: 0.95rem;
+}
+
+.input-style:focus {
+  outline: none;
+  border-color: #04d1b0;
+  box-shadow: 0 0 0 3px rgba(4, 209, 176, 0.2);
+  background-color: #111827;
+}
+
+.input-style:hover:not(:disabled) {
+  border-color: #4b5563;
+}
+
+.input-style:disabled {
+  background-color: #374151;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.input-style::placeholder {
+  color: #6b7280;
+}
+
+.input-style[readonly] {
+  background-color: #374151;
+  cursor: not-allowed;
+}
+
+/* Animação do spinner */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsividade melhorada */
+@media (max-width: 768px) {
+  .m-10 {
+    margin: 1rem;
+  }
+  
+  .p-10 {
+    padding: 1.5rem;
+  }
+  
+  .text-5xl {
+    font-size: 2rem;
+  }
+}
 </style>

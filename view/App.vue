@@ -1,13 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import Home from './components/Home.vue';
-import CreateAvatar from './components/CreateAvatar.vue';
-import Login from './components/Login.vue';
-import Register from './components/Register.vue';
-import EditUser from './components/EditUser.vue';
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
-import ResetPassword from './components/ResetPassword.vue';
 
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';

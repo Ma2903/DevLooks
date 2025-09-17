@@ -1,17 +1,19 @@
+// server/models/CouponModel.ts
+
 import { Schema, model, Document } from "mongoose";
 
-// Interface para tipagem do cupom
+// Interface para a tipagem do Cupom
 export interface ICoupon extends Document {
-    code: string; // Código do cupom (ex: PROMO10)
-    discountType: 'percentage' | 'fixed'; // Tipo de desconto: percentual ou fixo
-    discountValue: number; // Valor do desconto
-    expirationDate: Date; // Data de expiração
-    isActive: boolean; // Status do cupom
+    code: string;
+    discountType: 'percentage' | 'fixed';
+    discountValue: number;
+    expirationDate: Date;
+    isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
 
-// Schema do Mongoose
+// Schema do Cupom
 const CouponSchema = new Schema<ICoupon>({
     code: { type: String, required: true, unique: true, uppercase: true },
     discountType: { type: String, enum: ['percentage', 'fixed'], required: true },
@@ -22,27 +24,7 @@ const CouponSchema = new Schema<ICoupon>({
     updatedAt: { type: Date, default: Date.now },
 });
 
-// Métodos estáticos para operações
-CouponSchema.statics.findAll = function () {
-    return this.find();
-};
+// Cria e exporta o Model diretamente
+const CouponModel = model<ICoupon>("Coupon", CouponSchema);
 
-CouponSchema.statics.findById = function (id: string) {
-    return this.findOne({ _id: id });
-};
-
-CouponSchema.statics.findByCode = function (code: string) {
-    return this.findOne({ code: code.toUpperCase() });
-};
-
-CouponSchema.statics.findByIdAndUpdate = function (id: string, update: Partial<ICoupon>) {
-    return this.findOneAndUpdate({ _id: id }, update, { new: true });
-};
-
-CouponSchema.statics.findByIdAndDelete = function (id: string) {
-    return this.findOneAndDelete({ _id: id });
-};
-
-const Coupon = model<ICoupon>("Coupon", CouponSchema);
-
-export default Coupon;
+export default CouponModel;
