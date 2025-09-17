@@ -1,107 +1,101 @@
-// server/controllers/ProductController.ts
+import { Request, Response, RequestHandler } from 'express';
+import Product from '../models/ProductModel'; // Importa a CLASSE Product
+import multer from 'multer';
+import path from 'path';
 
-import { Request, Response, RequestHandler } from "express";
-import multer from "multer";
-import { ProductFactory } from "../factories/ProductFactory";
-
-const Product = ProductFactory.getModel();
-
+// Configuração do Multer para upload de imagens
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/images/");
-    },
+    destination: './public/images/products',
     filename: (req, file, cb) => {
-        const originalName = file.originalname;
-        cb(null, `${Date.now()}-${originalName}`);
-    },
+        cb(null, Date.now() + '-' + file.originalname);
+    }
 });
-
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 class ProductController {
-    // createProduct e outros métodos permanecem os mesmos
-    static createProduct = [
-        upload.single("imagem"),
-        async (req: Request, res: Response): Promise<void> => {
-            try {
-                const { name, description, price, category, stock, sizes } = req.body;
-                const image = req.file?.path;
+    // Adicionar um novo produto (MÉTODO CORRIGIDO)
+    static addProduct: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const { name, description, price, category, stock, sizes } = req.body;
+            const image = req.file ? `images/products/${req.file.filename}` : '';
+            
+            const newProduct = await Product.create({ // Agora funciona!
+                name,
+                description,
+                price,
+                category,
+                stock,
+                image,
+                sizes: sizes ? JSON.parse(sizes) : []
+            });
+            res.status(201).json(newProduct);
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao adicionar produto', error });
+        }
+    };
 
-                if (!name || !description || !price || !category || !stock || !image) {
-                    res.status(400).json({ error: "Todos os campos, incluindo a imagem, são obrigatórios." });
-                    return;
-                }
-                const productData = { name, description, price, category, stock, image, sizes: Array.isArray(sizes) ? sizes : [] };
-                const product = await Product.create(productData);
-                res.status(201).json(product);
-            } catch (error) {
-                console.error("Erro ao criar produto:", error);
-                res.status(500).json({ error: "Erro ao criar produto." });
-            }
-        },
-    ];
-
+    // Obter todos os produtos (MÉTODO CORRIGIDO)
     static getAllProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const products = await Product.find();
+            const products = await Product.findAll(); // Agora funciona!
             res.status(200).json(products);
         } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar produtos." });
+            res.status(500).json({ message: 'Erro ao buscar produtos', error });
         }
     };
 
+    // Obter um produto por ID (MÉTODO CORRIGIDO)
     static getProductById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const product = await Product.findById(req.params.id);
-            if (!product) { res.status(404).json({ error: "Produto não encontrado." }); } 
-            else { res.status(200).json(product); }
+            const product = await Product.findById(req.params.id); // Agora funciona!
+            if (!product) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+            res.status(200).json(product);
         } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar produto." });
+            res.status(500).json({ message: 'Erro ao buscar produto', error });
         }
     };
 
-    // MÉTODO DE ATUALIZAÇÃO CORRIGIDO PARA ACEITAR IMAGEM
-    static updateProduct = [
-        upload.single("imagem"), // <-- ADICIONADO AQUI
-        async (req: Request, res: Response): Promise<void> => {
-            try {
-                const updateData = { ...req.body };
-
-                // Se uma nova imagem foi enviada, adiciona o caminho dela aos dados de atualização
-                if (req.file) {
-                    updateData.image = req.file.path;
-                }
-
-                // Garante que 'sizes' seja um array
-                if (updateData.sizes && !Array.isArray(updateData.sizes)) {
-                    updateData.sizes = [updateData.sizes];
-                } else if (!updateData.sizes) {
-                    updateData.sizes = [];
-                }
-
-                const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
-                
-                if (!product) {
-                    res.status(404).json({ error: "Produto não encontrado." });
-                } else {
-                    res.status(200).json(product);
-                }
-            } catch (error) {
-                console.error("Erro ao atualizar produto:", error);
-                res.status(500).json({ error: "Erro ao atualizar produto." });
+    // Atualizar um produto (MÉTODO CORRIGIDO)
+    static updateProduct: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productData = req.body;
+            if (req.file) {
+                productData.image = `images/products/${req.file.filename}`;
             }
-        }
-    ];
+            if(productData.sizes && typeof productData.sizes === 'string') {
+                productData.sizes = JSON.parse(productData.sizes);
+            }
 
+            const updatedProduct = await Product.update(req.params.id, productData); // Agora funciona!
+            if (!updatedProduct) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+            res.status(200).json(updatedProduct);
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao atualizar produto', error });
+        }
+    };
+
+    // Deletar um produto (MÉTODO CORRIGIDO)
     static deleteProduct: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const product = await Product.findByIdAndDelete(req.params.id);
-            if (!product) { res.status(404).json({ error: "Produto não encontrado." }); } 
-            else { res.status(200).json({ message: "Produto deletado com sucesso." }); }
+            const deletedProduct = await Product.delete(req.params.id); // Agora funciona!
+            if (!deletedProduct) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+            res.status(200).json({ message: 'Produto deletado com sucesso' });
         } catch (error) {
-            res.status(500).json({ error: "Erro ao deletar produto." });
+            res.status(500).json({ message: 'Erro ao deletar produto', error });
         }
     };
+
+    // Middleware de upload
+    static uploadImage = upload.single('image');
 }
 
 export default ProductController;

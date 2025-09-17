@@ -20,10 +20,14 @@ const corsOptions = {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
+
+// --- CORREÇÃO IMPORTANTE ---
+// Middlewares devem ser declarados ANTES das rotas
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Conecta ao banco de dados
 connectDB.getInstance();
 
 const port = PORT;
@@ -34,8 +38,9 @@ app.use('/api', productRoutes);
 app.use('/api', couponRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
-app.use('/api', adminRoutes); USAR A NOVA ROTA
+app.use('/api', adminRoutes);
 
+// Servir arquivos estáticos da pasta 'public'
 app.use(express.static('public'));
 
 app.listen(port, () => {

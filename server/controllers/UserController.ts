@@ -1,8 +1,8 @@
-// server/controllers/UserController.ts
+// Ficheiro: DevLooks-main/server/controllers/UserController.ts
 
 import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/UserModel"; // Importa o model do Mongoose diretamente
+import User from "../models/UserModel"; // Importa a CLASSE User restaurada
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
@@ -17,6 +17,7 @@ import {
     OWNER_EMAIL
 } from "../config/config";
 
+// Funções de criptografia (permanecem as mesmas)
 function criptografar(dado: string): string {
     return encodeURIComponent(CryptoJS.AES.encrypt(dado, CRYPTO_SECRET).toString());
 }
@@ -31,10 +32,17 @@ class UserController {
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { password } = req.body;
+            
+            // Validação crucial para o erro do bcrypt
+            if (!password) {
+                res.status(400).json({ error: "O campo 'password' é obrigatório." });
+                return;
+            }
+
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             
-            // CORREÇÃO: Usa o método padrão do Mongoose
+            // Usa o método estático da sua classe User original
             const user = await User.create({
                 ...req.body,
                 password: hashedPassword,
@@ -43,7 +51,7 @@ class UserController {
             const userResponse = user.toObject();
             delete userResponse.password;
             res.status(201).json(userResponse);
-        } catch (error) {
+        } catch (error: any) {
             if (error.code === 11000) {
                 res.status(409).json({ error: "E-mail ou CPF já cadastrado." });
             } else {
@@ -52,93 +60,12 @@ class UserController {
             }
         }
     };
-
-    static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        try {
-            // CORREÇÃO: Usa 'find()' em vez do antigo 'findAll()'
-            const users = await User.find();
-            const usersResponse = users.map(user => {
-                const userObj = user.toObject();
-                delete userObj.password;
-                return userObj;
-            });
-            res.status(200).json(usersResponse);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar usuários." });
-        }
-    };
-
-    static getUserById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        let id = req.params.id || req.user.id;
-        try {
-            // CORREÇÃO: 'findById' já é o método padrão, está correto
-            const user = await User.findById(id);
-            if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
-            } else {
-                const userResponse = user.toObject();
-                delete userResponse.password;
-                res.status(200).json(userResponse);
-            }
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar usuário." });
-        }
-    };
-
-    static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userToUpdate = await User.findById(req.params.id);
-            if (userToUpdate && userToUpdate.email === OWNER_EMAIL) {
-                res.status(403).json({ error: "A conta do proprietário original não pode ser modificada." });
-                return;
-            }
-
-            if (req.body.password) {
-                const salt = await bcrypt.genSalt(10);
-                req.body.password = await bcrypt.hash(req.body.password, salt);
-            }
-
-            // CORREÇÃO: Usa 'findByIdAndUpdate' em vez do antigo 'update'
-            const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-            
-            if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
-            } else {
-                const userResponse = user.toObject();
-                delete userResponse.password;
-                res.status(200).json(userResponse);
-            }
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao atualizar usuário." });
-        }
-    };
-
-    static deleteUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userToDelete = await User.findById(req.params.id);
-            if (userToDelete && userToDelete.email === OWNER_EMAIL) {
-                res.status(403).json({ error: "A conta do proprietário original não pode ser apagada." });
-                return;
-            }
-            
-            // CORREÇÃO: Usa 'findByIdAndDelete' em vez do antigo 'delete'
-            const user = await User.findByIdAndDelete(req.params.id);
-            
-            if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
-            } else {
-                res.status(200).json({ message: "Usuário deletado com sucesso." });
-            }
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao deletar usuário." });
-        }
-    };
     
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
-            // CORREÇÃO: Usa 'findOne' em vez do antigo 'findByEmail'
-            const user = await User.findOne({ email: email });
+            // Usa o método estático da sua classe
+            const user = await User.findByEmail(email);
 
             if (!user || !bcrypt.compareSync(password, user.password)) {
                 res.status(401).json({ error: "Credenciais inválidas." });
@@ -156,95 +83,103 @@ class UserController {
         }
     };
 
-    static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const userId = req.user?.id;
-        const { avatarUrl } = req.body;
+    // --- OS DEMAIS MÉTODOS SEGUEM O MESMO PADRÃO, USANDO A CLASSE User ---
 
-        if (!userId) {
-            res.status(401).json({ error: "Usuário não autenticado." });
-            return;
-        }
-        if (!avatarUrl) {
-            res.status(400).json({ error: "URL do avatar é obrigatória." });
-            return;
-        }
-
+    static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await User.findById(userId);
+            const users = await User.findAll();
+            res.status(200).json(users);
+        } catch (error) {
+            res.status(500).json({ error: "Erro ao buscar usuários." });
+        }
+    };
+    
+    static getUserById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = await User.findById(req.params.id);
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-            if (user.hasCreatedAvatar) {
-                res.status(403).json({ error: "Você já criou seu avatar gratuito. Compre um novo slot na loja." });
-                return;
-            }
-
-            const updatedUser = await User.findByIdAndUpdate(userId, { 
-                avatarUrl: avatarUrl,
-                hasCreatedAvatar: true
-            }, { new: true });
-
-            if (!updatedUser) {
-                res.status(404).json({ error: "Não foi possível atualizar o usuário." });
-                return;
-            }
-
-            const userResponse = updatedUser.toObject();
-            delete userResponse.password;
-            res.status(200).json({ message: "Avatar salvo com sucesso.", user: userResponse });
+            res.status(200).json(user);
         } catch (error) {
-            res.status(500).json({ error: "Erro interno ao salvar avatar." });
+            res.status(500).json({ error: "Erro ao buscar usuário." });
+        }
+    };
+
+    static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            if (req.body.password) {
+                const salt = await bcrypt.genSalt(10);
+                req.body.password = await bcrypt.hash(req.body.password, salt);
+            }
+            const user = await User.update(req.params.id, req.body);
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+            res.status(200).json(user);
+        } catch (error) {
+            res.status(500).json({ error: "Erro ao atualizar usuário." });
+        }
+    };
+
+    static deleteUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = await User.delete(req.params.id);
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+            res.status(200).json({ message: "Usuário deletado com sucesso." });
+        } catch (error) {
+            res.status(500).json({ error: "Erro ao deletar usuário." });
         }
     };
 
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        const { email } = req.body;
         try {
-            const { email } = req.body;
-            // CORREÇÃO: Usa 'findOne' em vez do antigo 'findByEmail'
-            const user = await User.findOne({ email: email });
+            const user = await User.findByEmail(email);
             if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
+                res.status(404).json({ error: "E-mail não encontrado." });
                 return;
             }
 
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
             const transporter = nodemailer.createTransport({
                 host: MAIL_HOST,
-                port: parseInt(MAIL_PORT || '587'),
+                port: Number(MAIL_PORT),
                 secure: false,
-                auth: {
-                    user: MAIL_USER,
-                    pass: MAIL_PASS,
-                },
+                auth: { user: MAIL_USER, pass: MAIL_PASS },
             });
 
             await transporter.sendMail({
-                from: '"DevLooks" <no-reply@devlooks.com>',
+                from: `DevLooks <${OWNER_EMAIL}>`,
                 to: email,
                 subject: "Código de Recuperação de Senha",
-                html: `<p>Seu código de recuperação de senha é: <strong>${code}</strong></p>`
-            });
-            
-            res.status(200).json({ 
-                message: "Instruções de recuperação de senha enviadas para o e-mail.", 
-                code: bcrypt.hashSync(code, 10), 
-                email: criptografar(user.email) 
+                html: `<p>Seu código para redefinir a senha é: <strong>${code}</strong></p>`,
             });
 
-        } catch (error) {
-            console.error("Erro em forgotPassword:", error);
-            res.status(500).json({ error: "Erro ao recuperar senha.", errorMessage: error.message });
+            res.status(200).json({
+                message: "Instruções enviadas para o e-mail.",
+                code: bcrypt.hashSync(code, 10),
+                email: criptografar(user.email)
+            });
+
+        } catch (error: any) {
+            res.status(500).json({ error: "Erro ao recuperar senha.", details: error.message });
         }
-    }
+    };
 
     static resetPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { email, code, newPassword, hash } = req.body;
         try {
-            // CORREÇÃO: Usa 'findOne' em vez do antigo 'findByEmail'
-            const user = await User.findOne({ email: descriptografar(email) });
+            const userEmail = descriptografar(email);
+            const user = await User.findByEmail(userEmail);
+
             if (!user) {
-                res.status(404).json({ error: "Link de recuperação inválido ou expirado." });
+                res.status(404).json({ error: "Link de recuperação inválido." });
                 return;
             }
 
@@ -256,11 +191,10 @@ class UserController {
             } else {
                 res.status(400).json({ error: "Código de recuperação inválido." });
             }
-        } catch (error) {
-            console.error("Erro em resetPassword:", error);
-            res.status(500).json({ error: "Erro ao redefinir senha.", errorMessage: error.message });
+        } catch (error: any) {
+            res.status(500).json({ error: "Erro ao redefinir senha.", details: error.message });
         }
-    }
+    };
 }
 
 export default UserController;
