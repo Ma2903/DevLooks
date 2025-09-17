@@ -12,7 +12,6 @@ import couponRoutes from './routes/CouponRoutes';
 import orderRoutes from './routes/OrderRoutes';
 import cartRoutes from './routes/CartRoutes';
 import adminRoutes from './routes/AdminRoutes';
-import shippingRoutes from './routes/ShippingRoutes'; // IMPORTAR A NOVA ROTA
 
 const app = express();
 
@@ -35,6 +34,7 @@ app.use('/api', productRoutes);
 app.use('/api', couponRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
+app.use('/api', adminRoutes); USAR A NOVA ROTA
 
 app.use(express.static('public'));
 
