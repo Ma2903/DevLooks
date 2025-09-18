@@ -1,23 +1,20 @@
-// server/controllers/OrderController.ts
-
+// Ficheiro: server/controllers/OrderController.ts
 import { Request, Response, RequestHandler } from "express";
 import mongoose from "mongoose";
-// Agora estamos a importar os models diretamente, sem a classe wrapper
-import User from "../models/UserModel";
-import Product from "../models/ProductModel";
-import Coupon from "../models/CouponModel";
-import Order from "../models/OrderModel";
+import UserModel from "../models/UserModel";
+import ProductModel from "../models/ProductModel";
+import CouponModel from "../models/CouponModel";
+import OrderModel from "../models/OrderModel";
 
 class OrderController {
     static checkout: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const userId = req.user?.id;
         const { cartItems, couponCode, shippingCost, shippingAddress } = req.body;
-
         if (!userId) {
             res.status(401).json({ error: "Utilizador não autenticado." });
             return;
         }
-        if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+        if (!cartItems || cartItems.length === 0) {
             res.status(400).json({ error: "O carrinho de compras está vazio." });
             return;
         }
@@ -25,55 +22,38 @@ class OrderController {
             res.status(400).json({ error: "O endereço de entrega é obrigatório." });
             return;
         }
-
         const session = await mongoose.startSession();
         session.startTransaction();
-
         try {
-            // CORREÇÃO: Usamos 'User' diretamente, que agora é o model do Mongoose
-            const user = await User.findById(userId).session(session);
-            if (!user) {
-                throw new Error("Utilizador não encontrado.");
-            }
+            const user = await UserModel.findById(userId).session(session);
+            if (!user) throw new Error("Utilizador não encontrado.");
 
             let subtotal = 0;
             for (const item of cartItems) {
-                // CORREÇÃO: Usamos 'Product' diretamente
-                const product = await Product.findById(item.productId).session(session);
+                const product = await ProductModel.findById(item.productId).session(session);
                 if (!product) throw new Error(`Produto "${item.name}" não encontrado.`);
-                if (product.stock < item.quantity) {
-                    throw new Error(`Estoque insuficiente para "${item.name}". Disponível: ${product.stock}`);
-                }
+                if (product.stock < item.quantity) throw new Error(`Estoque insuficiente para "${item.name}".`);
                 subtotal += product.price * item.quantity;
             }
-
             let discountAmount = 0;
             if (couponCode) {
-                // CORREÇÃO: Usamos 'Coupon' diretamente
-                const coupon = await Coupon.findOne({ code: couponCode }).session(session);
+                const coupon = await CouponModel.findOne({ code: couponCode }).session(session);
                 if (!coupon || !coupon.isActive || new Date(coupon.expirationDate) < new Date()) {
                     throw new Error("Cupom inválido ou expirado.");
                 }
                 if (coupon.code === 'PRIMEIRACOMPRA10' && user.hasMadePurchase) {
-                    throw new Error("O cupom 'PRIMEIRACOMPRA10' é válido apenas na primeira compra.");
+                    throw new Error("Este cupom é válido apenas na primeira compra.");
                 }
                 discountAmount = coupon.discountType === 'percentage' ? subtotal * (coupon.discountValue / 100) : coupon.discountValue;
             }
-
-            const totalWithoutShipping = Math.max(0, subtotal - discountAmount);
-            const finalTotal = totalWithoutShipping + (shippingCost || 0);
+            const finalTotal = Math.max(0, subtotal - discountAmount) + (shippingCost || 0);
             
             for (const item of cartItems) {
-                // CORREÇÃO: Usamos 'Product' diretamente
-                await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } }, { session });
+                await ProductModel.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } }, { session });
             }
-
-            const [newOrder] = await Order.create([{
-                user: userId,
-                items: cartItems,
-                total: finalTotal,
-                status: 'Processando',
-                shippingAddress: shippingAddress,
+            const [newOrder] = await OrderModel.create([{
+                user: userId, items: cartItems, total: finalTotal,
+                status: 'Processando', shippingAddress: shippingAddress,
             }], { session });
             
             user.cart = [];
@@ -81,22 +61,15 @@ class OrderController {
             await user.save({ session });
             
             await session.commitTransaction();
-
-            res.status(200).json({ 
-                message: "Compra finalizada com sucesso!", 
-                orderId: newOrder._id 
-            });
-
-        } catch (error) {
+            res.status(200).json({ message: "Compra finalizada com sucesso!", orderId: newOrder._id });
+        } catch (error: any) {
             await session.abortTransaction();
-            console.error("Erro detalhado no checkout:", error);
             res.status(400).json({ error: error.message || "Erro ao processar a compra." });
         } finally {
             session.endSession();
         }
     };
     
-    // --- MÉTODOS DE ADMIN E HISTÓRICO ---
     static getOrderHistory: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const userId = req.user?.id;
         if (!userId) {
@@ -104,16 +77,16 @@ class OrderController {
             return;
         }
         try {
-            const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+            const orders = await OrderModel.find({ user: userId }).sort({ createdAt: -1 });
             res.status(200).json(orders);
         } catch (error) {
-            res.status(500).json({ error: "Erro interno ao buscar histórico de pedidos." });
+            res.status(500).json({ error: "Erro ao buscar histórico de pedidos." });
         }
     };
 
     static getAllOrders: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const orders = await Order.find().populate('user', 'name email').sort({ createdAt: -1 });
+            const orders = await OrderModel.find().populate('user', 'name email').sort({ createdAt: -1 });
             res.status(200).json(orders);
         } catch (error) {
             res.status(500).json({ error: "Erro ao buscar todos os pedidos." });
@@ -128,7 +101,7 @@ class OrderController {
             return;
         }
         try {
-            const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+            const order = await OrderModel.findByIdAndUpdate(id, { status }, { new: true });
             if (!order) {
                 res.status(404).json({ error: "Pedido não encontrado." });
                 return;
@@ -142,7 +115,7 @@ class OrderController {
     static deleteOrder: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { id } = req.params;
         try {
-            const order = await Order.findByIdAndDelete(id);
+            const order = await OrderModel.findByIdAndDelete(id);
             if (!order) {
                 res.status(404).json({ error: "Pedido não encontrado." });
                 return;

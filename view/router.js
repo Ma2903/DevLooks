@@ -15,6 +15,7 @@ import ConfirmReset from './components/ConfirmReset.vue';
 // Importa páginas de produtos
 import ProductList from './pages/ProductList.vue';
 import SingleProduto from './pages/singleProduto.vue';
+import OrderHistory from './pages/OrderHistory.vue'; // <-- ROTA ADICIONADA AQUI
 
 // Importa páginas de Admin
 import AdminUsers from './pages/AdminUsers.vue';
@@ -25,8 +26,9 @@ import EditProduto from './pages/editProduto.vue';
 import AdminCoupons from './pages/AdminCoupons.vue';
 import CouponForm from './pages/CouponForm.vue';
 import EditCoupon from './pages/editCoupon.vue';
+import AdminOrders from './pages/AdminOrders.vue'; // <-- ROTA ADICIONADA AQUI
 
-// --- NOVOS IMPORTS PARA O CHECKOUT ---
+// Importa páginas de Checkout
 import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
 import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
 import CheckoutReview from './pages/checkout/CheckoutReview.vue';
@@ -45,8 +47,9 @@ const routes = [
   { path: '/products/:id', name: 'SingleProduto', component: SingleProduto },
   { path: '/cart', name: 'Cart', component: Cart },
   { path: '/confirm-reset', name: 'ConfirmReset', component: ConfirmReset },
+  { path: '/order-history', name: 'OrderHistory', component: OrderHistory, meta: { requiresAuth: true } }, // <-- ROTA ADICIONADA AQUI
 
-  // --- NOVA ESTRUTURA DE CHECKOUT ---
+  // Estrutura de Checkout
   {
     path: '/checkout',
     component: CheckoutWrapper,
@@ -67,6 +70,7 @@ const routes = [
   { path: '/admin/coupons', name: 'AdminCoupons', component: AdminCoupons, meta: { requiresAuth: true } },
   { path: '/admin/coupons/add', name: 'AddCoupon', component: CouponForm, meta: { requiresAuth: true } },
   { path: '/admin/coupons/edit/:id', name: 'EditCoupon', component: EditCoupon, meta: { requiresAuth: true }, props: true },
+  { path: '/admin/orders', name: 'AdminOrders', component: AdminOrders, meta: { requiresAuth: true } }, // <-- ROTA ADICIONADA AQUI
 ];
 
 const router = createRouter({

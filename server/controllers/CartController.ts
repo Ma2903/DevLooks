@@ -1,12 +1,13 @@
+// Ficheiro: server/controllers/CartController.ts
+
 import { Request, Response, RequestHandler } from "express";
-import User from "../models/UserModel";
+import UserModel from "../models/UserModel";
 
 class CartController {
-
     // Obter o carrinho do utilizador logado
     static getCart: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await User.findById(req.user.id);
+            const user = await UserModel.findById(req.user.id);
             if (!user) {
                 res.status(404).json({ message: "Utilizador não encontrado" });
                 return;
@@ -22,7 +23,7 @@ class CartController {
         const { productId, quantity, selectedSize, name, price, image } = req.body;
         
         try {
-            const user = await User.findById(req.user.id);
+            const user = await UserModel.findById(req.user.id);
             if (!user) {
                 res.status(404).json({ message: "Utilizador não encontrado" });
                 return;
@@ -36,7 +37,8 @@ class CartController {
                 // Se o item já existe, atualiza a quantidade
                 user.cart[itemIndex].quantity += quantity;
             } else {
-                // Se não, adiciona o novo item
+                // CORREÇÃO APLICADA AQUI:
+                // Passamos o `productId` como string diretamente. O Mongoose cuidará da conversão.
                 user.cart.push({ productId, quantity, selectedSize, name, price, image });
             }
 
@@ -53,7 +55,7 @@ class CartController {
         const { cartItems } = req.body; // Espera receber o array completo do carrinho
 
         try {
-            const user = await User.findById(req.user.id);
+            const user = await UserModel.findById(req.user.id);
             if (!user) {
                 res.status(404).json({ message: "Utilizador não encontrado" });
                 return;

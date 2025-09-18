@@ -1,24 +1,23 @@
+// Ficheiro: server/controllers/AdminController.ts
 import { Request, Response, RequestHandler } from 'express';
-import User from '../models/UserModel'; // Importa a CLASSE User
-import Product from '../models/ProductModel'; // Importa a CLASSE Product
-import Coupon from '../models/CouponModel';
-import Order from '../models/OrderModel';
+import UserModel from '../models/UserModel';
+import ProductModel from '../models/ProductModel';
+import CouponModel from '../models/CouponModel';
+import OrderModel from '../models/OrderModel';
 
 class AdminController {
-    // Busca todos os usuários (MÉTODO CORRIGIDO)
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const users = await User.findAll(); // Agora funciona!
+            const users = await UserModel.find().select('-password');
             res.status(200).json(users);
         } catch (error) {
             res.status(500).json({ message: 'Erro ao buscar usuários', error });
         }
     };
 
-    // Busca usuário por ID (MÉTODO CORRIGIDO)
     static getUserById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await User.findById(req.params.id); // Agora funciona!
+            const user = await UserModel.findById(req.params.id).select('-password');
             if (!user) {
                 res.status(404).json({ message: 'Usuário não encontrado' });
                 return;
@@ -29,10 +28,9 @@ class AdminController {
         }
     };
 
-    // Atualiza usuário (MÉTODO CORRIGIDO)
     static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const updatedUser = await User.update(req.params.id, req.body); // Agora funciona!
+            const updatedUser = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
             if (!updatedUser) {
                 res.status(404).json({ message: 'Usuário não encontrado' });
                 return;
@@ -43,10 +41,9 @@ class AdminController {
         }
     };
 
-    // Deleta usuário (MÉTODO CORRIGIDO)
     static deleteUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const deletedUser = await User.delete(req.params.id); // Agora funciona!
+            const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
             if (!deletedUser) {
                 res.status(404).json({ message: 'Usuário não encontrado' });
                 return;
@@ -57,56 +54,48 @@ class AdminController {
         }
     };
 
-    // --- Métodos para Produtos (já devem estar corretos se seguirem o mesmo padrão) ---
     static getAllProducts: RequestHandler = async (req, res) => {
         try {
-            const products = await Product.findAll(); // Usa o ProductModel corrigido
+            const products = await ProductModel.find();
             res.json(products);
         } catch (error) {
             res.status(500).json({ message: 'Erro ao buscar produtos' });
         }
     };
     
-    // --- Métodos para Cupons ---
     static getAllCoupons: RequestHandler = async (req, res) => {
         try {
-            const coupons = await Coupon.find();
+            const coupons = await CouponModel.find();
             res.json(coupons);
         } catch (error) {
             res.status(500).json({ message: 'Erro ao buscar cupons' });
         }
     };
 
-    // --- Métodos para Pedidos ---
     static getAllOrders: RequestHandler = async (req, res) => {
         try {
-            const orders = await Order.find().populate('user', 'name email').populate('items.product', 'name price');
+            const orders = await OrderModel.find().populate('user', 'name email');
             res.json(orders);
         } catch (error) {
             res.status(500).json({ message: 'Erro ao buscar pedidos' });
         }
     };
 
-    // Adicione este método dentro da classe AdminController em server/controllers/AdminController.ts
-
-static extractData: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-        // Exemplo: aqui você poderia buscar todos os usuários e produtos
-        const users = await User.findAll();
-        const products = await Product.findAll();
-        
-        // Retorna os dados como um JSON
-        res.status(200).json({
-            message: "Dados extraídos com sucesso!",
-            totalUsers: users.length,
-            totalProducts: products.length,
-            users,
-            products
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao extrair dados', error });
-    }
-};
+    static extractData: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const users = await UserModel.find().select('-password');
+            const products = await ProductModel.find();
+            res.status(200).json({
+                message: "Dados extraídos com sucesso!",
+                totalUsers: users.length,
+                totalProducts: products.length,
+                users,
+                products
+            });
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao extrair dados', error });
+        }
+    };
 }
 
 export default AdminController;
