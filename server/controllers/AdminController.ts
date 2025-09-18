@@ -86,6 +86,27 @@ class AdminController {
             res.status(500).json({ message: 'Erro ao buscar pedidos' });
         }
     };
+
+    // Adicione este método dentro da classe AdminController em server/controllers/AdminController.ts
+
+static extractData: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    try {
+        // Exemplo: aqui você poderia buscar todos os usuários e produtos
+        const users = await User.findAll();
+        const products = await Product.findAll();
+        
+        // Retorna os dados como um JSON
+        res.status(200).json({
+            message: "Dados extraídos com sucesso!",
+            totalUsers: users.length,
+            totalProducts: products.length,
+            users,
+            products
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao extrair dados', error });
+    }
+};
 }
 
 export default AdminController;

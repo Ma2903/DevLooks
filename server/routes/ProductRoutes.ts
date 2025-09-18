@@ -5,7 +5,7 @@ import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware"; // Imp
 const router = Router();
 
 // Adicione os middlewares a todas as rotas de produto
-router.post("/products", verifyToken, verifyAdmin, ProductController.createProduct);
+router.post("/products", verifyToken, verifyAdmin, ProductController.addProduct);
 router.get("/products", ProductController.getAllProducts); // A listagem pode ser pública
 router.get("/products/:id", ProductController.getProductById); // A visualização pode ser pública
 router.put("/products/:id", verifyToken, verifyAdmin, ProductController.updateProduct);

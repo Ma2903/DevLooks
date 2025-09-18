@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Conecta ao banco de dados
-connectDB.getInstance();
+connectDB();
 
 const port = PORT;
 

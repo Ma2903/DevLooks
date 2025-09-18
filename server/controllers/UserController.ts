@@ -172,6 +172,45 @@ class UserController {
         }
     };
 
+    // Adicione este método dentro da classe UserController em server/controllers/UserController.ts
+
+static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    const { avatarUrl } = req.body;
+    const userId = req.user?.id;
+
+    if (!avatarUrl) {
+        res.status(400).json({ error: "A URL do avatar é obrigatória." });
+        return;
+    }
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            res.status(404).json({ error: "Usuário não encontrado." });
+            return;
+        }
+
+        // Verifica se o usuário já criou um avatar (se a regra de negócio exigir)
+        if (user.hasCreatedAvatar) {
+            res.status(403).json({ error: "Você já utilizou seu avatar gratuito." });
+            return;
+        }
+
+        user.avatarUrl = avatarUrl;
+        user.hasCreatedAvatar = true;
+        await user.save();
+        
+        // Retorna o usuário atualizado (sem a senha) para atualizar o frontend
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        res.status(200).json({ message: "Avatar salvo com sucesso!", user: userResponse });
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao salvar o avatar." });
+    }
+};
+
     static resetPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { email, code, newPassword, hash } = req.body;
         try {
