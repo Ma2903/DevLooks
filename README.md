@@ -24,7 +24,6 @@ DevLooks/
 ├── package.json
 ├── tailwind.config.js
 ├── vite.config.js
-└── .env
 
 ````
 
@@ -54,6 +53,12 @@ DevLooks/
    ```
 
 4. Acesse em `http://localhost:5173`
+
+5. Em outro terminal execute
+  
+   ```bash
+   npx tsx server/index.ts
+   ```
 
 ---
 
