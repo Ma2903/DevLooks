@@ -86,24 +86,27 @@ export default {
       defaultAvatar: defaultAvatar, // Adiciona a imagem padrão aos dados
     };
   },
-  async mounted() {
-    if (!this.token) {
-      this.$router.push("/login");
-      return;
-    }
-    try {
-      const res = await axios.post("/api/users/me", {}, {
-        headers: { Authorization: `Bearer ${this.token}` },
-      });
-      this.userData = res.data;
-      // Garante que a informação mais recente esteja no localStorage
-      localStorage.setItem("userData", JSON.stringify(this.userData));
-      window.dispatchEvent(new Event("storage"));
-    } catch (err) {
-      localStorage.removeItem("token");
-      this.$router.push("/login");
-    }
-  },
+async mounted() {
+  if (!this.token) {
+    this.$router.push("/login");
+    return;
+  }
+  try {
+    const res = await axios.get("/api/users/me", {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    
+    this.userData = res.data;
+    // Garante que a informação mais recente esteja no localStorage
+    localStorage.setItem("userData", JSON.stringify(this.userData));
+    window.dispatchEvent(new Event("storage"));
+  } catch (err) {
+    // Se a chamada falhar (agora por outros motivos, como token expirado),
+    // a lógica de logout continua correta.
+    localStorage.removeItem("token");
+    this.$router.push("/login");
+  }
+},
   methods: {
     confirmLogout() {
       Swal.fire({
@@ -155,29 +158,47 @@ export default {
         }
       });
     },
-    async deleteAccount() {
-      try {
-        await axios.delete(`/api/users/${this.userData._id}`, {
-          headers: { Authorization: `Bearer ${this.token}` },
-        });
-        Swal.fire({
-            title: 'Conta Deletada!',
-            text: 'Sua conta foi removida com sucesso.',
-            icon: 'success',
-            background: "#1F2937",
-            color: "#E5E7EB"
-        });
-        this.logout();
-      } catch (err) {
-        Swal.fire({
-            title: 'Erro!',
-            text: 'Não foi possível deletar a conta.',
-            icon: 'error',
-            background: "#1F2937",
-            color: "#E5E7EB"
-        });
-      }
-    },
+    // Dentro do objeto 'methods' do seu componente
+
+async deleteAccount() {
+  // --- ADICIONE ESTA VERIFICAÇÃO ---
+  // Se userData ou seu _id não existirem, exibe um erro e desloga o usuário.
+  if (!this.userData || !this.userData._id) {
+    Swal.fire({
+        title: 'Erro de Sessão',
+        text: 'Não foi possível encontrar os dados do seu usuário. Por favor, faça o login novamente.',
+        icon: 'warning',
+        background: "#1F2937",
+        color: "#E5E7EB"
+    });
+    this.logout(); // Redireciona para a página de login
+    return; // Para a execução da função aqui
+  }
+  // --- FIM DA VERIFICAÇÃO ---
+
+  try {
+    // O restante do código permanece o mesmo
+    await axios.delete(`/api/users/${this.userData._id}`, {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    Swal.fire({
+        title: 'Conta Deletada!',
+        text: 'Sua conta foi removida com sucesso.',
+        icon: 'success',
+        background: "#1F2937",
+        color: "#E5E7EB"
+    });
+    this.logout();
+  } catch (err) {
+    Swal.fire({
+        title: 'Erro!',
+        text: 'Não foi possível deletar a sua conta.',
+        icon: 'error',
+        background: "#1F2937",
+        color: "#E5E7EB"
+    });
+  }
+},
   },
 };
 </script>

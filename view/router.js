@@ -42,7 +42,7 @@ const routes = [
   { path: '/register', name: 'Register', component: Register },
   { path: '/edit-user', name: 'EditUser', component: EditUser },
   { path: '/reset-password', name: 'ResetPassword', component: ResetPassword },
-  { path: '/profile', name: 'Profile', component: Profile },
+  { path: '/profile', name: 'Profile', component: Profile, meta: { requiresAuth: true } },
   { path: '/products', name: 'ProductList', component: ProductList },
   { path: '/products/:id', name: 'SingleProduto', component: SingleProduto },
   { path: '/cart', name: 'Cart', component: Cart },

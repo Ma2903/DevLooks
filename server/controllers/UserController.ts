@@ -1,8 +1,6 @@
-// Ficheiro: server/controllers/UserController.ts
-
 import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import UserModel from "../models/UserModel"; // Garanta que a importação seja do MODELO
+import UserModel, { IUser } from "../models/UserModel";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
@@ -17,7 +15,13 @@ import {
     OWNER_EMAIL
 } from "../config/config";
 
-// Funções de criptografia
+const generateToken = (user: IUser): string => {
+    // Adicione este log para depuração
+    console.log('Assinando token com o segredo:', JWT_SECRET);
+    
+    return jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "5h" });
+};
+
 function criptografar(dado: string): string {
     return encodeURIComponent(CryptoJS.AES.encrypt(dado, CRYPTO_SECRET).toString());
 }
@@ -31,14 +35,7 @@ class UserController {
 
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { password } = req.body;
-            if (!password) {
-                res.status(400).json({ error: "O campo 'password' é obrigatório." });
-                return;
-            }
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-            const user = await UserModel.create({ ...req.body, password: hashedPassword });
+            const user = await UserModel.create(req.body);
             const userResponse = user.toObject();
             delete userResponse.password;
             res.status(201).json(userResponse);
@@ -46,29 +43,52 @@ class UserController {
             if (error.code === 11000) {
                 res.status(409).json({ error: "E-mail ou CPF já cadastrado." });
             } else {
-                console.error("Erro ao criar usuário:", error);
-                res.status(500).json({ error: "Ocorreu um erro inesperado ao criar o usuário." });
+                res.status(500).json({ error: "Ocorreu um erro inesperado." });
             }
         }
     };
-    
+
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
-            const user = await UserModel.findOne({ email });
-            if (!user || !bcrypt.compareSync(password, user.password)) {
+
+            // ---- CORREÇÃO DEFINITIVA APLICADA AQUI ----
+            if (!email || !password) {
+                res.status(400).json({ error: "E-mail e senha são obrigatórios." });
+                return;
+            }
+
+            const user = await UserModel.findOne({ email: email.toLowerCase() });
+
+            if (!user || !(await bcrypt.compare(password, user.password))) {
                 res.status(401).json({ error: "Credenciais inválidas." });
                 return;
             }
-            const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "5h" });
+            
+            const token = generateToken(user);
             const userResponse = user.toObject();
             delete userResponse.password;
+
             res.status(200).json({ message: "Login bem-sucedido.", token, user: userResponse });
         } catch (error) {
-            res.status(500).json({ error: "Erro ao fazer login." });
+            console.error("Erro no login:", error);
+            res.status(500).json({ error: "Erro interno ao tentar fazer login." });
         }
     };
     
+    static getMe: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = await UserModel.findById(req.user.id).select('-password');
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+            res.status(200).json(user);
+        } catch (error) {
+            res.status(500).json({ error: "Erro ao buscar dados do usuário." });
+        }
+    };
+
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const users = await UserModel.find().select('-password');
@@ -77,17 +97,15 @@ class UserController {
             res.status(500).json({ error: "Erro ao buscar usuários." });
         }
     };
-    
-    // ESTA É A FUNÇÃO CORRIGIDA PARA O ERRO 404
+
     static getUserById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const userId = req.user?.id || req.params.id; // Pega o ID do token ou da URL
-            const user = await UserModel.findById(userId).select('-password');
+            const user = await UserModel.findById(req.params.id).select('-password');
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
-                return;
+            } else {
+                res.status(200).json(user);
             }
-            res.status(200).json(user);
         } catch (error) {
             res.status(500).json({ error: "Erro ao buscar usuário." });
         }
@@ -102,9 +120,9 @@ class UserController {
             const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
-                return;
+            } else {
+                res.status(200).json(user);
             }
-            res.status(200).json(user);
         } catch (error) {
             res.status(500).json({ error: "Erro ao atualizar usuário." });
         }
@@ -115,45 +133,17 @@ class UserController {
             const user = await UserModel.findByIdAndDelete(req.params.id);
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
-                return;
+            } else {
+                res.status(200).json({ message: "Usuário deletado com sucesso." });
             }
-            res.status(200).json({ message: "Usuário deletado com sucesso." });
         } catch (error) {
             res.status(500).json({ error: "Erro ao deletar usuário." });
         }
     };
 
-    static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const { email } = req.body;
-        try {
-            const user = await UserModel.findOne({ email });
-            if (!user) {
-                res.status(404).json({ error: "E-mail não encontrado." });
-                return;
-            }
-            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const transporter = nodemailer.createTransport({
-                host: MAIL_HOST, port: Number(MAIL_PORT), secure: false, auth: { user: MAIL_USER, pass: MAIL_PASS },
-            });
-            await transporter.sendMail({
-                from: `DevLooks <${OWNER_EMAIL}>`, to: email, subject: "Código de Recuperação de Senha",
-                html: `<p>Seu código para redefinir a senha é: <strong>${code}</strong></p>`,
-            });
-            res.status(200).json({
-                message: "Instruções enviadas para o e-mail.", code: bcrypt.hashSync(code, 10), email: criptografar(user.email)
-            });
-        } catch (error: any) {
-            res.status(500).json({ error: "Erro ao recuperar senha.", details: error.message });
-        }
-    };
-
     static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const { avatarUrl } = req.body;
         const userId = req.user?.id;
-        if (!avatarUrl) {
-            res.status(400).json({ error: "A URL do avatar é obrigatória." });
-            return;
-        }
+        const { avatarUrl } = req.body;
         try {
             const user = await UserModel.findById(userId);
             if (!user) {
@@ -161,7 +151,7 @@ class UserController {
                 return;
             }
             if (user.hasCreatedAvatar) {
-                res.status(403).json({ error: "Você já utilizou seu avatar gratuito." });
+                res.status(403).json({ error: "Você já criou seu avatar gratuito." });
                 return;
             }
             user.avatarUrl = avatarUrl;
@@ -169,33 +159,62 @@ class UserController {
             await user.save();
             const userResponse = user.toObject();
             delete userResponse.password;
-            res.status(200).json({ message: "Avatar salvo com sucesso!", user: userResponse });
+            res.status(200).json({ message: "Avatar salvo com sucesso.", user: userResponse });
         } catch (error) {
-            res.status(500).json({ error: "Erro ao salvar o avatar." });
+            res.status(500).json({ error: "Erro interno ao salvar avatar." });
         }
     };
+
+    static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { email } = req.body;
+            const user = await UserModel.findOne({ email });
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const transporter = nodemailer.createTransport({
+                host: MAIL_HOST,
+                port: parseInt(MAIL_PORT || '587'),
+                secure: false,
+                auth: { user: MAIL_USER, pass: MAIL_PASS },
+            });
+            await transporter.sendMail({
+                from: '"DevLooks" <no-reply@devlooks.com>',
+                to: email,
+                subject: "Código de Recuperação de Senha",
+                html: `<p>Seu código de recuperação de senha é: <strong>${code}</strong></p>`
+            });
+            res.status(200).json({
+                message: "Instruções de recuperação enviadas.",
+                code: bcrypt.hashSync(code, 10),
+                email: criptografar(user.email)
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Erro ao recuperar senha." });
+        }
+    }
 
     static resetPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { email, code, newPassword, hash } = req.body;
         try {
-            const userEmail = descriptografar(email);
-            const user = await UserModel.findOne({ email: userEmail });
+            const user = await UserModel.findOne({ email: descriptografar(email) });
             if (!user) {
                 res.status(404).json({ error: "Link de recuperação inválido." });
                 return;
             }
             if (bcrypt.compareSync(code, hash)) {
-                const salt = await bcrypt.genSalt(10);
-                user.password = await bcrypt.hash(newPassword, salt);
+                user.password = newPassword;
                 await user.save();
                 res.status(200).json({ message: "Senha atualizada com sucesso.", success: true });
             } else {
                 res.status(400).json({ error: "Código de recuperação inválido." });
             }
-        } catch (error: any) {
-            res.status(500).json({ error: "Erro ao redefinir senha.", details: error.message });
+        } catch (error) {
+            res.status(500).json({ error: "Erro ao redefinir senha." });
         }
-    };
+    }
 }
 
 export default UserController;

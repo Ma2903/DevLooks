@@ -226,7 +226,7 @@ export default {
           this.$router.push('/login');
           return;
         }
-        const res = await axios.post("/api/users/me", {}, { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await axios.get("/api/users/me", {}, { headers: { 'Authorization': `Bearer ${token}` } });
         const userData = res.data;
         
         localStorage.setItem('userData', JSON.stringify(userData));

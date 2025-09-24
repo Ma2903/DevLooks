@@ -1,10 +1,8 @@
 // server/middlewares/authMiddleware.ts
-
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/config"; // Importa a chave do nosso ponto central
+import { JWT_SECRET } from "../config/config";
 
-// A interface global permanece a mesma
 declare global {
     namespace Express {
         interface Request {
@@ -14,27 +12,28 @@ declare global {
 }
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
-    let token = req.headers.authorization;
-    if (token && token.startsWith("Bearer ")) {
-        token = token.slice(7);
-    }
+    let token;
 
-    if (!token) {
-        res.status(401).json({ message: "Token not provided" });
-        return;
-    }
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
 
-    try {
-        // Usa a JWT_SECRET importada para verificar
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        // Simplificamos o tratamento de erro
-        res.status(403).json({ message: "Invalid token" });
+            // Adicione este log para depuração
+            console.log('Verificando token com o segredo:', JWT_SECRET);
+
+            const decoded = jwt.verify(token, JWT_SECRET);
+            req.user = decoded;
+            next();
+        } catch (error) {
+            console.error("ERRO ao verificar o token:", error);
+            res.status(401).json({ message: "Não autorizado, token inválido." });
+        }
+    } else {
+        res.status(401).json({ message: "Não autorizado, token não fornecido." });
     }
 };
 
+// A sua função verifyAdmin está correta e não precisa de alterações
 export const verifyAdmin = (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
         res.status(401).json({ message: "Acesso negado. Token não encontrado ou inválido." });
@@ -49,6 +48,7 @@ export const verifyAdmin = (req: Request, res: Response, next: NextFunction): vo
     next();
 };
 
+// A sua função verifyOwner também está correta
 export const verifyOwner = (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
         res.status(401).json({ message: "Acesso negado. Token não encontrado ou inválido." });

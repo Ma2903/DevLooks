@@ -128,17 +128,17 @@
             localStorage.setItem("userData", JSON.stringify(response.data.user));
             window.dispatchEvent(new Event("storage"));
 
-            Swal.fire({
-              icon: 'success',
-              title: 'Login realizado com sucesso!',
-              showConfirmButton: false,
-              timer: 1500,
-              background: "#1F2937",
-              color: "#E5E7EB",
-            });
-            setTimeout(() => {
-              this.$router.push("/profile");
-            }, 1500);
+           Swal.fire({
+            icon: 'success',
+            title: 'Login realizado com sucesso!',
+            showConfirmButton: false,
+            timer: 1500,
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
+          setTimeout(() => {
+            this.$router.push("/profile");
+          }, 1500);
 
           } catch (error) {
             this.loginError = "Verifique suas credenciais.";

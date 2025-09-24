@@ -1,9 +1,8 @@
-// Ficheiro: server/models/UserModel.ts
-
 import { Schema, model, Document } from "mongoose";
+import bcrypt from "bcrypt";
 
 // Interface para um item no carrinho
-interface ICartItem {
+interface ICartItem extends Document {
     productId: Schema.Types.ObjectId;
     quantity: number;
     selectedSize?: string;
@@ -27,17 +26,18 @@ export interface IUser extends Document {
     city: string;
     state: string;
     country: string;
-    role: string;
+    role: 'user' | 'admin' | 'owner';
     status: string;
     avatarUrl?: string;
     hasCreatedAvatar?: boolean;
     hasMadePurchase?: boolean;
     cart: ICartItem[];
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
 
-// Schema para os itens do carrinho
 const cartItemSchema = new Schema<ICartItem>({
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, min: 1 },
@@ -47,32 +47,40 @@ const cartItemSchema = new Schema<ICartItem>({
     image: { type: String, required: true },
 }, { _id: false });
 
-// Schema principal do usuário
 const UserSchema = new Schema<IUser>({
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     cpf: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     telephone: { type: String, required: true },
-    address: { type: String, required: true },
+    address: { type: String },
     number: { type: String },
     complement: { type: String },
     bairro: { type: String },
-    cep: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true },
+    cep: { type: String },
+    city: { type: String },
+    state: { type: String },
+    country: { type: String },
     role: { type: String, default: "user", enum: ['user', 'admin', 'owner'] },
     status: { type: String, default: "active" },
     avatarUrl: { type: String, default: null },
     hasCreatedAvatar: { type: Boolean, default: false },
     hasMadePurchase: { type: Boolean, default: false },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     cart: { type: [cartItemSchema], default: [] },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+}, { timestamps: true });
+
+// Middleware para criptografar a senha antes de salvar
+UserSchema.pre<IUser>('save', async function(next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
 });
 
-// Cria e exporta o Model diretamente
 const UserModel = model<IUser>("User", UserSchema);
 
 export default UserModel;
