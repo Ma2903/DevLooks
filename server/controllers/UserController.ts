@@ -37,13 +37,18 @@ class UserController {
         try {
             const user = await UserModel.create(req.body);
             const userResponse = user.toObject();
-            delete userResponse.password;
+            delete userResponse.password; // Ótima prática de segurança!
             res.status(201).json(userResponse);
         } catch (error: any) {
+            // --- INÍCIO DA MELHORIA ---
+            // Verifica se o erro é de chave duplicada (código 11000)
             if (error.code === 11000) {
-                res.status(409).json({ error: "E-mail ou CPF já cadastrado." });
+                // Verifica qual campo causou a duplicidade (geralmente email ou cpf)
+                const field = Object.keys(error.keyValue)[0];
+                res.status(409).json({ message: `O ${field} informado já está em uso.` }); // 409 Conflict
             } else {
-                res.status(500).json({ error: "Ocorreu um erro inesperado." });
+                // Mantém o erro genérico para outros problemas
+                res.status(500).json({ message: "Erro ao criar usuário", error: error.message });
             }
         }
     };

@@ -1,61 +1,58 @@
 <template>
-  <header class="bg-[#04d1b0] text-white p-4 md:p-6 shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto flex flex-wrap justify-between items-center">
-      <div class="flex items-center space-x-4">
+  <header class="bg-gray-900 text-white p-4 md:p-6 shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      
+      <router-link to="/home" class="flex items-center space-x-4">
         <img
           src="../assets/favicon.png"
-          alt="Nova Logo do Sistema"
+          alt="Logo DevLooks"
           class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-lg"
         />
         <div>
           <h1 class="text-3xl font-poppins font-bold tracking-wide">
-            <span class="text-[#04d1b0]">Dev</span><span class="text-[#4e44e1]">Looks</span>
+            <span class="text-[#04d1b0]">Dev</span><span class="text-white">Looks</span>
           </h1>
         </div>
-      </div>
+      </router-link>
+
+      <button @click="toggleMenu" class="md:hidden text-3xl">
+        <i :class="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
+      </button>
 
       <nav
-        :class="{'hidden': !menuOpen, 'block': menuOpen}"
-        class="w-full md:w-auto md:flex md:items-center md:space-x-6 text-lg md:text-xl mt-4 md:mt-0 text-[#4e44e1]"
+        :class="{'hidden': !menuOpen, 'flex': menuOpen}"
+        class="absolute md:relative top-full left-0 w-full bg-gray-900 md:bg-transparent p-5 md:p-0 md:flex md:w-auto flex-col md:flex-row md:items-center md:space-x-4 text-lg"
       >
-        <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
+        <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
           <li>
-            <router-link to="/home" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-home"></i><span>Home</span></router-link>
+            <router-link to="/home" class="nav-link"><i class="fas fa-home mr-2"></i>Home</router-link>
           </li>
           <li>
-            <router-link to="/products" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-store"></i><span>Produtos</span></router-link>
-          </li>
-          <li v-if="userType === 'user'">
-            <router-link to="/cart" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-shopping-cart"></i><span>Carrinho</span></router-link>
+            <router-link to="/products" class="nav-link"><i class="fas fa-store mr-2"></i>Produtos</router-link>
           </li>
 
           <template v-if="isLoggedIn">
-            <li v-if="userType === 'user'">
-              <router-link to="/create-avatar" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-user-astronaut"></i><span>Criar Avatar</span></router-link>
-            </li>
+            <template v-if="userType === 'user'">
+              <li><router-link to="/cart" class="nav-link"><i class="fas fa-shopping-cart mr-2"></i>Carrinho</router-link></li>
+              <li><router-link to="/order-history" class="nav-link"><i class="fas fa-receipt mr-2"></i>Minhas Compras</router-link></li>
+              <li><router-link to="/create-avatar" class="nav-link"><i class="fas fa-user-astronaut mr-2"></i>Criar Avatar</router-link></li>
+            </template>
             
-            <li v-if="userType === 'admin' || userType === 'owner'">
-              <router-link to="/admin/products" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-cogs"></i><span>Gerir Produtos</span></router-link>
-            </li>
-            <li v-if="userType === 'admin' || userType === 'owner'">
-              <router-link to="/admin/coupons" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-tags"></i><span>Gerir Cupons</span></router-link>
-            </li>
+            <template v-if="userType === 'admin' || userType === 'owner'">
+              <li><router-link to="/admin/products" class="nav-link"><i class="fas fa-cogs mr-2"></i>Gerir Produtos</router-link></li>
+              <li><router-link to="/admin/coupons" class="nav-link"><i class="fas fa-tags mr-2"></i>Gerir Cupons</router-link></li>
+              <li><router-link to="/admin/orders" class="nav-link"><i class="fas fa-dollar-sign mr-2"></i>Gerir Vendas</router-link></li>
+            </template>
             
-            <li v-if="userType === 'admin' || userType === 'owner'">
-              <router-link to="/admin/orders" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-dollar-sign"></i><span>Gerir Vendas</span></router-link>
-            </li>
-
             <li v-if="userType === 'owner'">
-              <router-link to="/admin/users" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-users"></i><span>Gerir Utilizadores</span></router-link>
+              <router-link to="/admin/users" class="nav-link"><i class="fas fa-users mr-2"></i>Gerir Utilizadores</router-link>
             </li>
             
-            <li>
-              <router-link to="/profile" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-user"></i><span>Perfil</span></router-link>
-            </li>
+            <li><router-link to="/profile" class="nav-link"><i class="fas fa-user mr-2"></i>Perfil</router-link></li>
           </template>
 
           <li v-if="!isLoggedIn">
-            <router-link to="/login" class="px-4 py-2 bg-[#4e44e1] text-white rounded hover:bg-[#04d1b0] flex items-center space-x-2 transition" style="color: white !important;"><i class="fas fa-sign-in-alt"></i><span>Entrar</span></router-link>
+            <router-link to="/login" class="nav-link"><i class="fas fa-sign-in-alt mr-2"></i>Entrar</router-link>
           </li>
         </ul>
       </nav>
@@ -64,44 +61,65 @@
 </template>
 
 <script>
-// ... (a lógica do script permanece a mesma) ...
 export default {
   name: "Header",
   data() {
+    // Inicializa o estado lendo do localStorage para evitar "piscadas" na tela
+    const token = localStorage.getItem("token");
+    const userDataRaw = localStorage.getItem("userData");
+    let userType = 'guest';
+
+    if (token && userDataRaw && userDataRaw !== "undefined") {
+      try {
+        const userData = JSON.parse(userDataRaw);
+        userType = userData.role || 'user';
+      } catch (e) {
+        console.error("Erro ao parsear userData do localStorage", e);
+      }
+    }
+    
     return {
       menuOpen: false,
-      isLoggedIn: !!localStorage.getItem("token"),
-      userType: "user",
+      isLoggedIn: !!token,
+      userType: userType,
     };
   },
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen;
     },
-    atualizarUserType() {
+    atualizarEstado() {
+      const token = localStorage.getItem("token");
       const userDataRaw = localStorage.getItem("userData");
-      this.isLoggedIn = !!localStorage.getItem("token");
+      this.isLoggedIn = !!token;
 
       if (this.isLoggedIn && userDataRaw && userDataRaw !== "undefined") {
-        const userData = JSON.parse(userDataRaw);
-        this.userType = userData.role || "user";
+        try {
+          const userData = JSON.parse(userDataRaw);
+          this.userType = userData.role || "user";
+        } catch (e) {
+          this.userType = 'user'; // Fallback em caso de erro
+        }
       } else {
         this.userType = 'guest'; 
       }
     },
   },
   created() {
-    this.atualizarUserType();
-    window.addEventListener("storage", this.atualizarUserType);
-    window.addEventListener("login-update", this.atualizarUserType);
+    // Adiciona listeners para manter o header sincronizado
+    window.addEventListener("storage", this.atualizarEstado);
+    window.addEventListener("login-update", this.atualizarEstado);
   },
   beforeUnmount() {
-    window.removeEventListener("storage", this.atualizarUserType);
-    window.removeEventListener("login-update", this.atualizarUserType);
+    // Remove os listeners ao destruir o componente
+    window.removeEventListener("storage", this.atualizarEstado);
+    window.removeEventListener("login-update", this.atualizarEstado);
   },
   watch: {
+    // Atualiza o header a cada mudança de rota
     $route() {
-      this.atualizarUserType();
+      this.atualizarEstado();
+      this.menuOpen = false; // Fecha o menu mobile ao navegar
     }
   }
 };
@@ -111,23 +129,25 @@ export default {
 @import '@fortawesome/fontawesome-free/css/all.css';
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
-/* O seu CSS permanece igual */
-header {
-  background-color: #1a202c;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 h1 {
   font-family: "Poppins", sans-serif;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-a {
-  transition: color 0.3s, transform 0.2s;
+
+/* Estilo unificado para os links de navegação */
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s, color 0.3s, transform 0.2s;
+  background-color: #4e44e1;
+  color: white;
 }
-a:hover {
-  transform: scale(1.07);
-}
-button:hover {
-  transform: scale(1.1);
+
+.nav-link:hover {
+  background-color: #04d1b0;
+  transform: scale(1.05);
 }
 </style>

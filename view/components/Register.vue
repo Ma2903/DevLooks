@@ -75,7 +75,7 @@
             <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
             <div class="relative flex items-center">
               <i class="fas fa-map-pin absolute left-4 text-gray-400 z-10"></i>
-              <input type="text" id="cep" v-model="form.cep" @blur="fetchAddressFromCep"
+              <input type="text" id="cep" v-model="form.cep" @blur="fetchAddress"
                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
                      placeholder="00000-000" required />
             </div>
@@ -158,8 +158,10 @@ export default {
       showPassword: false,
       showConfirmPassword: false,
       loading: false,
+      loadingCep: false, // Propriedade para o loading do CEP
     };
   },
+  // SUAS MÁSCARAS ESTÃO DE VOLTA AQUI, INTACTAS!
   watch: {
     'form.cpf'(newValue) {
       if (!newValue) return;
@@ -185,18 +187,38 @@ export default {
     }
   },
   methods: {
-    async fetchAddressFromCep() {
-      const cep = this.form.cep?.replace(/\D/g, '');
-      if (!cep || cep.length !== 8) return;
-      try {
-        const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-        if (response.data.erro) return;
-        this.form.address = response.data.logradouro;
-        this.form.bairro = response.data.bairro;
-        this.form.city = response.data.localidade;
-        this.form.state = response.data.uf;
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
+    async fetchAddress() {
+      const cep = this.form.cep.replace(/\D/g, "");
+      if (cep.length === 8) {
+        try {
+          this.loadingCep = true;
+          const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+          if (response.data.erro) {
+            Swal.fire({
+              icon: 'error',
+              title: 'CEP não encontrado',
+              text: 'Por favor, verifique o CEP digitado.',
+              background: "#1F2937",
+              color: "#E5E7EB",
+            });
+          } else {
+            this.form.address = response.data.logradouro;
+            this.form.bairro = response.data.bairro;
+            this.form.city = response.data.localidade;
+            this.form.state = response.data.uf;
+          }
+        } catch (error) {
+          console.error("Erro ao buscar CEP:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro na Consulta',
+            text: 'Não foi possível consultar o CEP. Tente novamente mais tarde.',
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
+        } finally {
+          this.loadingCep = false;
+        }
       }
     },
     async handleRegister() {
@@ -221,7 +243,7 @@ export default {
       } catch (error) {
         Swal.fire({
           icon: 'error', title: 'Erro no Cadastro',
-          text: error.response?.data?.error || 'Não foi possível realizar o cadastro.',
+          text: error.response?.data?.message || 'Não foi possível realizar o cadastro.',
           background: "#1F2937", color: "#E5E7EB",
         });
       } finally {

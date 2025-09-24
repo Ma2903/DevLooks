@@ -42,7 +42,7 @@
             <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
             <div class="relative">
               <i class="fas fa-map-pin absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="cep" v-model="userData.cep" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
+              <input type="text" id="cep" v-model="userData.cep" @blur="fetchAddressFromCep" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
             </div>
           </div>
           <div>
@@ -88,96 +88,120 @@
 </template>
 
 <script>
-import axios from 'axios';
-import Swal from 'sweetalert2'
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
-  name: "EditUser",
   data() {
     return {
-      userData: {
-        name: "", email: "", cpf: "", telephone: "",
-        address: "", number: "", complement: "", bairro: "", cep: "",
-        city: "", state: "", country: "",
-      },
+      // Inicializa userData como null para sabermos quando os dados estão carregando
+      userData: null,
+      token: null,
+      loading: true, // Adiciona um estado de loading
     };
   },
   watch: {
+    // Suas excelentes máscaras continuam aqui
     'userData.cpf'(newValue) {
-      if (!newValue) return;
-      this.userData.cpf = newValue.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2').slice(0, 14);
+        if (!newValue || !this.userData) return;
+        this.userData.cpf = newValue
+            .replace(/\D/g, '').slice(0, 11)
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     },
     'userData.telephone'(newValue) {
-      if (!newValue) return;
-      const digits = newValue.replace(/\D/g, '').slice(0, 11);
-      if (digits.length > 10) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-      else if (digits.length > 6) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-      else if (digits.length > 2) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-      else this.userData.telephone = digits;
+        if (!newValue || !this.userData) return;
+        const digits = newValue.replace(/\D/g, '').slice(0, 11);
+        if (digits.length > 10) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+        else if (digits.length > 6) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+        else if (digits.length > 2) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+        else this.userData.telephone = `(${digits})`;
     },
     'userData.cep'(newValue) {
-      if (!newValue) return;
-      const digits = newValue.replace(/\D/g, '').slice(0, 8);
-      this.userData.cep = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
-      if (this.userData.cep.length === 9) this.fetchAddressFromCep(this.userData.cep);
+        if (!newValue || !this.userData) return;
+        const digits = newValue.replace(/\D/g, '').slice(0, 8);
+        this.userData.cep = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
     }
   },
-  async mounted() {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  async created() {
+    this.token = localStorage.getItem("token");
+    if (!this.token) {
       this.$router.push("/login");
       return;
     }
     try {
-      const res = await axios.get("/api/users/me", {}, { headers: { 'Authorization': `Bearer ${token}` } });
-      
-      // CORREÇÃO: Garante que os campos opcionais existam no objeto
-      this.userData = {
-        ...res.data,
-        number: res.data.number || '',
-        complement: res.data.complement || '',
-        bairro: res.data.bairro || '',
-      };
+      // A chamada de API para buscar os dados
+      const res = await axios.get("/api/users/me", {
+        headers: { Authorization: `Bearer ${this.token}` },
+      });
+      // Atribui os dados recebidos ao userData
+      this.userData = res.data;
     } catch (err) {
+      // Se a chamada falhar, faz o logout
+      Swal.fire({
+        title: 'Sessão Expirada',
+        text: 'Por favor, faça o login novamente.',
+        icon: 'warning',
+        background: "#1F2937",
+        color: "#E5E7EB"
+      });
       localStorage.removeItem("token");
       this.$router.push("/login");
+    } finally {
+      this.loading = false;
     }
   },
   methods: {
-    async fetchAddressFromCep(cep) {
+    // Sua lógica de buscar o CEP está ótima, apenas ajustada para a nova estrutura
+    async fetchAddressFromCep() {
+      if (!this.userData.cep) return;
+      const cep = this.userData.cep.replace(/\D/g, "");
+      if (cep.length !== 8) return;
+
       try {
-        const response = await axios.get(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
+        const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
         if (response.data.erro) return;
         
         this.userData.address = response.data.logradouro;
         this.userData.bairro = response.data.bairro;
         this.userData.city = response.data.localidade;
         this.userData.state = response.data.uf;
-        this.userData.country = "Brasil";
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
       }
     },
     async handleEdit() {
-      const token = localStorage.getItem("token");
+      if (!this.userData || !this.userData._id) {
+          Swal.fire("Erro", "Dados do usuário não encontrados.", "error");
+          return;
+      }
       try {
-        // Envia o objeto userData completo, que agora contém os novos campos
         await axios.put(`/api/users/${this.userData._id}`, this.userData, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { 'Authorization': `Bearer ${this.token}` },
         });
+        
+        // Atualiza o localStorage com os novos dados
+        localStorage.setItem("userData", JSON.stringify(this.userData));
+        window.dispatchEvent(new Event("storage")); // Notifica outros componentes da mudança
+
         Swal.fire({
           title: "Dados Atualizados!",
           icon: "success",
           background: "#1F2937",
           color: "#E5E7EB",
+          timer: 1500,
+          showConfirmButton: false,
         });
         this.$router.push("/profile");
       } catch(error) {
         Swal.fire({
-          title: 'Erro!',
-          text: 'Não foi possível atualizar os dados.',
+          title: 'Erro ao Atualizar',
+          text: error.response?.data?.message || "Não foi possível atualizar seus dados.",
           icon: 'error',
-        })
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
       }
     },
   },
