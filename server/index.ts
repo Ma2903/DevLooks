@@ -12,6 +12,7 @@ import couponRoutes from './routes/CouponRoutes';
 import orderRoutes from './routes/OrderRoutes';
 import cartRoutes from './routes/CartRoutes';
 import adminRoutes from './routes/AdminRoutes';
+import avatarRoutes from './routes/AvatarRoutes';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api', couponRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', adminRoutes);
+app.use('/api', avatarRoutes);
 
 // Servir arquivos estáticos da pasta 'public'
 app.use(express.static('public'));

@@ -22,93 +22,89 @@
               Personalização
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="md:col-span-2">
-                <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-[#04d1b0] rounded-full flex items-center justify-center">
-                      <i class="fas fa-user text-white text-sm"></i>
-                    </div>
-                    Nome do Avatar
-                  </div>
-                  <input v-model="avatar.name" type="text" required placeholder="Digite um nome para o avatar" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300" />
-                </label>
-              </div>
-
               <div>
                 <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-[#4e44e1] rounded-full flex items-center justify-center"><i class="fas fa-cut text-white text-sm"></i></div>
-                    Estilo de Cabelo
-                  </div>
-                  <select v-model="avatar.topType" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300">
-                    <option v-for="option in options.topType" :key="option" :value="option" class="bg-gray-700 text-white">{{ traduzir(option) }}</option>
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-[#4e44e1]"><i class="fas fa-cut"></i></div>Estilo de Cabelo</div>
+                  <select v-model="avatarOptions.topType" class="select-input">
+                    <option v-for="option in options.topType" :key="option" :value="option">{{ traduzir(option) }}</option>
                   </select>
                 </label>
               </div>
-
               <div>
                 <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center"><i class="fas fa-palette text-white text-sm"></i></div>
-                    Cor do Cabelo
-                  </div>
-                  <select v-model="avatar.hairColor" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300">
-                    <option v-for="option in options.hairColor" :key="option" :value="option" class="bg-gray-700 text-white">{{ traduzir(option) }}</option>
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-orange-500"><i class="fas fa-glasses"></i></div>Acessórios</div>
+                  <select v-model="avatarOptions.accessoriesType" class="select-input">
+                    <option v-for="option in options.accessoriesType" :key="option" :value="option">{{ traduzir(option) }}</option>
                   </select>
                 </label>
               </div>
-
               <div>
                 <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center"><i class="fas fa-glasses text-white text-sm"></i></div>
-                    Acessórios
-                  </div>
-                  <select v-model="avatar.accessoriesType" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300">
-                    <option v-for="option in options.accessoriesType" :key="option" :value="option" class="bg-gray-700 text-white">{{ traduzir(option) }}</option>
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-pink-500"><i class="fas fa-palette"></i></div>Cor do Cabelo</div>
+                  <select v-model="avatarOptions.hairColor" class="select-input">
+                    <option v-for="option in options.hairColor" :key="option" :value="option">{{ traduzir(option) }}</option>
                   </select>
                 </label>
               </div>
-
               <div>
                 <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><i class="fas fa-tshirt text-white text-sm"></i></div>
-                    Roupa
-                  </div>
-                  <select v-model="avatar.clotheType" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300">
-                    <option v-for="option in options.clotheType" :key="option" :value="option" class="bg-gray-700 text-white">{{ traduzir(option) }}</option>
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-gray-500"><i class="fas fa-user-secret"></i></div>Barba / Bigode</div>
+                  <select v-model="avatarOptions.facialHairType" class="select-input">
+                    <option v-for="option in options.facialHairType" :key="option" :value="option">{{ traduzir(option) }}</option>
                   </select>
                 </label>
               </div>
-
               <div>
                 <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center"><i class="fas fa-sun text-white text-sm"></i></div>
-                    Cor da Pele
-                  </div>
-                  <select v-model="avatar.skinColor" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300">
-                    <option v-for="option in options.skinColor" :key="option" :value="option" class="bg-gray-700 text-white">{{ traduzir(option) }}</option>
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-green-500"><i class="fas fa-tshirt"></i></div>Roupa</div>
+                  <select v-model="avatarOptions.clotheType" class="select-input">
+                    <option v-for="option in options.clotheType" :key="option" :value="option">{{ traduzir(option) }}</option>
                   </select>
                 </label>
               </div>
-
               <div>
                 <label class="block text-white font-semibold mb-3">
-                  <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center"><i class="fas fa-image text-white text-sm"></i></div>
-                    Tamanho PNG
-                  </div>
-                  <select v-model.number="pngSize" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition-all duration-300">
-                    <option :value="200" class="bg-gray-700 text-white">200x200</option>
-                    <option :value="400" class="bg-gray-700 text-white">400x400</option>
-                    <option :value="600" class="bg-gray-700 text-white">600x600</option>
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-blue-500"><i class="fas fa-eye"></i></div>Olhos</div>
+                  <select v-model="avatarOptions.eyeType" class="select-input">
+                    <option v-for="option in options.eyeType" :key="option" :value="option">{{ traduzir(option) }}</option>
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label class="block text-white font-semibold mb-3">
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-purple-500"><i class="fas fa-angle-double-up"></i></div>Sobrancelha</div>
+                  <select v-model="avatarOptions.eyebrowType" class="select-input">
+                    <option v-for="option in options.eyebrowType" :key="option" :value="option">{{ traduzir(option) }}</option>
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label class="block text-white font-semibold mb-3">
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-red-500"><i class="fas fa-mouth-guard"></i></div>Boca</div>
+                  <select v-model="avatarOptions.mouthType" class="select-input">
+                    <option v-for="option in options.mouthType" :key="option" :value="option">{{ traduzir(option) }}</option>
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label class="block text-white font-semibold mb-3">
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-yellow-500"><i class="fas fa-sun"></i></div>Cor da Pele</div>
+                  <select v-model="avatarOptions.skinColor" class="select-input">
+                    <option v-for="option in options.skinColor" :key="option" :value="option">{{ traduzir(option) }}</option>
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label class="block text-white font-semibold mb-3">
+                  <div class="flex items-center gap-2 mb-3"><div class="option-icon bg-indigo-500"><i class="fas fa-image"></i></div>Tamanho PNG</div>
+                  <select v-model.number="pngSize" class="select-input">
+                    <option :value="200">200x200</option>
+                    <option :value="400">400x400</option>
+                    <option :value="600">600x600</option>
                   </select>
                 </label>
               </div>
             </div>
-
             <button type="submit" class="w-full mt-8 bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-3">
               <i class="fas fa-save text-xl"></i>
               Salvar Avatar
@@ -118,26 +114,19 @@
 
         <div class="lg:col-span-1">
           <div class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700 sticky top-8">
-            <h3 class="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center gap-3">
-              <i class="fas fa-eye text-[#04d1b0]"></i>
-              Visualização
-            </h3>
+            <h3 class="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center gap-3"><i class="fas fa-eye text-[#04d1b0]"></i>Visualização</h3>
             <div class="flex flex-col items-center">
               <div class="relative mb-6">
-                <img :src="avatarUrl" alt="Prévia do Avatar" class="w-48 h-48 md:w-56 md:h-56 rounded-full border-4 border-[#04d1b0] shadow-2xl bg-gray-700 p-2 transition-transform duration-300 hover:scale-105" />
-                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center border-4 border-gray-800">
-                  <i class="fas fa-check text-white"></i>
-                </div>
+                <img :src="proxiedAvatarUrl" alt="Prévia do Avatar" class="w-48 h-48 md:w-56 md:h-56 rounded-full border-4 border-[#04d1b0] shadow-2xl bg-gray-700 p-2 transition-transform duration-300 hover:scale-105" />
+                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center border-4 border-gray-800"><i class="fas fa-check text-white"></i></div>
               </div>
               <div class="w-full space-y-3">
-                <button @click="downloadSVG" :disabled="isDownloading" class="w-full bg-[#4e44e1] hover:bg-[#3e3ab8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
-                  <i v-if="!isDownloading" class="fas fa-file-code"></i>
-                  <i v-else class="fas fa-spinner fa-spin"></i>
+                <button @click="downloadSVG" :disabled="isDownloading" class="download-button bg-[#4e44e1] hover:bg-[#3e3ab8]">
+                  <i v-if="!isDownloading" class="fas fa-file-code"></i><i v-else class="fas fa-spinner fa-spin"></i>
                   {{ isDownloading ? 'Baixando...' : 'Baixar SVG' }}
                 </button>
-                <button @click="downloadPNG" :disabled="isDownloading" class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2">
-                  <i v-if="!isDownloading" class="fas fa-file-image"></i>
-                  <i v-else class="fas fa-spinner fa-spin"></i>
+                <button @click="downloadPNG" :disabled="isDownloading" class="download-button bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90">
+                  <i v-if="!isDownloading" class="fas fa-file-image"></i><i v-else class="fas fa-spinner fa-spin"></i>
                   {{ isDownloading ? 'Processando...' : 'Baixar PNG' }}
                 </button>
               </div>
@@ -148,158 +137,187 @@
     </div>
 
     <div v-else class="container mx-auto max-w-2xl text-center">
-       <div class="bg-gray-800 rounded-xl shadow-2xl p-10 border border-gray-700">
-          <i class="fas fa-lock text-5xl text-yellow-400 mb-4"></i>
-          <h1 class="text-3xl font-bold text-white mb-4">Você já usou seu avatar gratuito!</h1>
-          <p class="text-gray-400 text-lg mb-8">
-            Para criar um novo avatar e substituir o atual, você pode adquirir um "Slot de Avatar" em nossa loja.
-          </p>
-          <router-link
-            to="/products"
-            class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2 max-w-xs mx-auto"
-          >
-            <i class="fas fa-shopping-cart"></i>
-            Comprar Slot de Avatar
-          </router-link>
-       </div>
+      <div class="bg-gray-800 rounded-xl shadow-2xl p-10 border border-gray-700">
+        <i class="fas fa-lock text-5xl text-yellow-400 mb-4"></i>
+        <h1 class="text-3xl font-bold text-white mb-4">Você já usou seu avatar gratuito!</h1>
+        <p class="text-gray-400 text-lg mb-8">
+          Para criar um novo avatar e substituir o atual, você pode adquirir um "Slot de Avatar" em nossa loja.
+        </p>
+        <router-link to="/products" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2 max-w-xs mx-auto">
+          <i class="fas fa-shopping-cart"></i>
+          Comprar Slot de Avatar
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
-  name: 'CreateAvatar',
+  name: "CreateAvatar",
   data() {
     return {
-      loading: true,
-      canCreateAvatar: false,
-      isDownloading: false,
-      avatar: {
-        name: '',
-        topType: 'ShortHairShortFlat',
-        hairColor: 'Brown',
+      avatarOptions: {
+        topType: 'NoHair',
         accessoriesType: 'Blank',
+        hairColor: 'BrownDark',
+        facialHairType: 'Blank',
         clotheType: 'BlazerShirt',
+        eyeType: 'Default',
+        eyebrowType: 'Default',
+        mouthType: 'Default',
         skinColor: 'Light'
       },
-      pngSize: 400,
+      // ✅ OPÇÕES DE PERSONALIZAÇÃO RESTAURADAS ✅
       options: {
-        topType: ['NoHair', 'Hat', 'Hijab', 'ShortHairShortFlat', 'LongHairStraight'],
-        hairColor: ['Auburn', 'Black', 'Blonde', 'Brown', 'Red', 'SilverGray'],
-        accessoriesType: ['Blank', 'Kurt', 'Prescription01', 'Sunglasses'],
-        clotheType: ['BlazerShirt', 'BlazerSweater', 'Hoodie', 'ShirtCrewNeck'],
-        skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black']
-      }
+        topType: ['NoHair', 'LongHairBigHair', 'ShortHairShortFlat', 'LongHairStraight', 'ShortHairTheCaesar', 'Hat', 'WinterHat1', 'Hijab'],
+        accessoriesType: ['Blank', 'Prescription02', 'Kurt', 'Round', 'Wayfarers', 'Sunglasses'],
+        hairColor: ['BrownDark', 'Blonde', 'Red', 'Black', 'PastelPink', 'Blue', 'Auburn', 'SilverGray'],
+        facialHairType: ['Blank', 'BeardLight', 'BeardMajestic', 'MoustacheFancy', 'MoustacheMagnum'],
+        clotheType: ['BlazerShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'GraphicShirt', 'BlazerSweater', 'CollarSweater'],
+        eyeType: ['Default', 'Happy', 'Wink', 'Squint', 'Surprised', 'Cry', 'Dizzy', 'EyeRoll'],
+        eyebrowType: ['Default', 'RaisedExcited', 'UpDown', 'Angry', 'SadConcerned', 'FlatNatural'],
+        mouthType: ['Default', 'Smile', 'Serious', 'Twinkle', 'Eating', 'Concerned', 'Disbelief', 'Vomit'],
+        skinColor: ['Light', 'Tanned', 'DarkBrown', 'Black', 'Pale', 'Yellow', 'Brown'],
+      },
+      avatar: { name: "meu-avatar" },
+      pngSize: 400,
+      isDownloading: false,
+      token: null,
+      user: null,
+      loading: true,
     };
   },
   computed: {
+    canCreateAvatar() {
+      return this.user && this.user.hasFreeAvatar !== true;
+    },
     avatarUrl() {
-      const base = 'https://avataaars.io/';
-      const query = new URLSearchParams({
-        avatarStyle: 'Circle',
-        topType: this.avatar.topType,
-        accessoriesType: this.avatar.accessoriesType,
-        hairColor: this.avatar.hairColor,
-        clotheType: this.avatar.clotheType,
-        skinColor: this.avatar.skinColor
-      }).toString();
-      return `${base}?${query}`;
+      const baseUrl = 'https://avataaars.io/?';
+      const params = new URLSearchParams(this.avatarOptions).toString();
+      return `${baseUrl}${params}`;
+    },
+    // ✅ URL DO PROXY PARA CORRIGIR A PRÉ-VISUALIZAÇÃO ✅
+    proxiedAvatarUrl() {
+      if (!this.avatarUrl) return '';
+      const externalUrl = encodeURIComponent(this.avatarUrl);
+      return `http://localhost:3000/api/avatar/proxy?url=${externalUrl}`;
     }
   },
-  async mounted() {
-    await this.checkUserAvatarStatus();
-    // Preenche o nome do avatar com o nome do usuário como sugestão
-    const userData = JSON.parse(localStorage.getItem('userData'));
-    if (userData && userData.name) {
-      this.avatar.name = `${userData.name}'s Avatar`;
+  async created() {
+    this.token = localStorage.getItem("token");
+    if (!this.token) {
+      this.$router.push("/login");
+      return;
+    }
+    try {
+      // ✅ ROTA CORRIGIDA PARA BUSCAR DADOS DO USUÁRIO ✅
+      const res = await axios.get("/api/users/me", {
+        headers: { Authorization: `Bearer ${this.token}` },
+      });
+      this.user = res.data;
+    } catch (err) {
+      console.error("Erro ao buscar dados do usuário:", err);
+      localStorage.removeItem("token");
+      this.$router.push("/login");
+    } finally {
+      this.loading = false;
     }
   },
   methods: {
-    async checkUserAvatarStatus() {
-      this.loading = true;
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          this.$router.push('/login');
-          return;
-        }
-        const res = await axios.get("/api/users/me", {}, { headers: { 'Authorization': `Bearer ${token}` } });
-        const userData = res.data;
-        
-        localStorage.setItem('userData', JSON.stringify(userData));
-        window.dispatchEvent(new Event('storage'));
-
-        this.canCreateAvatar = !userData.hasCreatedAvatar;
-
-      } catch (error) {
-        console.error("Erro ao verificar status do avatar:", error);
-        this.canCreateAvatar = false;
-        Swal.fire({ icon: 'error', title: 'Erro de Autenticação', text: 'Não foi possível verificar seu perfil. Faça login novamente.', background: '#1F2937', color: '#E5E7EB' });
-        this.$router.push('/login');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async saveAvatar() {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            Swal.fire({ icon: 'error', title: 'Erro', text: 'Você precisa estar logado para salvar.', background: '#1F2937', color: '#E5E7EB' });
-            return;
-        }
-
-        try {
-            const response = await axios.put('/api/users/avatar', {
-                avatarUrl: this.avatarUrl
-            }, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            localStorage.setItem('userData', JSON.stringify(response.data.user));
-            window.dispatchEvent(new Event('storage'));
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Avatar Salvo!',
-                text: 'Seu novo avatar já está no seu perfil.',
-                background: '#1F2937',
-                color: '#E5E7EB',
-                timer: 2000,
-                showConfirmButton: false,
-            }).then(() => {
-                this.$router.push('/profile');
-            });
-
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.response?.data?.error || 'Não foi possível salvar o avatar.',
-                background: '#1F2937',
-                color: '#E5E7EB'
-            });
-        }
-    },
-    
-    // Métodos de Download (sem alterações)
-    downloadSVG() { /* ... */ },
-    async fetchAndDownloadSVG() { /* ... */ },
-    fallbackSVGDownload() { /* ... */ },
-    showDownloadError() { /* ... */ },
-    downloadPNG() { /* ... */ },
-    showPNGError() { /* ... */ },
-
-    traduzir(valor) {
-      const mapa = {
-        NoHair: 'Sem cabelo', Hat: 'Chapéu', Hijab: 'Hijab', ShortHairShortFlat: 'Cabelo curto', LongHairStraight: 'Cabelo longo',
-        Auburn: 'Ruivo escuro', Black: 'Preto', Blonde: 'Loiro', Brown: 'Castanho', Red: 'Ruivo', SilverGray: 'Grisalho',
-        Blank: 'Nenhum', Kurt: 'Óculos Kurt', Prescription01: 'Óculos de Grau', Sunglasses: 'Óculos Escuros',
-        BlazerShirt: 'Blazer e Camisa', BlazerSweater: 'Blazer e Suéter', Hoodie: 'Moletom', ShirtCrewNeck: 'Camisa Gola Careca',
-        Tanned: 'Bronzeado', Yellow: 'Amarelo', Pale: 'Pálido', Light: 'Claro', Brown: 'Castanho', DarkBrown: 'Castanho Escuro', Black: 'Preto'
+    traduzir(option) {
+      const traducoes = {
+        'NoHair': 'Careca', 'LongHairBigHair': 'Cabelo Grande', 'ShortHairShortFlat': 'Cabelo Curto', 'LongHairStraight': 'Cabelo Longo Liso', 'ShortHairTheCaesar': 'Corte César', 'Hat': 'Chapéu', 'WinterHat1': 'Gorro', 'Hijab': 'Hijab',
+        'BrownDark': 'Castanho Escuro', 'Blonde': 'Loiro', 'Red': 'Ruivo', 'Black': 'Preto', 'PastelPink': 'Rosa Pastel', 'Blue': 'Azul', 'Auburn': 'Ruivo Acobreado', 'SilverGray': 'Grisalho',
+        'Blank': 'Nenhum', 'Prescription02': 'Óculos de Grau', 'Kurt': 'Óculos Kurt', 'Round': 'Óculos Redondo', 'Wayfarers': 'Óculos Wayfarers', 'Sunglasses': 'Óculos de Sol',
+        'BeardLight': 'Barba Rala', 'BeardMajestic': 'Barba Cheia', 'MoustacheFancy': 'Bigode Chique', 'MoustacheMagnum': 'Bigode Magnum',
+        'BlazerShirt': 'Blazer e Camisa', 'Hoodie': 'Moletom', 'Overall': 'Macacão', 'ShirtCrewNeck': 'Camiseta Gola Redonda', 'GraphicShirt': 'Camiseta Estampada', 'BlazerSweater': 'Blazer e Suéter', 'CollarSweater': 'Suéter com Gola',
+        'Default': 'Normal', 'Happy': 'Feliz', 'Wink': 'Piscando', 'Squint': 'Semicerrado', 'Surprised': 'Surpreso', 'Cry': 'Chorando', 'Dizzy': 'Tonto', 'EyeRoll': 'Virando os Olhos',
+        'RaisedExcited': 'Animado', 'UpDown': 'Assimétrica', 'Angry': 'Bravo', 'SadConcerned': 'Triste', 'FlatNatural': 'Reta',
+        'Smile': 'Sorrindo', 'Serious': 'Sério', 'Twinkle': 'Radiante', 'Eating': 'Comendo', 'Concerned': 'Preocupado', 'Disbelief': 'Incrédulo', 'Vomit': 'Vômito',
+        'Light': 'Clara', 'Tanned': 'Bronzeada', 'DarkBrown': 'Morena', 'Black': 'Negra', 'Pale': 'Pálida', 'Yellow': 'Amarela', 'Brown': 'Marrom'
       };
-      return mapa[valor] || valor;
+      return traducoes[option] || option;
+    },
+      async saveAvatar() {
+    if (!this.user) return;
+    try {
+      await axios.put('/api/users/avatar', { avatarUrl: this.avatarUrl }, { headers: { Authorization: `Bearer ${this.token}` } });
+      this.user.hasFreeAvatar = true;
+
+      const updatedUser = { ...this.user, avatarUrl: this.avatarUrl, hasFreeAvatar: true };
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      window.dispatchEvent(new Event("storage"));
+
+      await Swal.fire({
+        title: 'Avatar Salvo!', text: 'Seu avatar foi salvo com sucesso e seu perfil atualizado.', icon: 'success',
+        background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false,
+      });
+
+      this.$router.push('/profile');
+    } catch (error) {
+      console.error("Erro ao salvar o avatar:", error);
+      Swal.fire({
+        title: 'Erro ao Salvar',
+        text: error.response?.data?.message || 'Não foi possível salvar seu avatar.',
+        icon: 'error',
+        background: "#1F2937", color: "#E5E7EB"
+      });
+    }
+      },
+    async downloadSVG() {
+        this.isDownloading = true;
+        try {
+            const response = await axios.get(this.proxiedAvatarUrl, { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/svg+xml' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${this.avatar.name || 'avatar'}.svg`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Erro ao baixar SVG:", error);
+            Swal.fire('Erro', 'Não foi possível baixar o SVG.', 'error');
+        } finally {
+            this.isDownloading = false;
+        }
+    },
+    async downloadPNG() {
+        this.isDownloading = true;
+        try {
+            const response = await axios.get(this.proxiedAvatarUrl, { responseType: 'text' });
+            const svgText = response.data;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = this.pngSize;
+            canvas.height = this.pngSize;
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, this.pngSize, this.pngSize);
+                const pngUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = pngUrl;
+                link.download = `${this.avatar.name || 'avatar'}.png`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                this.isDownloading = false;
+            };
+            const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            img.src = url;
+        } catch (error) {
+            console.error("Erro ao converter para PNG:", error);
+            Swal.fire('Erro', 'Não foi possível baixar o PNG.', 'error');
+            this.isDownloading = false;
+        }
     }
   }
 };
@@ -307,8 +325,50 @@ export default {
 
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
-select option { background-color: #374151; color: #e5e7eb; }
-.transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
-button:hover { transform: translateY(-1px); }
-img:hover { transform: scale(1.05); }
+
+.select-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.5rem;
+  color: white;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+.select-input option { background-color: #374151; color: #e5e7eb; }
+
+.option-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.option-icon i { color: white; font-size: 0.875rem; }
+
+.download-button {
+  width: 100%;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.download-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>
