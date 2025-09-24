@@ -1,4 +1,4 @@
-// Ficheiro: server/controllers/OrderController.ts
+// server/controllers/OrderController.ts
 import { Request, Response, RequestHandler } from "express";
 import mongoose from "mongoose";
 import UserModel from "../models/UserModel";
@@ -9,7 +9,9 @@ import OrderModel from "../models/OrderModel";
 class OrderController {
     static checkout: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const userId = req.user?.id;
-        const { cartItems, couponCode, shippingCost, shippingAddress } = req.body;
+        // Adiciona paymentMethod ao destruct
+        const { cartItems, couponCode, shippingCost, shippingAddress, paymentMethod } = req.body;
+
         if (!userId) {
             res.status(401).json({ error: "Utilizador não autenticado." });
             return;
@@ -22,8 +24,14 @@ class OrderController {
             res.status(400).json({ error: "O endereço de entrega é obrigatório." });
             return;
         }
+         if (!paymentMethod) { // Validação do método de pagamento
+            res.status(400).json({ error: "O método de pagamento é obrigatório." });
+            return;
+        }
+
         const session = await mongoose.startSession();
         session.startTransaction();
+
         try {
             const user = await UserModel.findById(userId).session(session);
             if (!user) throw new Error("Utilizador não encontrado.");
@@ -35,6 +43,7 @@ class OrderController {
                 if (product.stock < item.quantity) throw new Error(`Estoque insuficiente para "${item.name}".`);
                 subtotal += product.price * item.quantity;
             }
+
             let discountAmount = 0;
             if (couponCode) {
                 const coupon = await CouponModel.findOne({ code: couponCode }).session(session);
@@ -46,14 +55,23 @@ class OrderController {
                 }
                 discountAmount = coupon.discountType === 'percentage' ? subtotal * (coupon.discountValue / 100) : coupon.discountValue;
             }
+
             const finalTotal = Math.max(0, subtotal - discountAmount) + (shippingCost || 0);
             
             for (const item of cartItems) {
                 await ProductModel.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } }, { session });
             }
+
             const [newOrder] = await OrderModel.create([{
-                user: userId, items: cartItems, total: finalTotal,
-                status: 'Processando', shippingAddress: shippingAddress,
+                user: userId, 
+                items: cartItems, 
+                total: finalTotal,
+                // --- MUDANÇA AQUI ---
+                // O status inicial agora reflete que o pagamento está pendente.
+                // Você pode adicionar mais lógica aqui depois, com webhooks de pagamento.
+                status: 'Aguardando Pagamento', 
+                shippingAddress: shippingAddress,
+                // paymentMethod: paymentMethod // Você pode salvar o método de pagamento se quiser
             }], { session });
             
             user.cart = [];
@@ -62,6 +80,7 @@ class OrderController {
             
             await session.commitTransaction();
             res.status(200).json({ message: "Compra finalizada com sucesso!", orderId: newOrder._id });
+
         } catch (error: any) {
             await session.abortTransaction();
             res.status(400).json({ error: error.message || "Erro ao processar a compra." });
@@ -70,6 +89,7 @@ class OrderController {
         }
     };
     
+    // ... (os outros métodos do controller permanecem iguais)
     static getOrderHistory: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const userId = req.user?.id;
         if (!userId) {

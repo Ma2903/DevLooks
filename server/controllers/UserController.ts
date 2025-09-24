@@ -16,9 +16,6 @@ import {
 } from "../config/config";
 
 const generateToken = (user: IUser): string => {
-    // Adicione este log para depuração
-    console.log('Assinando token com o segredo:', JWT_SECRET);
-    
     return jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "5h" });
 };
 
@@ -33,21 +30,18 @@ function descriptografar(dadoCriptografado: string): string {
 
 class UserController {
 
+    // ... (outros métodos como createUser, login, etc., permanecem iguais)
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.create(req.body);
             const userResponse = user.toObject();
-            delete userResponse.password; // Ótima prática de segurança!
+            delete userResponse.password; 
             res.status(201).json(userResponse);
         } catch (error: any) {
-            // --- INÍCIO DA MELHORIA ---
-            // Verifica se o erro é de chave duplicada (código 11000)
             if (error.code === 11000) {
-                // Verifica qual campo causou a duplicidade (geralmente email ou cpf)
                 const field = Object.keys(error.keyValue)[0];
-                res.status(409).json({ message: `O ${field} informado já está em uso.` }); // 409 Conflict
+                res.status(409).json({ message: `O ${field} informado já está em uso.` });
             } else {
-                // Mantém o erro genérico para outros problemas
                 res.status(500).json({ message: "Erro ao criar usuário", error: error.message });
             }
         }
@@ -56,24 +50,18 @@ class UserController {
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
-
-            // ---- CORREÇÃO DEFINITIVA APLICADA AQUI ----
             if (!email || !password) {
                 res.status(400).json({ error: "E-mail e senha são obrigatórios." });
                 return;
             }
-
             const user = await UserModel.findOne({ email: email.toLowerCase() });
-
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 res.status(401).json({ error: "Credenciais inválidas." });
                 return;
             }
-            
             const token = generateToken(user);
             const userResponse = user.toObject();
             delete userResponse.password;
-
             res.status(200).json({ message: "Login bem-sucedido.", token, user: userResponse });
         } catch (error) {
             console.error("Erro no login:", error);
@@ -145,7 +133,8 @@ class UserController {
             res.status(500).json({ error: "Erro ao deletar usuário." });
         }
     };
-
+    
+    // MÉTODO saveAvatar ATUALIZADO
     static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const userId = req.user?.id;
         const { avatarUrl } = req.body;
@@ -155,21 +144,39 @@ class UserController {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-            if (user.hasCreatedAvatar) {
-                res.status(403).json({ error: "Você já criou seu avatar gratuito." });
-                return;
+
+            // Se o usuário ainda não criou o avatar gratuito
+            if (!user.hasCreatedAvatar) {
+                user.avatarUrl = avatarUrl;
+                user.hasCreatedAvatar = true;
+                user.savedAvatars.push(avatarUrl); // Salva na galeria
+                await user.save();
+
+                const userResponse = user.toObject();
+                delete userResponse.password;
+                res.status(200).json({ message: "Avatar gratuito salvo com sucesso.", user: userResponse });
+            } 
+            // Se já usou o gratuito, verifica se tem passes
+            else if (user.avatarPasses && user.avatarPasses > 0) {
+                user.avatarUrl = avatarUrl;
+                user.avatarPasses -= 1; // Decrementa o número de passes
+                user.savedAvatars.push(avatarUrl); // Salva na galeria
+                await user.save();
+
+                const userResponse = user.toObject();
+                delete userResponse.password;
+                res.status(200).json({ message: "Avatar salvo com sucesso usando um passe.", user: userResponse });
+            } 
+            // Se não tem passes
+            else {
+                res.status(403).json({ error: "Você não tem passes para criar um novo avatar." });
             }
-            user.avatarUrl = avatarUrl;
-            user.hasCreatedAvatar = true;
-            await user.save();
-            const userResponse = user.toObject();
-            delete userResponse.password;
-            res.status(200).json({ message: "Avatar salvo com sucesso.", user: userResponse });
         } catch (error) {
             res.status(500).json({ error: "Erro interno ao salvar avatar." });
         }
     };
-
+    
+    // ... (outros métodos como forgotPassword e resetPassword permanecem iguais)
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;

@@ -9,9 +9,12 @@
       <div class="text-center mb-8">
         <h1 class="text-3xl md:text-4xl font-bold text-[#04d1b0] mb-4 flex items-center justify-center gap-3">
           <i class="fas fa-user-circle"></i>
-          Crie seu Avatar Gratuito
+          Crie seu Avatar
         </h1>
-        <p class="text-gray-400 text-lg">Personalize seu avatar com diferentes estilos e características.</p>
+        <p v-if="!user.hasCreatedAvatar" class="text-gray-400 text-lg">Personalize seu avatar gratuito com diferentes estilos.</p>
+        <p v-if="user && user.hasCreatedAvatar" class="text-lg text-yellow-400 mt-2">
+            <i class="fas fa-ticket-alt"></i> Você tem {{ user.avatarPasses }} passes de avatar.
+        </p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -141,11 +144,11 @@
         <i class="fas fa-lock text-5xl text-yellow-400 mb-4"></i>
         <h1 class="text-3xl font-bold text-white mb-4">Você já usou seu avatar gratuito!</h1>
         <p class="text-gray-400 text-lg mb-8">
-          Para criar um novo avatar e substituir o atual, você pode adquirir um "Slot de Avatar" em nossa loja.
+          Para criar um novo avatar, você precisa de um "Passe de Avatar". Você pode adquiri-los em nossa loja.
         </p>
         <router-link to="/products" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 flex items-center justify-center gap-2 max-w-xs mx-auto">
           <i class="fas fa-shopping-cart"></i>
-          Comprar Slot de Avatar
+          Comprar Passe de Avatar
         </router-link>
       </div>
     </div>
@@ -161,17 +164,8 @@ export default {
   data() {
     return {
       avatarOptions: {
-        topType: 'NoHair',
-        accessoriesType: 'Blank',
-        hairColor: 'BrownDark',
-        facialHairType: 'Blank',
-        clotheType: 'BlazerShirt',
-        eyeType: 'Default',
-        eyebrowType: 'Default',
-        mouthType: 'Default',
-        skinColor: 'Light'
+        topType: 'NoHair', accessoriesType: 'Blank', hairColor: 'BrownDark', facialHairType: 'Blank', clotheType: 'BlazerShirt', eyeType: 'Default', eyebrowType: 'Default', mouthType: 'Default', skinColor: 'Light'
       },
-      // ✅ OPÇÕES DE PERSONALIZAÇÃO RESTAURADAS ✅
       options: {
         topType: ['NoHair', 'LongHairBigHair', 'ShortHairShortFlat', 'LongHairStraight', 'ShortHairTheCaesar', 'Hat', 'WinterHat1', 'Hijab'],
         accessoriesType: ['Blank', 'Prescription02', 'Kurt', 'Round', 'Wayfarers', 'Sunglasses'],
@@ -183,7 +177,6 @@ export default {
         mouthType: ['Default', 'Smile', 'Serious', 'Twinkle', 'Eating', 'Concerned', 'Disbelief', 'Vomit'],
         skinColor: ['Light', 'Tanned', 'DarkBrown', 'Black', 'Pale', 'Yellow', 'Brown'],
       },
-      avatar: { name: "meu-avatar" },
       pngSize: 400,
       isDownloading: false,
       token: null,
@@ -192,15 +185,17 @@ export default {
     };
   },
   computed: {
+    // LÓGICA ATUALIZADA
     canCreateAvatar() {
-      return this.user && this.user.hasFreeAvatar !== true;
+      if (!this.user) return false;
+      // Pode criar se ainda não criou o gratuito OU se tem passes
+      return !this.user.hasCreatedAvatar || (this.user.avatarPasses && this.user.avatarPasses > 0);
     },
     avatarUrl() {
       const baseUrl = 'https://avataaars.io/?';
       const params = new URLSearchParams(this.avatarOptions).toString();
       return `${baseUrl}${params}`;
     },
-    // ✅ URL DO PROXY PARA CORRIGIR A PRÉ-VISUALIZAÇÃO ✅
     proxiedAvatarUrl() {
       if (!this.avatarUrl) return '';
       const externalUrl = encodeURIComponent(this.avatarUrl);
@@ -214,7 +209,6 @@ export default {
       return;
     }
     try {
-      // ✅ ROTA CORRIGIDA PARA BUSCAR DADOS DO USUÁRIO ✅
       const res = await axios.get("/api/users/me", {
         headers: { Authorization: `Bearer ${this.token}` },
       });
@@ -228,7 +222,8 @@ export default {
     }
   },
   methods: {
-    traduzir(option) {
+    // ... (seu método 'traduzir' continua igual)
+     traduzir(option) {
       const traducoes = {
         'NoHair': 'Careca', 'LongHairBigHair': 'Cabelo Grande', 'ShortHairShortFlat': 'Cabelo Curto', 'LongHairStraight': 'Cabelo Longo Liso', 'ShortHairTheCaesar': 'Corte César', 'Hat': 'Chapéu', 'WinterHat1': 'Gorro', 'Hijab': 'Hijab',
         'BrownDark': 'Castanho Escuro', 'Blonde': 'Loiro', 'Red': 'Ruivo', 'Black': 'Preto', 'PastelPink': 'Rosa Pastel', 'Blue': 'Azul', 'Auburn': 'Ruivo Acobreado', 'SilverGray': 'Grisalho',
@@ -242,32 +237,57 @@ export default {
       };
       return traducoes[option] || option;
     },
-      async saveAvatar() {
-    if (!this.user) return;
-    try {
-      await axios.put('/api/users/avatar', { avatarUrl: this.avatarUrl }, { headers: { Authorization: `Bearer ${this.token}` } });
-      this.user.hasFreeAvatar = true;
+    // MÉTODO saveAvatar ATUALIZADO
+    async saveAvatar() {
+        if (!this.user) return;
 
-      const updatedUser = { ...this.user, avatarUrl: this.avatarUrl, hasFreeAvatar: true };
-      localStorage.setItem("userData", JSON.stringify(updatedUser));
-      window.dispatchEvent(new Event("storage"));
+        // Se o usuário já criou o avatar gratuito, pede confirmação
+        if (this.user.hasCreatedAvatar) {
+            const result = await Swal.fire({
+                title: 'Usar um Passe?',
+                text: `Você está prestes a usar 1 dos seus ${this.user.avatarPasses} passes para salvar este avatar. Deseja continuar?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, usar passe!',
+                cancelButtonText: 'Cancelar',
+                background: "#1F2937",
+                color: "#E5E7EB"
+            });
 
-      await Swal.fire({
-        title: 'Avatar Salvo!', text: 'Seu avatar foi salvo com sucesso e seu perfil atualizado.', icon: 'success',
-        background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false,
-      });
+            if (!result.isConfirmed) {
+                return; // Aborta se o usuário cancelar
+            }
+        }
+      
+        try {
+            // A requisição para o backend continua a mesma
+            const response = await axios.put('/api/users/avatar', { avatarUrl: this.avatarUrl }, { headers: { Authorization: `Bearer ${this.token}` } });
+            
+            // ATUALIZA O USUÁRIO LOCAL COM OS DADOS VINDOS DO BACKEND
+            this.user = response.data.user;
+            localStorage.setItem("userData", JSON.stringify(this.user));
+            window.dispatchEvent(new Event("storage"));
 
-      this.$router.push('/profile');
-    } catch (error) {
-      console.error("Erro ao salvar o avatar:", error);
-      Swal.fire({
-        title: 'Erro ao Salvar',
-        text: error.response?.data?.message || 'Não foi possível salvar seu avatar.',
-        icon: 'error',
-        background: "#1F2937", color: "#E5E7EB"
-      });
-    }
-      },
+            await Swal.fire({
+                title: 'Avatar Salvo!',
+                text: 'Seu novo avatar foi salvo com sucesso!',
+                icon: 'success',
+                background: "#1F2937",
+                color: "#E5E7EB",
+            });
+
+            this.$router.push('/profile');
+        } catch (error) {
+            Swal.fire({
+                title: 'Erro ao Salvar',
+                text: error.response?.data?.error || 'Não foi possível salvar seu avatar.',
+                icon: 'error',
+                background: "#1F2937",
+                color: "#E5E7EB"
+            });
+        }
+    },
+    // ... (seus métodos de download 'downloadSVG' e 'downloadPNG' continuam iguais)
     async downloadSVG() {
         this.isDownloading = true;
         try {
@@ -275,7 +295,7 @@ export default {
             const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/svg+xml' }));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${this.avatar.name || 'avatar'}.svg`);
+            link.setAttribute('download', 'avatar.svg');
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -304,7 +324,7 @@ export default {
                 const pngUrl = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
                 link.href = pngUrl;
-                link.download = `${this.avatar.name || 'avatar'}.png`;
+                link.download = 'avatar.png';
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
@@ -327,48 +347,13 @@ export default {
 @import '@fortawesome/fontawesome-free/css/all.css';
 
 .select-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background-color: #374151;
-  border: 1px solid #4B5563;
-  border-radius: 0.5rem;
-  color: white;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  width: 100%; padding: 0.75rem 1rem; background-color: #374151; border: 1px solid #4B5563; border-radius: 0.5rem; color: white; -webkit-appearance: none; -moz-appearance: none; appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
-  padding-right: 2.5rem;
+  background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem;
 }
 .select-input option { background-color: #374151; color: #e5e7eb; }
-
-.option-icon {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+.option-icon { width: 2rem; height: 2rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .option-icon i { color: white; font-size: 0.875rem; }
-
-.download-button {
-  width: 100%;
-  font-weight: 600;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.download-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.download-button { width: 100%; font-weight: 600; padding: 0.75rem 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.download-button:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

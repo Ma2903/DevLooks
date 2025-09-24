@@ -76,12 +76,9 @@ const cartItems = ref([]);
 const couponCodeInput = ref('');
 const appliedCoupon = ref(null);
 
-// --- NOVAS FUNÇÕES DE API ---
-
 async function fetchCart() {
     const token = localStorage.getItem('token');
     if (!token) {
-        // Se não há token, limpa o carrinho para evitar mostrar dados antigos
         cartItems.value = [];
         return;
     }
@@ -92,7 +89,7 @@ async function fetchCart() {
         cartItems.value = response.data;
     } catch (error) {
         console.error("Erro ao buscar carrinho:", error);
-        cartItems.value = []; // Limpa em caso de erro
+        cartItems.value = [];
     }
 }
 
@@ -102,18 +99,18 @@ async function updateCartOnServer(newCart) {
         const response = await axios.put('/api/cart/update', { cartItems: newCart }, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        cartItems.value = response.data; // Atualiza o estado local com a resposta do servidor
+        cartItems.value = response.data;
     } catch (error) {
         Swal.fire({ title: 'Erro', text: 'Não foi possível atualizar o carrinho.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });
     }
 }
 
 async function updateItemQuantity(index, newQuantity) {
-    const updatedCart = JSON.parse(JSON.stringify(cartItems.value)); // Cria uma cópia profunda
+    const updatedCart = JSON.parse(JSON.stringify(cartItems.value));
     if (newQuantity > 0) {
         updatedCart[index].quantity = newQuantity;
     } else {
-        updatedCart.splice(index, 1); // Remove se a quantidade for 0 ou menor
+        updatedCart.splice(index, 1);
     }
     await updateCartOnServer(updatedCart);
 }
@@ -130,15 +127,12 @@ function confirmRemoveFromCart(index) {
         background: '#1f2937', color: '#e5e7eb'
     }).then((result) => {
         if (result.isConfirmed) {
-            updateItemQuantity(index, 0); // Define a quantidade como 0 para remover
+            updateItemQuantity(index, 0);
         }
     });
 }
 
-// --- Funções existentes que permanecem ---
-
 async function handleApplyCoupon(isSilent = false) {
-  // (Esta função não precisa de alterações)
   if (!couponCodeInput.value.trim()) {
     appliedCoupon.value = null;
     return;
@@ -160,7 +154,6 @@ function getImageUrl(imagePath) {
 }
 
 function goToCheckout() {
-    // (Esta função não precisa de alterações)
     const token = localStorage.getItem('token');
     if (!token) {
         Swal.fire({
@@ -190,7 +183,8 @@ function goToCheckout() {
         discountAmount: discountAmount.value,
         finalTotal: finalTotal.value
     }));
-    router.push("/checkout");
+    
+    router.push('/checkout/address');
 }
 
 const totalItems = computed(() => cartItems.value.reduce((t, i) => t + i.quantity, 0));

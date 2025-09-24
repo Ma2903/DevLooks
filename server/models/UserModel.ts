@@ -30,6 +30,8 @@ export interface IUser extends Document {
     status: string;
     avatarUrl?: string;
     hasCreatedAvatar?: boolean;
+    avatarPasses?: number;      // <-- NOVO
+    savedAvatars?: string[];    // <-- NOVO
     hasMadePurchase?: boolean;
     cart: ICartItem[];
     resetPasswordToken?: string;
@@ -65,6 +67,8 @@ const UserSchema = new Schema<IUser>({
     status: { type: String, default: "active" },
     avatarUrl: { type: String, default: null },
     hasCreatedAvatar: { type: Boolean, default: false },
+    avatarPasses: { type: Number, default: 0 },         // <-- NOVO
+    savedAvatars: { type: [String], default: [] },      // <-- NOVO
     hasMadePurchase: { type: Boolean, default: false },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },

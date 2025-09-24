@@ -85,7 +85,6 @@
 </template>
 
 <script>
-// IMPORTANTE: Usando a MESMA importação do Register.vue
 import axios from "@/services/main";
 import Swal from 'sweetalert2';
 
@@ -111,7 +110,6 @@ export default {
     await this.fetchUserData();
   },
   watch: {
-    // EXATAMENTE o mesmo watcher do Register.vue para o CEP
     'newAddress.cep'(newValue) {
       const digits = newValue.replace(/\D/g, '').slice(0, 8);
       this.newAddress.cep = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
@@ -125,7 +123,8 @@ export default {
       this.loading = true;
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.post('/api/users/me', {}, {
+        // --- CORREÇÃO AQUI: MUDADO DE .post PARA .get ---
+        const response = await axios.get('/api/users/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const userData = response.data;
@@ -145,7 +144,6 @@ export default {
       }
     },
     
-    // EXATAMENTE o mesmo método do Register.vue
     async fetchAddressFromCep(cep) {
       try {
         const response = await axios.get(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
@@ -181,7 +179,6 @@ export default {
       if (this.addressChoice === 'profile') {
         shippingAddress = this.profileAddress;
       } else {
-        // Validação dos campos obrigatórios
         const requiredFields = ['cep', 'street', 'number', 'neighborhood', 'city', 'state'];
         for (const field of requiredFields) {
           if (!this.newAddress[field]) {

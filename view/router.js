@@ -15,7 +15,7 @@ import ConfirmReset from './components/ConfirmReset.vue';
 // Importa páginas de produtos
 import ProductList from './pages/ProductList.vue';
 import SingleProduto from './pages/singleProduto.vue';
-import OrderHistory from './pages/OrderHistory.vue'; // <-- ROTA ADICIONADA AQUI
+import OrderHistory from './pages/OrderHistory.vue';
 
 // Importa páginas de Admin
 import AdminUsers from './pages/AdminUsers.vue';
@@ -26,12 +26,13 @@ import EditProduto from './pages/editProduto.vue';
 import AdminCoupons from './pages/AdminCoupons.vue';
 import CouponForm from './pages/CouponForm.vue';
 import EditCoupon from './pages/editCoupon.vue';
-import AdminOrders from './pages/AdminOrders.vue'; // <-- ROTA ADICIONADA AQUI
+import AdminOrders from './pages/AdminOrders.vue';
 
 // Importa páginas de Checkout
 import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
 import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
 import CheckoutReview from './pages/checkout/CheckoutReview.vue';
+import CheckoutPayment from './pages/checkout/CheckoutPayment.vue';
 
 // Define as rotas
 const routes = [
@@ -47,17 +48,19 @@ const routes = [
   { path: '/products/:id', name: 'SingleProduto', component: SingleProduto },
   { path: '/cart', name: 'Cart', component: Cart },
   { path: '/confirm-reset', name: 'ConfirmReset', component: ConfirmReset },
-  { path: '/order-history', name: 'OrderHistory', component: OrderHistory, meta: { requiresAuth: true } }, // <-- ROTA ADICIONADA AQUI
+  { path: '/order-history', name: 'OrderHistory', component: OrderHistory, meta: { requiresAuth: true } },
 
-  // Estrutura de Checkout
+  // --- ESTRUTURA DE CHECKOUT CORRIGIDA ---
   {
     path: '/checkout',
     component: CheckoutWrapper,
     meta: { requiresAuth: true },
     children: [
-      { path: '', redirect: '/checkout/address' },
+      // CORREÇÃO: Redireciona a rota pai '/checkout' para a primeira etapa, 'address'
+      { path: '', redirect: 'address' }, 
       { path: 'address', name: 'CheckoutAddress', component: CheckoutAddress },
-      { path: 'review', name: 'CheckoutReview', component: CheckoutReview }
+      { path: 'review', name: 'CheckoutReview', component: CheckoutReview },
+      { path: 'payment', name: 'CheckoutPayment', component: CheckoutPayment },
     ]
   },
 
@@ -70,7 +73,7 @@ const routes = [
   { path: '/admin/coupons', name: 'AdminCoupons', component: AdminCoupons, meta: { requiresAuth: true } },
   { path: '/admin/coupons/add', name: 'AddCoupon', component: CouponForm, meta: { requiresAuth: true } },
   { path: '/admin/coupons/edit/:id', name: 'EditCoupon', component: EditCoupon, meta: { requiresAuth: true }, props: true },
-  { path: '/admin/orders', name: 'AdminOrders', component: AdminOrders, meta: { requiresAuth: true } }, // <-- ROTA ADICIONADA AQUI
+  { path: '/admin/orders', name: 'AdminOrders', component: AdminOrders, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
