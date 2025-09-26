@@ -7,7 +7,7 @@ import path from 'path';
 
 const storage = multer.diskStorage({
     destination: './public/images/products',
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
@@ -29,7 +29,7 @@ class ProductController {
         }
     };
 
-    static getAllProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    static getAllProducts: RequestHandler = async (_req: Request, res: Response): Promise<void> => {
         try {
             const products = await ProductModel.find();
             res.status(200).json(products);
@@ -117,6 +117,18 @@ class ProductController {
           res.status(500).json({ message: 'Erro ao buscar produtos mais vendidos', error: error.message });
         }
     };
+
+    static getLatestProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const latestProducts = await ProductModel.find()
+                .sort({ createdAt: -1 }) // Ordena pela data de criação
+                .limit(8); // Pega os 8 mais novos
+            res.status(200).json(latestProducts);
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao buscar produtos recentes', error: error.message });
+        }
+    };
+    // --- FIM DO NOVO MÉTODO ---
 
     static uploadImage = upload.single('imagem');
 }

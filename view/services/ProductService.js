@@ -57,6 +57,27 @@ export default {
     }
   },
 
+  async getBestSellingProducts() {
+    try {
+      const response = await axios.get(`${API_URL}/best-selling`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar produtos mais vendidos:', error);
+      throw error;
+    }
+  },
+
+  // --- NOVO MÉTODO ADICIONADO AQUI ---
+  async getLatestProducts() {
+    try {
+      const response = await axios.get(`${API_URL}/latest`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar produtos recentes:', error);
+      throw error;
+    }
+  },
+
   async updateProduto(produto) {
     return axios.put(`http://localhost:3000/api/products/${produto._id}`, produto);
   }

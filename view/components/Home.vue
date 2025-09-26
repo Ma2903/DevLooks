@@ -1,6 +1,5 @@
 <template>
   <div class="bg-gray-900 min-h-screen font-mono text-gray-200 relative">
-    <!-- Banner de Boas-Vindas -->
     <section id="home" class="relative bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white text-center py-40 overflow-hidden">
       <div class="absolute inset-0 bg-black opacity-60 bg-opacity-40 bg-cover bg-center" style="background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/online-shopping-1869235_960_720.jpg');"></div>
       <div class="relative z-10 container mx-auto px-4 md:px-6">
@@ -27,7 +26,6 @@
       </div>
     </section>
 
-    <!-- Seção "Categorias" -->
     <section id="categories" class="container mx-auto py-16 px-4 md:px-6 text-center">
       <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
         <i class="fas fa-th-large mr-2"></i>Categorias
@@ -45,9 +43,8 @@
       </div>
     </section>
 
-    <!-- Seção "Produtos em Destaque" -->
     <section id="best-sellers" class="container mx-auto py-16 px-4 md:px-6">
-      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] text-center mb-8">
+      <h2 id="products-section-title" class="text-3xl md:text-4xl font-semibold text-[#04d1b0] text-center mb-8">
         <i class="fas fa-fire mr-2"></i>Mais Vendidos
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -62,8 +59,9 @@
           <span v-if="produto.promo" class="absolute top-2 right-2 bg-[#4e44e1] text-white text-xs px-2 py-1 rounded-full font-bold z-10">
             <i class="fas fa-bolt"></i> Promoção
           </span>
+          
           <img
-            :src="produto.image || '/camisa.jpg'"
+            :src="produto.image ? `http://localhost:3000/${produto.image}` : '/camisa.jpg'"
             :alt="produto.name"
             class="w-full h-48 object-cover rounded-lg mb-4"
           />
@@ -71,7 +69,7 @@
           <p class="text-gray-300 mb-4">{{ produto.description }}</p>
           <div class="flex justify-between items-center mb-4">
             <span class="text-[#04d1b0] font-bold text-lg">
-              R$ {{ produto.price.toFixed(2) }}
+              R$ {{ produto.price ? produto.price.toFixed(2) : '0.00' }}
             </span>
             <span class="bg-[#4e44e1] text-white text-sm font-medium px-4 py-1 rounded-lg">
               #{{ produto.category }}
@@ -94,7 +92,6 @@
       </div>
     </section>
 
-    <!-- Seção "Benefícios" -->
     <section id="benefits" class="bg-gray-900 py-16">
       <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         <div>
@@ -115,7 +112,6 @@
       </div>
     </section>
 
-    <!-- Seção de Newsletter -->
     <div class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] py-8 mt-8 text-center rounded-lg">
       <h3 class="text-2xl font-bold text-white mb-4">
         <i class="fas fa-envelope mr-2"></i>Inscreva-se na nossa Newsletter
@@ -129,7 +125,6 @@
       </router-link>
     </div>
 
-    <!-- Seção "Sobre Nós" -->
     <section id="about" class="container mx-auto py-16 px-4 md:px-6 text-center">
       <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
         <i class="fas fa-info-circle mr-2"></i>Sobre Nós
@@ -154,7 +149,6 @@
       </p>
     </section>
 
-    <!-- Seção "Depoimentos" -->
     <section class="container mx-auto py-16 px-4 md:px-6 text-center">
       <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
         <i class="fas fa-comments mr-2"></i>O que dizem nossos clientes
@@ -175,7 +169,6 @@
       </div>
     </section>
 
-    <!-- Botão para voltar ao topo -->
     <button
       v-show="showScrollButton"
       @click="scrollToTop"
@@ -183,33 +176,28 @@
     >
       <i class="fas fa-arrow-up"></i>
     </button>
-
   </div>
 </template>
 
 <script>
-import Product from './Product.vue';
 import ProductService from '../services/ProductService';
 import Swal from 'sweetalert2';
 
 export default {
   name: "Home",
-  components: {
-    Product
-  },
   data() {
     return {
-      produtos: [], // Lista de produtos
+      produtos: [],
       categorias: [
         { nome: "Avatares", value: "avatares", icone: "fas fa-user-astronaut", desc: "Personalize seu avatar com acessórios únicos." },
         { nome: "Skins", value: "skins", icone: "fas fa-tshirt", desc: "Dê um toque especial ao seu estilo com nossas skins." },
         { nome: "Acessórios", value: "acessorios", icone: "fas fa-keyboard", desc: "Teclados, mouses e muito mais para completar seu setup." },
         { nome: "Presentes", value: "presentes", icone: "fas fa-gift", desc: "Encontre o presente perfeito para seus amigos geeks." }
-      ], // Lista de categorias
-      loading: true, // Estado de carregamento
-      error: null, // Estado de erro
+      ],
+      loading: true,
+      error: null,
       showScrollButton: false,
-      userType: "user", // Valor padrão
+      userType: "user",
     };
   },
   methods: {
@@ -217,7 +205,18 @@ export default {
       try {
         this.loading = true;
         this.error = null;
-        this.produtos = await ProductService.getAllProducts(); // Busca os produtos
+        
+        let products = await ProductService.getBestSellingProducts();
+
+        if (products.length === 0) {
+          const titleElement = document.querySelector('#products-section-title');
+          if (titleElement) {
+            titleElement.innerHTML = '<i class="fas fa-rocket mr-2"></i>Lançamentos';
+          }
+          products = await ProductService.getLatestProducts();
+        }
+
+        this.produtos = products;
       } catch (err) {
         this.error = 'Erro ao carregar os produtos. Tente novamente mais tarde.';
         console.error(err);
@@ -274,15 +273,15 @@ export default {
   },
   async mounted() {
     window.addEventListener('scroll', this.handleScroll);
-    await this.fetchProducts(); // Chama o método para buscar os produtos
+    await this.fetchProducts();
 
-     const userDataRaw = localStorage.getItem("userData");
+    const userDataRaw = localStorage.getItem("userData");
     if (userDataRaw && userDataRaw !== "undefined") {
       const userData = JSON.parse(userDataRaw);
       this.userType = userData.role || (userData.user && userData.user.role) || "user";
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
   }
 };
