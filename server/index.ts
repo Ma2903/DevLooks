@@ -3,7 +3,7 @@
 import { PORT } from './config/config';
 import express from 'express';
 import cors from 'cors';
-import connectDB from "./config/database";
+import './config/database'; 
 
 // Importa as rotas
 import usersRoutes from './routes/UserRoutes';
@@ -22,14 +22,10 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-// --- CORREÇÃO IMPORTANTE ---
-// Middlewares devem ser declarados ANTES das rotas
+// Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Conecta ao banco de dados
-connectDB();
 
 const port = PORT;
 
