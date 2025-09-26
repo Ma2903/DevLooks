@@ -1,6 +1,7 @@
 // Ficheiro: server/controllers/ProductController.ts
 import { Request, Response, RequestHandler } from 'express';
 import ProductModel from '../models/ProductModel';
+import Order from '../models/OrderModel';
 import multer from 'multer';
 import path from 'path';
 
@@ -13,19 +14,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 class ProductController {
-    static addProduct: RequestHandler = async (req: Request, res: Response) => {
+    static addProduct: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { name, description, price, category, stock, sizes } = req.body;
-            // CORREÇÃO: O caminho da imagem não deve incluir 'public'
             const image = req.file ? path.join('images/products', req.file.filename) : '';
             
             const newProduct = await ProductModel.create({
                 name, description, price, category, stock, image,
-                sizes: sizes ? (Array.isArray(sizes) ? sizes : [sizes]) : [] // Garante que `sizes` seja um array
+                sizes: sizes ? (Array.isArray(sizes) ? sizes : [sizes]) : []
             });
             res.status(201).json(newProduct);
-        } catch (error) {
-            res.status(500).json({ message: 'Erro ao adicionar produto', error });
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao adicionar produto', error: error.message });
         }
     };
 
@@ -33,8 +33,8 @@ class ProductController {
         try {
             const products = await ProductModel.find();
             res.status(200).json(products);
-        } catch (error) {
-            res.status(500).json({ message: 'Erro ao buscar produtos', error });
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao buscar produtos', error: error.message });
         }
     };
 
@@ -46,8 +46,8 @@ class ProductController {
                 return;
             }
             res.status(200).json(product);
-        } catch (error) {
-            res.status(500).json({ message: 'Erro ao buscar produto', error });
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao buscar produto', error: error.message });
         }
     };
 
@@ -67,8 +67,8 @@ class ProductController {
                 return;
             }
             res.status(200).json(updatedProduct);
-        } catch (error) {
-            res.status(500).json({ message: 'Erro ao atualizar produto', error });
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao atualizar produto', error: error.message });
         }
     };
 
@@ -80,12 +80,45 @@ class ProductController {
                 return;
             }
             res.status(200).json({ message: 'Produto deletado com sucesso' });
-        } catch (error) {
-            res.status(500).json({ message: 'Erro ao deletar produto', error });
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao deletar produto', error: error.message });
         }
     };
 
-    static uploadImage = upload.single('imagem'); // Nome do campo deve ser 'imagem'
+    // CORREÇÃO APLICADA AQUI
+    static getBestSellingProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+          const bestSellingProducts = await Order.aggregate([
+            { $unwind: '$items' },
+            {
+              $group: {
+                _id: '$items.productId',
+                totalSold: { $sum: '$items.quantity' },
+              },
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 8 },
+            {
+              $lookup: {
+                from: 'products',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productDetails',
+              },
+            },
+            { $unwind: '$productDetails' },
+            {
+              $replaceRoot: { newRoot: '$productDetails' }
+            },
+          ]);
+      
+          res.status(200).json(bestSellingProducts);
+        } catch (error: any) {
+          res.status(500).json({ message: 'Erro ao buscar produtos mais vendidos', error: error.message });
+        }
+    };
+
+    static uploadImage = upload.single('imagem');
 }
 
 export default ProductController;
