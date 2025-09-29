@@ -1,87 +1,67 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
-    <div class="m-10 bg-gray-900 p-10 md:p-20 rounded-3xl shadow-2xl w-full max-w-6xl">
-      <div class="text-center mb-10">
-        <i class="fas fa-user-edit text-6xl text-[#04d1b0] mb-4"></i>
-        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-2">Editar Dados</h1>
-        <p class="text-gray-400 mt-3 text-lg">Atualize suas informações abaixo</p>
-      </div>
-      <form @submit.prevent="handleEdit">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome Completo</label>
-            <div class="relative">
-              <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="name" v-model="userData.name" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
-            </div>
+  <div class="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center p-6">
+    <div class="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl p-8 border-t-4 border-emerald-400">
+      <h1 class="text-3xl font-bold text-center text-white mb-8">Editar Perfil</h1>
+      
+      <form v-if="userData" @submit.prevent="handleEdit">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="mb-4">
+            <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+            <input type="text" id="name" v-model="userData.name" class="form-input" required>
           </div>
-          <div>
+
+          <div class="mb-4">
             <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-            <div class="relative">
-              <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="email" id="email" v-model="userData.email" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
-            </div>
-          </div>
-          <div>
-            <label for="cpf" class="block text-sm font-medium text-gray-300 mb-2">CPF</label>
-            <div class="relative">
-              <i class="fas fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="cpf" v-model="userData.cpf" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
-            </div>
-          </div>
-          <div>
-            <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
-            <div class="relative">
-              <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="phone" v-model="userData.telephone" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
-            </div>
-          </div>
-
-          <div>
-            <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
-            <div class="relative">
-              <i class="fas fa-map-pin absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="cep" v-model="userData.cep" @blur="fetchAddressFromCep" class="w-full pl-10 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
-            </div>
-          </div>
-          <div>
-            <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
-            <input type="text" id="address" v-model="userData.address" class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg cursor-not-allowed" readonly />
-          </div>
-          <div class="grid grid-cols-2 gap-x-4">
-              <div>
-                <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
-                <input type="text" id="number" v-model="userData.number" class="w-full pl-4 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" required />
-              </div>
-              <div>
-                <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento</label>
-                <input type="text" id="complement" v-model="userData.complement" class="w-full pl-4 pr-4 py-4 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0]" />
-              </div>
-          </div>
-          <div>
-            <label for="bairro" class="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
-            <input type="text" id="bairro" v-model="userData.bairro" class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg" readonly />
-          </div>
-          <div class="grid grid-cols-2 gap-x-4">
-            <div>
-              <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
-              <input type="text" id="city" v-model="userData.city" class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg" readonly />
-            </div>
-            <div>
-              <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-              <input type="text" id="state" v-model="userData.state" class="w-full pl-4 pr-4 py-4 bg-gray-700 rounded-lg" readonly />
-            </div>
+            <input type="email" id="email" v-model="userData.email" class="form-input" required>
           </div>
         </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-6 rounded-lg shadow-lg mt-8">
-          <i class="fas fa-save mr-2"></i> Salvar Alterações
-        </button>
+
+        <h2 class="text-xl font-semibold text-white mt-6 mb-4 border-b border-gray-700 pb-2">Endereço</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="mb-4 md:col-span-1">
+            <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
+            <input type="text" id="cep" v-model="userData.address.cep" @input="formatCep" class="form-input" placeholder="00000-000">
+          </div>
+          <div class="mb-4 md:col-span-2">
+            <label for="street" class="block text-sm font-medium text-gray-300 mb-2">Rua</label>
+            <input type="text" id="street" v-model="userData.address.street" class="form-input">
+          </div>
+          <div class="mb-4">
+            <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
+            <input type="text" id="number" v-model="userData.address.number" class="form-input">
+          </div>
+          <div class="mb-4">
+            <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento</label>
+            <input type="text" id="complement" v-model="userData.address.complement" class="form-input">
+          </div>
+          <div class="mb-4">
+            <label for="neighborhood" class="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
+            <input type="text" id="neighborhood" v-model="userData.address.neighborhood" class="form-input">
+          </div>
+          <div class="mb-4">
+            <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
+            <input type="text" id="city" v-model="userData.address.city" class="form-input">
+          </div>
+          <div class="mb-4">
+            <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
+            <input type="text" id="state" v-model="userData.address.state" class="form-input">
+          </div>
+        </div>
+
+        <div class="mt-8 flex flex-col md:flex-row gap-4">
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+            <i class="fas fa-save"></i>Salvar Alterações
+          </button>
+          <router-link to="/profile" class="w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+            Cancelar
+          </router-link>
+        </div>
       </form>
-      <div class="mt-8 text-center">
-        <router-link to="/profile" class="text-[#04d1b0] hover:underline text-lg flex items-center justify-center gap-2">
-          <i class="fas fa-arrow-left"></i> Voltar ao Perfil
-        </router-link>
+
+      <div v-else class="text-center py-8">
+          <i class="fas fa-spinner fa-spin text-4xl text-emerald-400"></i>
+          <p class="mt-4 text-lg">Carregando dados do usuário...</p>
       </div>
     </div>
   </div>
@@ -89,39 +69,21 @@
 
 <script>
 import axios from "axios";
+import api from "@/services/main.js";
 import Swal from "sweetalert2";
 
 export default {
   data() {
     return {
-      // Inicializa userData como null para sabermos quando os dados estão carregando
       userData: null,
       token: null,
-      loading: true, // Adiciona um estado de loading
     };
   },
   watch: {
-    // Suas excelentes máscaras continuam aqui
-    'userData.cpf'(newValue) {
-        if (!newValue || !this.userData) return;
-        this.userData.cpf = newValue
-            .replace(/\D/g, '').slice(0, 11)
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    },
-    'userData.telephone'(newValue) {
-        if (!newValue || !this.userData) return;
-        const digits = newValue.replace(/\D/g, '').slice(0, 11);
-        if (digits.length > 10) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-        else if (digits.length > 6) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-        else if (digits.length > 2) this.userData.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-        else this.userData.telephone = `(${digits})`;
-    },
-    'userData.cep'(newValue) {
-        if (!newValue || !this.userData) return;
-        const digits = newValue.replace(/\D/g, '').slice(0, 8);
-        this.userData.cep = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
+    'userData.address.cep'(newCep) {
+      if (newCep && newCep.replace(/\D/g, '').length === 8) {
+        this.fetchAddressFromCep(newCep);
+      }
     }
   },
   async created() {
@@ -131,76 +93,75 @@ export default {
       return;
     }
     try {
-      // A chamada de API para buscar os dados
-      const res = await axios.get("/api/users/me", {
+      const userId = this.$route.params.id;
+      const res = await api.get(`/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${this.token}` },
       });
-      // Atribui os dados recebidos ao userData
       this.userData = res.data;
+      if (!this.userData.address) {
+        this.userData.address = {};
+      }
     } catch (err) {
-      // Se a chamada falhar, faz o logout
+      console.error("Erro ao buscar dados do usuário:", err);
       Swal.fire({
-        title: 'Sessão Expirada',
-        text: 'Por favor, faça o login novamente.',
-        icon: 'warning',
-        background: "#1F2937",
-        color: "#E5E7EB"
+          icon: 'error', title: 'Erro', text: 'Não foi possível carregar os dados do usuário.',
+          background: "#1F2937", color: "#E5E7EB"
       });
-      localStorage.removeItem("token");
-      this.$router.push("/login");
-    } finally {
-      this.loading = false;
+      this.$router.push("/profile");
     }
   },
   methods: {
-    // Sua lógica de buscar o CEP está ótima, apenas ajustada para a nova estrutura
-    async fetchAddressFromCep() {
-      if (!this.userData.cep) return;
-      const cep = this.userData.cep.replace(/\D/g, "");
-      if (cep.length !== 8) return;
-
+    formatCep(event) {
+        let value = event.target.value.replace(/\D/g, '');
+        if (value.length > 5) {
+            value = value.slice(0, 5) + '-' + value.slice(5, 8);
+        }
+        this.userData.address.cep = value;
+    },
+    async fetchAddressFromCep(cep) {
+      const cleanCep = cep.replace(/\D/g, '');
       try {
-        const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-        if (response.data.erro) return;
-        
-        this.userData.address = response.data.logradouro;
-        this.userData.bairro = response.data.bairro;
-        this.userData.city = response.data.localidade;
-        this.userData.state = response.data.uf;
+        const response = await axios.get(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        const data = response.data;
+        if (!data.erro) {
+          this.userData.address.street = data.logouro;
+          this.userData.address.neighborhood = data.bairro;
+          this.userData.address.city = data.localidade;
+          this.userData.address.state = data.uf;
+        }
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
       }
     },
     async handleEdit() {
-      if (!this.userData || !this.userData._id) {
-          Swal.fire("Erro", "Dados do usuário não encontrados.", "error");
-          return;
+      if (!this.userData.name || !this.userData.email) {
+        Swal.fire({
+            icon: 'error', title: 'Erro', text: 'Nome e email são obrigatórios.',
+            background: "#1F2937", color: "#E5E7EB"
+        });
+        return;
       }
       try {
-        await axios.put(`/api/users/${this.userData._id}`, this.userData, {
-          headers: { 'Authorization': `Bearer ${this.token}` },
+        await api.put(`/api/users/${this.userData._id}`, this.userData, {
+          headers: { 'Authorization': `Bearer ${this.token}` }
         });
-        
-        // Atualiza o localStorage com os novos dados
-        localStorage.setItem("userData", JSON.stringify(this.userData));
-        window.dispatchEvent(new Event("storage")); // Notifica outros componentes da mudança
 
-        Swal.fire({
-          title: "Dados Atualizados!",
-          icon: "success",
-          background: "#1F2937",
-          color: "#E5E7EB",
-          timer: 1500,
-          showConfirmButton: false,
+        const loggedInUser = JSON.parse(localStorage.getItem('userData'));
+        if(loggedInUser && loggedInUser._id === this.userData._id) {
+          localStorage.setItem('userData', JSON.stringify(this.userData));
+          window.dispatchEvent(new Event('auth-change'));
+        }
+
+        await Swal.fire({
+            icon: 'success', title: 'Sucesso!', text: 'Dados atualizados com sucesso.',
+            background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false
         });
         this.$router.push("/profile");
-      } catch(error) {
+      } catch (error) {
+        console.error('Erro ao atualizar usuário:', error);
         Swal.fire({
-          title: 'Erro ao Atualizar',
-          text: error.response?.data?.message || "Não foi possível atualizar seus dados.",
-          icon: 'error',
-          background: "#1F2937",
-          color: "#E5E7EB",
+            icon: 'error', title: 'Erro', text: 'Não foi possível atualizar os dados.',
+            background: "#1F2937", color: "#E5E7EB"
         });
       }
     },
@@ -210,4 +171,22 @@ export default {
 
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
+
+.form-input {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  background-color: #374151;
+  color: #e5e7eb;
+  border-radius: 0.5rem;
+  outline: none;
+  border: 1px solid #4b5563;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.form-input:focus {
+  box-shadow: 0 0 0 2px #10b981;
+  border-color: #10b981;
+}
 </style>

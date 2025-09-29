@@ -73,10 +73,11 @@
         </div>
       </div>
     </div>
-  </template>
+</template>
 
  <script>
-    import axios from "axios";
+    // ✅ CORREÇÃO 1: Troque a importação do axios
+    import api from "@/services/main.js"; // Importe sua instância configurada
     import Swal from "sweetalert2";
 
     export default {
@@ -117,14 +118,16 @@
           this.loading = true;
           this.loginError = "";
           try {
-            const response = await axios.post("/api/users/login", {
+            // ✅ CORREÇÃO 2: Use a instância 'api' para a chamada
+            const response = await api.post("/api/users/login", {
               email: this.email,
               password: this.password,
             });
 
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("userData", JSON.stringify(response.data.user));
-            window.dispatchEvent(new Event("storage"));
+            // Dispara o evento correto que o Header.vue está ouvindo
+            window.dispatchEvent(new Event("auth-change")); 
 
            await Swal.fire({
             icon: 'success',
@@ -135,8 +138,6 @@
             color: "#E5E7EB",
           });
 
-          // <<-- A CORREÇÃO PRINCIPAL ESTÁ AQUI -->>
-          // Redireciona para /profile, que é uma rota válida e segura
           this.$router.push("/profile");
 
           } catch (error) {

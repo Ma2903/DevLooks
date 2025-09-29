@@ -89,8 +89,9 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '@/services/main.js';
-// <<--- A CORREÇÃO PRINCIPAL ESTÁ AQUI --- >>
-import SearchBar from './Search-bar.vue'; // Importa o componente
+import SearchBar from './Search-bar.vue';
+// ✅ CORREÇÃO: Importe o Swal
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const user = ref(null);
@@ -99,7 +100,7 @@ const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 
 const updateUserState = () => {
-  const storedUser = localStorage.getItem('user');
+  const storedUser = localStorage.getItem('userData');
   user.value = storedUser ? JSON.parse(storedUser) : null;
   
   const storedCart = localStorage.getItem('cart');
@@ -124,13 +125,42 @@ const handleSearch = (query) => {
   router.push({ path: '/products', query: { q: query } });
 };
 
+// ✅ CORREÇÃO: Função de logout atualizada com SweetAlert
 const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
   isDropdownOpen.value = false;
   isMobileMenuOpen.value = false;
-  window.dispatchEvent(new Event('auth-change'));
-  router.push('/');
+
+  Swal.fire({
+    title: 'Você tem certeza?',
+    text: "Você será desconectado da sua conta.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#10B981', // Verde esmeralda
+    cancelButtonColor: '#EF4444', // Vermelho
+    confirmButtonText: 'Sim, quero sair!',
+    cancelButtonText: 'Cancelar',
+    background: "#1F2937", // Fundo escuro para combinar com o tema
+    color: "#E5E7EB"       // Cor do texto
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Se o usuário confirmar, executa a lógica de logout
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+      window.dispatchEvent(new Event('auth-change'));
+      router.push('/');
+
+      // Exibe uma notificação de sucesso
+      Swal.fire({
+        title: 'Desconectado!',
+        text: 'Você saiu da sua conta com segurança.',
+        icon: 'success',
+        background: "#1F2937",
+        color: "#E5E7EB",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+  });
 };
 
 watch(() => router.currentRoute.value, () => {
