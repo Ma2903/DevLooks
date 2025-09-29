@@ -17,7 +17,7 @@ class ProductController {
     static addProduct: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { name, description, price, category, stock, sizes } = req.body;
-            const image = req.file ? path.join('images/products', req.file.filename) : '';
+            const image = req.file ? path.join('public/images/products', req.file.filename) : '';
             
             const newProduct = await ProductModel.create({
                 name, description, price, category, stock, image,
@@ -55,7 +55,7 @@ class ProductController {
         try {
             const productData = req.body;
             if (req.file) {
-                productData.image = path.join('images/products', req.file.filename);
+                productData.image = path.join('public/images/products', req.file.filename);
             }
             if(productData.sizes && !Array.isArray(productData.sizes)) {
                  productData.sizes = [productData.sizes];
@@ -85,7 +85,7 @@ class ProductController {
         }
     };
 
-    // CORREÇÃO APLICADA AQUI
+    // <<-- CORREÇÃO APLICADA AQUI -->>
     static getBestSellingProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
           const bestSellingProducts = await Order.aggregate([
@@ -100,13 +100,14 @@ class ProductController {
             { $limit: 8 },
             {
               $lookup: {
-                from: 'products',
+                from: 'products', // A coleção de produtos
                 localField: '_id',
                 foreignField: '_id',
                 as: 'productDetails',
               },
             },
             { $unwind: '$productDetails' },
+            // Esta é a linha chave que "promove" os detalhes do produto para o nível principal do documento
             {
               $replaceRoot: { newRoot: '$productDetails' }
             },
@@ -121,15 +122,14 @@ class ProductController {
     static getLatestProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const latestProducts = await ProductModel.find()
-                .sort({ createdAt: -1 }) // Ordena pela data de criação
-                .limit(8); // Pega os 8 mais novos
+                .sort({ createdAt: -1 })
+                .limit(8);
             res.status(200).json(latestProducts);
         } catch (error: any) {
             res.status(500).json({ message: 'Erro ao buscar produtos recentes', error: error.message });
         }
     };
-    // --- FIM DO NOVO MÉTODO ---
-
+    
     static uploadImage = upload.single('imagem');
 }
 

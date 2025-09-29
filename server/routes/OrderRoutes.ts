@@ -6,7 +6,7 @@ import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware"; // Imp
 const router = Router();
 
 // --- Rotas de Cliente ---
-router.post("/orders/checkout", verifyToken, OrderController.createOrder);
+router.post("/orders/checkout", verifyToken, OrderController.checkout);
 
 // --- Rotas de Admin ---
 router.get("/orders", verifyToken, verifyAdmin, OrderController.getAllOrders);

@@ -1,9 +1,11 @@
-// Ficheiro: DevLooks-main/server/index.ts
+// Ficheiro: server/index.ts
 
 import { PORT } from './config/config';
 import express from 'express';
 import cors from 'cors';
 import './config/database'; 
+import path from 'path'; // <<---- IMPORTE O 'path'
+// Remova a importação de fileURLToPath pois não será mais usada
 
 // Importa as rotas
 import usersRoutes from './routes/UserRoutes';
@@ -29,6 +31,11 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = PORT;
 
+// Essas linhas garantem que o Express encontre a pasta 'public' corretamente
+// Use as variáveis globais do Node.js (__dirname e __filename)
+app.use(express.static(path.join(__dirname, '../public')));
+
+
 // Configura as rotas da API
 app.use('/api', usersRoutes);
 app.use('/api', productRoutes);
@@ -37,9 +44,6 @@ app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', avatarRoutes);
-
-// Servir arquivos estáticos da pasta 'public'
-app.use(express.static('public'));
 
 app.listen(port, () => {
     console.log(`✅ API Rodando em http://localhost:${port}`);

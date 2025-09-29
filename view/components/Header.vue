@@ -88,7 +88,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '@/services/main.js'; // Importa a instância configurada
+import api from '@/services/main.js';
+// <<--- A CORREÇÃO PRINCIPAL ESTÁ AQUI --- >>
+import SearchBar from './Search-bar.vue'; // Importa o componente
 
 const router = useRouter();
 const user = ref(null);
