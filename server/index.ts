@@ -4,8 +4,8 @@ import { PORT } from './config/config';
 import express from 'express';
 import cors from 'cors';
 import './config/database'; 
-import path from 'path'; // <<---- IMPORTE O 'path'
-// Remova a importação de fileURLToPath pois não será mais usada
+import path from 'path'; 
+import { fileURLToPath } from 'url';
 
 // Importa as rotas
 import usersRoutes from './routes/UserRoutes';
@@ -24,6 +24,10 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
+const __filename = fileURLToPath(import.meta.url);
+// A CORREÇÃO ESTÁ AQUI 👇: Adicionado '__' antes de 'dirname'
+const __dirname = path.dirname(__filename);
+
 // Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -31,8 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = PORT;
 
-// Essas linhas garantem que o Express encontre a pasta 'public' corretamente
-// Use as variáveis globais do Node.js (__dirname e __filename)
+// A linha abaixo agora funcionará corretamente
 app.use(express.static(path.join(__dirname, '../public')));
 
 

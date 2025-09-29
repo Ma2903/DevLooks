@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = '/api/products';
+// Define a URL base completa para a API de produtos.
+// Isso torna o código mais claro e fácil de manter.
+const API_URL = 'http://localhost:3000/api/products';
 
 export default {
   // Buscar todos os produtos
@@ -10,7 +12,7 @@ export default {
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
-      throw error;
+      throw error; // Propaga o erro para o componente tratar
     }
   },
 
@@ -20,15 +22,20 @@ export default {
       const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Erro ao buscar produto:', error);
+      console.error(`Erro ao buscar o produto ${id}:`, error);
       throw error;
     }
   },
 
   // Criar um novo produto
-  async createProduct(product) {
+  // (Este método recebe um FormData por causa do upload de imagem)
+  async createProduct(productData) {
     try {
-      const response = await axios.post(API_URL, product);
+      const response = await axios.post(API_URL, productData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Erro ao criar produto:', error);
@@ -37,12 +44,17 @@ export default {
   },
 
   // Atualizar um produto existente
-  async updateProduct(id, product) {
+  // (Também pode receber FormData se a imagem for atualizada)
+  async updateProduct(id, productData) {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, product);
+      const response = await axios.put(`${API_URL}/${id}`, productData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
-      console.error('Erro ao atualizar produto:', error);
+      console.error(`Erro ao atualizar o produto ${id}:`, error);
       throw error;
     }
   },
@@ -50,13 +62,15 @@ export default {
   // Deletar um produto
   async deleteProduct(id) {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      const response = await axios.delete(`${API_URL}/${id}`);
+      return response.data; // Retorna a mensagem de sucesso do backend
     } catch (error) {
-      console.error('Erro ao deletar produto:', error);
+      console.error(`Erro ao deletar o produto ${id}:`, error);
       throw error;
     }
   },
 
+  // Buscar os produtos mais vendidos
   async getBestSellingProducts() {
     try {
       const response = await axios.get(`${API_URL}/best-selling`);
@@ -67,7 +81,7 @@ export default {
     }
   },
 
-  // --- NOVO MÉTODO ADICIONADO AQUI ---
+  // Buscar os produtos mais recentes
   async getLatestProducts() {
     try {
       const response = await axios.get(`${API_URL}/latest`);
@@ -77,8 +91,4 @@ export default {
       throw error;
     }
   },
-
-  async updateProduto(produto) {
-    return axios.put(`http://localhost:3000/api/products/${produto._id}`, produto);
-  }
 };

@@ -1,44 +1,43 @@
 <template>
-  <div class="bg-gray-900 min-h-screen font-sans text-gray-200">
-    <section class="relative text-white text-center py-40 overflow-hidden">
-      <div class="absolute inset-0 bg-black opacity-50 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80');"></div>
+  <div class="bg-gray-900 min-h-screen font-mono text-gray-200 relative">
+    <section id="home" class="relative bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white text-center py-40 overflow-hidden">
+      <div class="absolute inset-0 bg-black opacity-60 bg-cover bg-center" style="background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/online-shopping-1869235_960_720.jpg');"></div>
       <div class="relative z-10 container mx-auto px-4 md:px-6">
-        <h1 class="text-5xl md:text-6xl font-extrabold mb-4 text-emerald-400 drop-shadow-lg animate-fade-in-down">
-          DevLooks
+        <h1 class="text-5xl md:text-6xl font-extrabold mb-6 text-[#04d1b0] animate-fade-in">
+          <i class="fas fa-shopping-cart mr-2"></i>Bem-vindo à DevLooks
         </h1>
-        <p class="text-lg md:text-xl mb-8 text-gray-200 max-w-2xl mx-auto animate-fade-in-down" style="animation-delay: 0.2s;">
-          O seu estilo, o seu código. Produtos criados para celebrar a cultura da tecnologia.
+        <p class="text-lg md:text-xl mb-8 text-gray-200 animate-fade-in">
+          Descubra produtos exclusivos para personalizar seu estilo e mostrar sua paixão por tecnologia!
         </p>
-        <router-link to="/products" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in-up text-lg">
-          <i class="fas fa-store mr-2"></i> Explorar Coleção
+        <router-link to="/products" class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in text-lg">
+          <i class="fas fa-store mr-2"></i> Ver Produtos
         </router-link>
-      </div>
-    </section>
-
-    <section class="bg-gray-800/50 py-16">
-      <div class="container mx-auto px-4 md:px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div class="p-6">
-            <i class="fas fa-shipping-fast text-4xl text-emerald-400 mb-4"></i>
-            <h3 class="text-xl font-bold text-white mb-2">Entrega Rápida</h3>
-            <p class="text-gray-400">Receba seus produtos em tempo recorde, em qualquer lugar do Brasil.</p>
-          </div>
-          <div class="p-6">
-            <i class="fas fa-lock text-4xl text-emerald-400 mb-4"></i>
-            <h3 class="text-xl font-bold text-white mb-2">Pagamento Seguro</h3>
-            <p class="text-gray-400">Compre com tranquilidade usando os métodos de pagamento mais seguros.</p>
-          </div>
-          <div class="p-6">
-            <i class="fas fa-headset text-4xl text-emerald-400 mb-4"></i>
-            <h3 class="text-xl font-bold text-white mb-2">Suporte Dedicado</h3>
-            <p class="text-gray-400">Nossa equipe está sempre pronta para ajudar com qualquer dúvida.</p>
-          </div>
+        <div class="mt-6 flex justify-center gap-4">
+          <span class="bg-[#04d1b0] text-white px-4 py-2 rounded-full font-bold shadow-lg animate-bounce">
+            Frete grátis acima de R$ 150
+          </span>
+          <span class="bg-[#4e44e1] text-white px-4 py-2 rounded-full font-bold shadow-lg animate-pulse">
+            10% OFF na primeira compra!
+          </span>
         </div>
       </div>
     </section>
 
-    <section class="container mx-auto py-20 px-4 md:px-6">
-      <h2 id="products-section-title" class="text-3xl md:text-4xl font-bold text-emerald-400 text-center mb-12">
+    <section id="categories" class="container mx-auto py-16 px-4 md:px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
+        <i class="fas fa-th-large mr-2"></i>Categorias
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div v-for="cat in categorias" :key="cat.nome" class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-[#04d1b0] transition duration-300 flex flex-col items-center cursor-default group">
+          <i :class="cat.icone + ' text-5xl text-[#04d1b0] mb-4 group-hover:scale-110 transition'"></i>
+          <h3 class="text-lg font-bold text-white">{{ cat.nome }}</h3>
+          <p class="text-gray-300 mt-2">{{ cat.desc }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="best-sellers" class="container mx-auto py-16 px-4 md:px-6">
+      <h2 id="products-section-title" class="text-3xl md:text-4xl font-semibold text-[#04d1b0] text-center mb-8">
         <i class="fas fa-fire mr-2"></i>Mais Vendidos
       </h2>
       <div v-if="loading" class="text-center text-xl">
@@ -48,92 +47,206 @@
         {{ error }}
       </div>
       <div v-if="!loading && produtos.length === 0 && !error" class="text-center text-gray-400">
-        Ainda não há produtos mais vendidos para exibir.
+        Nenhum produto para exibir no momento.
       </div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div v-for="produto in produtos" :key="produto._id" class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 group">
-          <router-link :to="`/products/${produto._id}`" class="block">
-            <img :src="getImageUrl(produto.image)" :alt="produto.name" class="w-full h-56 object-cover"/>
-          </router-link>
-          <div class="p-6">
+        <div v-for="produto in produtos" :key="produto._id" class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 flex flex-col">
+            <router-link :to="`/products/${produto._id}`" class="block mb-4">
+              <img :src="getImageUrl(produto.image)" :alt="produto.name" class="w-full h-48 object-cover rounded-lg"/>
+            </router-link>
             <h3 class="text-lg font-bold text-white mb-2 truncate">{{ produto.name }}</h3>
-            <div class="flex justify-between items-center">
-              <span class="text-emerald-400 font-bold text-xl">R$ {{ produto.price ? produto.price.toFixed(2) : '0.00' }}</span>
-              <router-link :to="`/products/${produto._id}`" class="bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                Ver mais
-              </router-link>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-[#04d1b0] font-bold text-lg">R$ {{ produto.price ? produto.price.toFixed(2) : '0.00' }}</span>
+              <span class="bg-[#4e44e1] text-white text-sm font-medium px-4 py-1 rounded-lg">#{{ produto.category }}</span>
+            </div>
+            <div class="mt-auto">
+                <router-link :to="`/products/${produto._id}`" class="block bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-2 px-4 rounded-lg text-center transition duration-300 mb-2">
+                Ver Detalhes
+                </router-link>
+                <button v-if="userType !== 'admin'" @click="addToCart(produto)" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition">
+                <i class="fas fa-cart-plus"></i> Adicionar
+                </button>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="benefits" class="bg-gray-800/50 py-16">
+      <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div>
+          <i class="fas fa-shipping-fast text-5xl text-[#04d1b0] mb-4"></i>
+          <h3 class="text-lg font-bold text-white">Frete Grátis</h3>
+          <p class="text-gray-300">Para compras acima de R$ 150,00.</p>
+        </div>
+        <div>
+          <i class="fas fa-sync-alt text-5xl text-[#04d1b0] mb-4"></i>
+          <h3 class="text-lg font-bold text-white">Devolução Fácil</h3>
+          <p class="text-gray-300">30 dias para devolução sem custo.</p>
+        </div>
+        <div>
+          <i class="fas fa-lock text-5xl text-[#04d1b0] mb-4"></i>
+          <h3 class="text-lg font-bold text-white">Pagamento Seguro</h3>
+          <p class="text-gray-300">Seus dados protegidos com criptografia.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="container mx-auto py-16 px-4 md:px-6">
+        <div class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] py-8 text-center rounded-lg">
+            <h3 class="text-2xl font-bold text-white mb-4">
+                <i class="fas fa-envelope mr-2"></i>Inscreva-se na nossa Newsletter
+            </h3>
+            <p class="text-gray-200 mb-6">Receba novidades, promoções e ofertas exclusivas!</p>
+            <router-link to="/register" class="bg-white text-[#04d1b0] font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                <i class="fas fa-user-plus mr-2"></i> Inscrever-se
+            </router-link>
+        </div>
+    </section>
+    
+    <section class="container mx-auto py-16 px-4 md:px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-semibold text-[#04d1b0] mb-6">
+        <i class="fas fa-comments mr-2"></i>O que dizem nossos clientes
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <p class="text-gray-300 mb-4">"Produtos de ótima qualidade e entrega super rápida. A camiseta de 'Hello World' é minha favorita!"</p>
+          <div class="flex items-center justify-center">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 1" class="w-12 h-12 rounded-full mr-4">
+        <div>
+          <p class="font-bold text-white">Lucas Martins</p>
+          <p class="text-sm text-gray-400">Desenvolvedor Full-Stack</p>
+        </div>
+          </div>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <p class="text-gray-300 mb-4">"Finalmente uma loja que entende a gente! A caneca de JavaScript é perfeita para os longos dias de codificação."</p>
+          <div class="flex items-center justify-center">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Cliente 2" class="w-12 h-12 rounded-full mr-4">
+        <div>
+          <p class="font-bold text-white">Marina Souza</p>
+          <p class="text-sm text-gray-400">Engenheira de Software</p>
+        </div>
+          </div>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <p class="text-gray-300 mb-4">"O criador de avatares é incrível! Pude fazer um avatar único para usar em todas as minhas redes."</p>
+          <div class="flex items-center justify-center">
+            <img src="https://i.pravatar.cc/50?u=woman" alt="Cliente 3" class="w-12 h-12 rounded-full mr-4">
+            <div>
+              <p class="font-bold text-white">Fernanda L.</p>
+              <p class="text-sm text-gray-400">UI/UX Designer</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="bg-gray-800/50 py-24 px-4 md:px-6">
-        </section>
-    <section class="container mx-auto py-20 px-4 md:px-6">
-        </section>
-    <transition name="fade">
-      <button v-if="showScrollButton" @click="scrollToTop" class="fixed bottom-8 right-8 bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition-all duration-300 z-50">
-        <i class="fas fa-arrow-up"></i>
-      </button>
-    </transition>
+    <button v-show="showScrollButton" @click="scrollToTop" class="fixed bottom-4 right-4 bg-[#04d1b0] hover:bg-[#4e44e1] text-white font-bold py-3 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+      <i class="fas fa-arrow-up"></i>
+    </button>
   </div>
 </template>
 
 <script>
 import ProductService from '../services/ProductService';
+import Swal from 'sweetalert2';
 
 export default {
   name: "Home",
   data() {
     return {
       produtos: [],
-      loading: true, // Inicia como true para mostrar o spinner
+      categorias: [
+        { nome: "Roupas", value: "roupas", icone: "fas fa-tshirt", desc: "Mostre seu amor por código com estilo." },
+        { nome: "Acessórios", value: "acessorios", icone: "fas fa-keyboard", desc: "Complete seu setup com itens incríveis." },
+        { nome: "Canecas", value: "canecas", icone: "fas fa-mug-hot", desc: "Para aquele café que te salva durante o debug." },
+        { nome: "Avatares", value: "avatares", icone: "fas fa-user-astronaut", desc: "Crie um avatar único para suas redes." }
+      ],
+      loading: true,
       error: null,
       showScrollButton: false,
+      userType: "user",
     };
   },
   methods: {
-    // <<--- MÉTODO getImageUrl CORRIGIDO E SIMPLIFICADO --- >>
     getImageUrl(imagePath) {
       if (!imagePath) {
-        // Retorna uma URL de placeholder que funciona ou uma imagem local
-        return 'https://i.imgur.com/L1e3z0x.png'; // Um placeholder genérico
+        return 'https://i.imgur.com/L1e3z0x.png'; // Placeholder
       }
-      // Constrói a URL completa e confiável para a imagem do produto
-      return `http://localhost:3000/${imagePath.replace(/\\/g, '/')}`;
+      // Remove o 'public\' do caminho para a URL ficar correta
+      const cleanPath = imagePath.replace(/^public[\\/]/, '');
+      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
     },
-    
-    // <<--- MÉTODO fetchProducts CORRIGIDO E SIMPLIFICADO --- >>
     async fetchProducts() {
       this.loading = true;
       this.error = null;
       try {
-        // Chama diretamente o método para buscar os mais vendidos
-        const products = await ProductService.getBestSellingProducts();
+        let products = await ProductService.getBestSellingProducts();
+
+        // Se não houver 'mais vendidos', busca os últimos lançamentos
+        if (products.length === 0) {
+          const titleElement = document.querySelector('#products-section-title');
+          if (titleElement) {
+            titleElement.innerHTML = '<i class="fas fa-rocket mr-2"></i>Lançamentos';
+          }
+          products = await ProductService.getLatestProducts();
+        }
         this.produtos = products;
       } catch (err) {
-        this.error = 'Ops! Não foi possível carregar os produtos mais vendidos.';
+        this.error = 'Ops! Não foi possível carregar os produtos.';
         console.error("Erro detalhado:", err);
       } finally {
         this.loading = false;
       }
     },
-    
-    // Seus outros métodos continuam iguais
-    handleScroll() {
-      this.showScrollButton = window.scrollY > 300;
+    addToCart(produto) {
+      const cart = localStorage.getItem("cart");
+      const cartItems = cart ? JSON.parse(cart) : [];
+      const existingItem = cartItems.find((item) => item._id === produto._id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cartItems.push({ ...produto, quantity: 1 });
+      }
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+
+      Swal.fire({
+        title: "Produto Adicionado!",
+        text: `"${produto.name}" foi adicionado ao carrinho.`,
+        icon: "success",
+        background: "#1a202c",
+        color: "#e2e8f0",
+        showCancelButton: true,
+        confirmButtonText: "Ir para o Carrinho",
+        cancelButtonText: "Continuar Comprando",
+        customClass: {
+          popup: "rounded-lg shadow-lg",
+          confirmButton: "bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-4 rounded-lg mx-2",
+          cancelButton: "bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg mx-2",
+        },
+        buttonsStyling: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$router.push("/cart");
+        }
+      });
     },
     scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    handleScroll() {
+      this.showScrollButton = window.scrollY > 200;
+    },
   },
   async mounted() {
-    await this.fetchProducts();
     window.addEventListener('scroll', this.handleScroll);
+    await this.fetchProducts();
+
+    const userDataRaw = localStorage.getItem("userData");
+    if (userDataRaw && userDataRaw !== "undefined") {
+      const userData = JSON.parse(userDataRaw);
+      this.userType = userData.role || (userData.user && userData.user.role) || "user";
+    }
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
@@ -142,33 +255,29 @@ export default {
 </script>
 
 <style scoped>
-/* SEU CSS PERMANECE IGUAL */
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-@keyframes fade-in-down {
-  from { opacity: 0; transform: translateY(-20px); }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
 }
 
-.animate-fade-in-down {
-  animation: fade-in-down 0.6s ease-out forwards;
-}
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards 0.4s;
+.animate-bounce {
+    animation: bounce 1.5s infinite;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-15%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 </style>

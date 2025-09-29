@@ -1,4 +1,3 @@
-// Ficheiro: server/models/ProductModel.ts
 import { Schema, model, Document } from "mongoose";
 
 // Interface para o documento do produto
@@ -10,6 +9,7 @@ export interface IProduct extends Document {
     stock: number;
     image: string;
     sizes?: string[];
+    // A linha "sales: number;" foi removida daqui
     createdAt: Date;
     updatedAt: Date;
 }
@@ -23,6 +23,7 @@ const ProductSchema = new Schema<IProduct>({
     stock: { type: Number, required: true },
     image: { type: String, required: true },
     sizes: { type: [String], required: false },
+    // A linha "sales: { type: Number, default: 0 }," foi removida daqui
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
