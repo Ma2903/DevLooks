@@ -1,153 +1,225 @@
 <template>
-  <header class="bg-gray-900 text-white p-4 md:p-6 shadow-lg sticky top-0 z-50">
+  <header class="bg-gray-800 text-white p-4 shadow-lg sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
-      
-      <router-link to="/home" class="flex items-center space-x-4">
-        <img
-          src="../assets/favicon.png"
-          alt="Logo DevLooks"
-          class="w-16 h-16 md:w-20 md:h-20 rounded-full shadow-lg"
-        />
-        <div>
-          <h1 class="text-3xl font-poppins font-bold tracking-wide">
-            <span class="text-[#04d1b0]">Dev</span><span class="text-white">Looks</span>
-          </h1>
-        </div>
+      <router-link to="/" class="flex items-center gap-2 flex-shrink-0">
+        <img src="@/assets/Logo.png" alt="DevLooks Logo" class="h-10">
+        <span class="text-2xl font-bold text-white hidden sm:inline">DevLooks</span>
       </router-link>
 
-      <button @click="toggleMenu" class="md:hidden text-3xl">
-        <i :class="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
-      </button>
-
-      <nav
-        :class="{'hidden': !menuOpen, 'flex': menuOpen}"
-        class="absolute md:relative top-full left-0 w-full bg-gray-900 md:bg-transparent p-5 md:p-0 md:flex md:w-auto flex-col md:flex-row md:items-center md:space-x-4 text-lg"
-      >
-        <ul class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-          <li>
-            <router-link to="/home" class="nav-link"><i class="fas fa-home mr-2"></i>Home</router-link>
-          </li>
-          <li>
-            <router-link to="/products" class="nav-link"><i class="fas fa-store mr-2"></i>Produtos</router-link>
-          </li>
-
-          <template v-if="isLoggedIn">
-            <template v-if="userType === 'user'">
-              <li><router-link to="/cart" class="nav-link"><i class="fas fa-shopping-cart mr-2"></i>Carrinho</router-link></li>
-              <li><router-link to="/order-history" class="nav-link"><i class="fas fa-receipt mr-2"></i>Minhas Compras</router-link></li>
-              <li><router-link to="/create-avatar" class="nav-link"><i class="fas fa-user-astronaut mr-2"></i>Criar Avatar</router-link></li>
-            </template>
-            
-            <template v-if="userType === 'admin' || userType === 'owner'">
-              <li><router-link to="/admin/products" class="nav-link"><i class="fas fa-cogs mr-2"></i>Gerir Produtos</router-link></li>
-              <li><router-link to="/admin/coupons" class="nav-link"><i class="fas fa-tags mr-2"></i>Gerir Cupons</router-link></li>
-              <li><router-link to="/admin/orders" class="nav-link"><i class="fas fa-dollar-sign mr-2"></i>Gerir Vendas</router-link></li>
-            </template>
-            
-            <li v-if="userType === 'owner'">
-              <router-link to="/admin/users" class="nav-link"><i class="fas fa-users mr-2"></i>Gerir Utilizadores</router-link>
-            </li>
-            
-            <li><router-link to="/profile" class="nav-link"><i class="fas fa-user mr-2"></i>Perfil</router-link></li>
-          </template>
-
-          <li v-if="!isLoggedIn">
-            <router-link to="/login" class="nav-link"><i class="fas fa-sign-in-alt mr-2"></i>Entrar</router-link>
-          </li>
-        </ul>
+      <nav class="hidden lg:flex items-center space-x-6">
+        <router-link to="/" class="nav-link flex items-center"><i class="fas fa-home w-5"></i> Home</router-link>
+        <router-link to="/products" class="nav-link flex items-center"><i class="fas fa-box-open w-5"></i> Produtos</router-link>
+        <router-link to="/create-avatar" class="nav-link flex items-center"><i class="fas fa-paint-brush w-5"></i> Criar Avatar</router-link>
+        <router-link to="/about" class="nav-link flex items-center"><i class="fas fa-users w-5"></i> Sobre Nós</router-link>
+        <router-link to="/faq" class="nav-link flex items-center"><i class="fas fa-question-circle w-5"></i> FAQ</router-link>
       </nav>
+
+      <div class="hidden md:flex items-center space-x-6">
+        <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors">
+          <i class="fas fa-shopping-cart text-xl"></i>
+          <span v-if="cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+        </router-link>
+        
+        <div v-if="user" class="relative">
+          <button @click="toggleDropdown" class="flex items-center gap-2">
+            <img :src="user.avatarUrl || 'https://i.pravatar.cc/40'" alt="User Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
+          </button>
+          <transition name="fade-scale">
+            <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-56 bg-gray-700 rounded-md shadow-lg py-2 z-50 border border-gray-600">
+              <div class="px-4 py-2 border-b border-gray-600">
+                <p class="text-sm font-semibold text-white truncate">{{ user.name }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ user.email }}</p>
+              </div>
+              <router-link to="/profile" @click="isDropdownOpen = false" class="dropdown-item"><i class="fas fa-user-circle w-5"></i> Meu Perfil</router-link>
+              <router-link to="/my-orders" @click="isDropdownOpen = false" class="dropdown-item"><i class="fas fa-receipt w-5"></i> Minhas Compras</router-link>
+              <router-link v-if="user.role === 'admin' || user.role === 'owner'" to="/admin/products" @click="isDropdownOpen = false" class="dropdown-item"><i class="fas fa-tachometer-alt w-5"></i> Dashboard</router-link>
+              <a @click="logout" href="#" class="dropdown-item"><i class="fas fa-sign-out-alt w-5"></i> Sair</a>
+            </div>
+          </transition>
+        </div>
+        <router-link v-else to="/login" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-md transition-colors">
+          Entrar
+        </router-link>
+      </div>
+      
+      <div class="md:hidden flex items-center">
+        <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors mr-4">
+          <i class="fas fa-shopping-cart text-xl"></i>
+           <span v-if="cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+        </router-link>
+        <button @click="isMobileMenuOpen = !isMobileMenuOpen">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+      </div>
     </div>
+    
+    <transition name="fade">
+      <div v-if="isMobileMenuOpen" class="md:hidden mt-4 absolute top-full left-0 w-full bg-gray-800 shadow-lg">
+        <nav class="flex flex-col space-y-1 px-2 py-3">
+          <SearchBar @search="handleSearch" class="mb-2" />
+          <router-link to="/" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-home w-6"></i> Home</router-link>
+          <router-link to="/products" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-box-open w-6"></i> Produtos</router-link>
+          <router-link to="/create-avatar" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-paint-brush w-6"></i> Criar Avatar</router-link>
+          <router-link to="/about" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-users w-6"></i> Sobre Nós</router-link>
+          <router-link to="/faq" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-question-circle w-6"></i> FAQ</router-link>
+          
+          <div class="border-t border-gray-700 pt-4 mt-2">
+              <div v-if="user" class="flex items-center px-3 mb-3">
+                  <img :src="user.avatarUrl || 'https://i.pravatar.cc/40'" alt="User Avatar" class="w-10 h-10 rounded-full object-cover">
+                  <div class="ml-3">
+                      <p class="text-base font-medium text-white">{{ user.name }}</p>
+                      <p class="text-sm font-medium text-gray-400">{{ user.email }}</p>
+                  </div>
+              </div>
+              <router-link v-if="user" to="/profile" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-user-circle w-6"></i> Meu Perfil</router-link>
+              <router-link v-if="user" to="/my-orders" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-receipt w-6"></i> Minhas Compras</router-link>
+              <router-link v-if="user && (user.role === 'admin' || user.role === 'owner')" to="/admin/products" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-tachometer-alt w-6"></i> Dashboard</router-link>
+              <a v-if="user" @click="logout" href="#" class="mobile-link"><i class="fas fa-sign-out-alt w-6"></i> Sair</a>
+              <router-link v-else to="/login" class="block w-full text-left bg-emerald-500 mt-2 px-3 py-2 rounded-md text-base font-medium hover:bg-emerald-600" @click="isMobileMenuOpen = false">
+                  Entrar
+              </router-link>
+          </div>
+        </nav>
+      </div>
+    </transition>
   </header>
 </template>
 
-<script>
-export default {
-  name: "Header",
-  data() {
-    // Inicializa o estado lendo do localStorage para evitar "piscadas" na tela
-    const token = localStorage.getItem("token");
-    const userDataRaw = localStorage.getItem("userData");
-    let userType = 'guest';
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import api from '@/services/main.js'; // Importa a instância configurada
 
-    if (token && userDataRaw && userDataRaw !== "undefined") {
-      try {
-        const userData = JSON.parse(userDataRaw);
-        userType = userData.role || 'user';
-      } catch (e) {
-        console.error("Erro ao parsear userData do localStorage", e);
-      }
-    }
-    
-    return {
-      menuOpen: false,
-      isLoggedIn: !!token,
-      userType: userType,
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.menuOpen = !this.menuOpen;
-    },
-    atualizarEstado() {
-      const token = localStorage.getItem("token");
-      const userDataRaw = localStorage.getItem("userData");
-      this.isLoggedIn = !!token;
+const router = useRouter();
+const user = ref(null);
+const cartItemCount = ref(0);
+const isDropdownOpen = ref(false);
+const isMobileMenuOpen = ref(false);
 
-      if (this.isLoggedIn && userDataRaw && userDataRaw !== "undefined") {
-        try {
-          const userData = JSON.parse(userDataRaw);
-          this.userType = userData.role || "user";
-        } catch (e) {
-          this.userType = 'user'; // Fallback em caso de erro
-        }
-      } else {
-        this.userType = 'guest'; 
-      }
-    },
-  },
-  created() {
-    // Adiciona listeners para manter o header sincronizado
-    window.addEventListener("storage", this.atualizarEstado);
-    window.addEventListener("login-update", this.atualizarEstado);
-  },
-  beforeUnmount() {
-    // Remove os listeners ao destruir o componente
-    window.removeEventListener("storage", this.atualizarEstado);
-    window.removeEventListener("login-update", this.atualizarEstado);
-  },
-  watch: {
-    // Atualiza o header a cada mudança de rota
-    $route() {
-      this.atualizarEstado();
-      this.menuOpen = false; // Fecha o menu mobile ao navegar
-    }
+const updateUserState = () => {
+  const storedUser = localStorage.getItem('user');
+  user.value = storedUser ? JSON.parse(storedUser) : null;
+  
+  const storedCart = localStorage.getItem('cart');
+  if (storedCart) {
+    const cart = JSON.parse(storedCart);
+    cartItemCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+  } else {
+    cartItemCount.value = 0;
   }
 };
+
+onMounted(() => {
+  updateUserState();
+  window.addEventListener('auth-change', updateUserState);
+  window.addEventListener('cart-updated', updateUserState);
+});
+
+const toggleDropdown = () => isDropdownOpen.value = !isDropdownOpen.value;
+
+const handleSearch = (query) => {
+  isMobileMenuOpen.value = false;
+  router.push({ path: '/products', query: { q: query } });
+};
+
+const logout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  isDropdownOpen.value = false;
+  isMobileMenuOpen.value = false;
+  window.dispatchEvent(new Event('auth-change'));
+  router.push('/');
+};
+
+watch(() => router.currentRoute.value, () => {
+  isMobileMenuOpen.value = false;
+  isDropdownOpen.value = false;
+});
 </script>
 
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
-h1 {
-  font-family: "Poppins", sans-serif;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+.router-link-exact-active {
+  color: #34d399; /* Cor emerald-400 */
 }
-
-/* Estilo unificado para os links de navegação */
 .nav-link {
+  position: relative;
+  transition: color 0.3s;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: #34d399;
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+.nav-link.router-link-exact-active::after {
+    transform: scaleX(1);
+    transform-origin: bottom center;
+}
+.dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.3s, color 0.3s, transform 0.2s;
-  background-color: #4e44e1;
-  color: white;
+  padding-left: 1rem;   /* px-4 */
+  padding-right: 1rem;
+  padding-top: 0.5rem;  /* py-2 */
+  padding-bottom: 0.5rem;
+  font-size: 0.875rem;  /* text-sm */
+  color: #e5e7eb;       /* text-gray-200 */
+  transition: background 0.2s, color 0.2s;
+}
+.dropdown-item:hover {
+  background-color: #10b981; /* bg-emerald-500 */
+  color: #fff;               /* text-white */
 }
 
-.nav-link:hover {
-  background-color: #04d1b0;
-  transform: scale(1.05);
+.mobile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;              /* gap-3 */
+  padding-left: 0.75rem;     /* px-3 */
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;       /* py-2 */
+  padding-bottom: 0.5rem;
+  border-radius: 0.375rem;   /* rounded-md */
+  font-size: 1rem;           /* text-base */
+  font-weight: 500;          /* font-medium */
+  color: #e5e7eb;            /* text-gray-200 (default) */
+  transition: background 0.2s, color 0.2s;
+}
+.mobile-link:hover {
+  background-color: #374151; /* bg-gray-700 */
+}
+
+.mobile-link.router-link-exact-active {
+  background-color: #10b981; /* bg-emerald-500 */
+  color: #fff;               /* text-white */
+}
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  transform: scale(0.95) translateY(-10px);
+  opacity: 0;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

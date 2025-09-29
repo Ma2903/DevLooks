@@ -1,4 +1,5 @@
-// Ficheiro: server/models/CouponModel.ts
+// server/models/CouponModel.ts
+
 import { Schema, model, Document } from "mongoose";
 
 export interface ICoupon extends Document {
@@ -7,6 +8,7 @@ export interface ICoupon extends Document {
     discountValue: number;
     expirationDate: Date;
     isActive: boolean;
+    isSingleUse?: boolean; // << CAMPO ADICIONADO
     createdAt: Date;
     updatedAt: Date;
 }
@@ -17,6 +19,10 @@ const CouponSchema = new Schema<ICoupon>({
     discountValue: { type: Number, required: true },
     expirationDate: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
+    isSingleUse: { // << CAMPO ADICIONADO
+        type: Boolean,
+        default: false
+    },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

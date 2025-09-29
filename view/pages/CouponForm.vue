@@ -14,7 +14,7 @@
             type="text" 
             id="code" 
             class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" 
-            placeholder="Ex: DEVSUPER15"
+            placeholder="Ex: PRIMEIRACOMPRA10"
             required
           >
         </div>
@@ -40,7 +40,7 @@
               id="discountValue" 
               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#04d1b0] transition" 
               step="0.01" 
-              placeholder="Ex: 15"
+              placeholder="Ex: 10"
               required
             >
           </div>
@@ -65,6 +65,16 @@
             class="h-5 w-5 bg-gray-700 border-gray-600 rounded text-[#04d1b0] focus:ring-[#04d1b0]"
           >
           <label for="isActive" class="ml-3 text-gray-300">Cupom Ativo</label>
+        </div>
+
+        <div class="flex items-center">
+          <input 
+            type="checkbox" 
+            v-model="form.isSingleUse" 
+            id="isSingleUse" 
+            class="h-5 w-5 bg-gray-700 border-gray-600 rounded text-[#04d1b0] focus:ring-[#04d1b0]"
+          >
+          <label for="isSingleUse" class="ml-3 text-gray-300">Uso único por usuário</label>
         </div>
         
         <div class="flex justify-end pt-4 gap-4">
@@ -101,6 +111,7 @@ const form = ref({
   discountValue: null,
   expirationDate: '',
   isActive: true,
+  isSingleUse: false, // << NOVO CAMPO ADICIONADO AO FORMULÁRIO
 });
 
 async function handleSubmit() {
@@ -134,7 +145,6 @@ onMounted(async () => {
   if (isEditing.value) {
     try {
       const coupon = await CouponService.getCouponById(couponId.value);
-      // O 'T' é necessário para o input type="date" interpretar corretamente
       const formattedDate = new Date(coupon.expirationDate).toISOString().split('T')[0];
       form.value = {
         ...coupon,
@@ -156,7 +166,6 @@ onMounted(async () => {
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-/* Garante que o calendário do input de data também seja escuro em navegadores que suportam */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }

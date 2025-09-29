@@ -1,5 +1,7 @@
+// server/models/UserModel.ts
+
 import { Schema, model, Document } from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcrypt"; // Corrigido de bcryptjs para bcrypt
 
 // Interface para um item no carrinho
 interface ICartItem extends Document {
@@ -11,7 +13,7 @@ interface ICartItem extends Document {
     image: string;
 }
 
-// Interface para o documento do usuário
+// Interface para o documento do usuário (Mantendo sua estrutura original)
 export interface IUser extends Document {
     name: string;
     email: string;
@@ -30,9 +32,10 @@ export interface IUser extends Document {
     status: string;
     avatarUrl?: string;
     hasCreatedAvatar?: boolean;
-    avatarPasses?: number;      // <-- NOVO
-    savedAvatars?: string[];    // <-- NOVO
+    avatarPasses?: number;
+    savedAvatars?: string[];
     hasMadePurchase?: boolean;
+    usedCoupons?: string[]; // << Campo adicionado para a lógica de cupons
     cart: ICartItem[];
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
@@ -65,11 +68,12 @@ const UserSchema = new Schema<IUser>({
     country: { type: String },
     role: { type: String, default: "user", enum: ['user', 'admin', 'owner'] },
     status: { type: String, default: "active" },
-    avatarUrl: { type: String, default: null },
+    avatarUrl: { type: String },
     hasCreatedAvatar: { type: Boolean, default: false },
-    avatarPasses: { type: Number, default: 0 },         // <-- NOVO
-    savedAvatars: { type: [String], default: [] },      // <-- NOVO
+    avatarPasses: { type: Number, default: 0 },
+    savedAvatars: { type: [String], default: [] },
     hasMadePurchase: { type: Boolean, default: false },
+    usedCoupons: { type: [String], default: [] }, // << Campo adicionado
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     cart: { type: [cartItemSchema], default: [] },

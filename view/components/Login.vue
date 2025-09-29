@@ -8,22 +8,22 @@
         </div>
         <form @submit.prevent="handleLogin">
           <div class="mb-8">
-  <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-          <div class="relative flex">
-            <i class="fas fa-envelope absolute left-3 mt-5 text-gray-400"></i>
-            <input
-              ref="emailInput"
-              type="email"
-              id="email"
-              v-model="email"
-              @blur="validateEmail"  aria-label="Email"
-              :class="['w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2', emailError ? 'ring-2 ring-red-500' : 'focus:ring-[#04d1b0]']"
-              placeholder="Digite seu email (Ex: exemplo@email.com)"
-              required
-            />
+            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <div class="relative flex">
+              <i class="fas fa-envelope absolute left-3 mt-5 text-gray-400"></i>
+              <input
+                ref="emailInput"
+                type="email"
+                id="email"
+                v-model="email"
+                @blur="validateEmail"  aria-label="Email"
+                :class="['w-full pl-10 pr-4 py-4 bg-gray-800 text-gray-200 rounded-lg focus:outline-none focus:ring-2', emailError ? 'ring-2 ring-red-500' : 'focus:ring-[#04d1b0]']"
+                placeholder="Digite seu email (Ex: exemplo@email.com)"
+                required
+              />
+            </div>
+            <span v-if="emailError" class="text-red-400 text-sm mt-1">{{ emailError }}</span>
           </div>
-          <span v-if="emailError" class="text-red-400 text-sm mt-1">{{ emailError }}</span>
-        </div>
           <div class="mb-8">
             <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
             <div class="relative">
@@ -67,14 +67,14 @@
         </form>
         <div class="mt-8 text-center">
             <p class="text-gray-400 text-lg">
-                Não tem uma conta? 
+                Não tem uma conta?
                 <router-link to="/register" class="text-[#04d1b0] hover:underline">Cadastre-se</router-link>
             </p>
         </div>
       </div>
     </div>
   </template>
-  
+
  <script>
     import axios from "axios";
     import Swal from "sweetalert2";
@@ -88,14 +88,13 @@
           showPassword: false,
           loading: false,
           loginError: "",
-          emailError: "", // <-- NOVO: Guarda a mensagem de erro do e-mail
+          emailError: "",
         };
       },
       mounted() {
         this.$refs.emailInput.focus();
       },
       methods: {
-        // NOVO: Método para validar o e-mail
         validateEmail() {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!this.email) {
@@ -110,10 +109,9 @@
           this.showPassword = !this.showPassword;
         },
         async handleLogin() {
-          // Executa a validação antes de tentar o login
           this.validateEmail();
           if (this.emailError) {
-            return; // Impede o envio se houver erro
+            return;
           }
 
           this.loading = true;
@@ -123,12 +121,12 @@
               email: this.email,
               password: this.password,
             });
-            
+
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("userData", JSON.stringify(response.data.user));
             window.dispatchEvent(new Event("storage"));
 
-           Swal.fire({
+           await Swal.fire({
             icon: 'success',
             title: 'Login realizado com sucesso!',
             showConfirmButton: false,
@@ -136,9 +134,10 @@
             background: "#1F2937",
             color: "#E5E7EB",
           });
-          setTimeout(() => {
-            this.$router.push("/profile");
-          }, 1500);
+
+          // <<-- A CORREÇÃO PRINCIPAL ESTÁ AQUI -->>
+          // Redireciona para /profile, que é uma rota válida e segura
+          this.$router.push("/profile");
 
           } catch (error) {
             this.loginError = "Verifique suas credenciais.";
@@ -156,18 +155,18 @@
       },
     };
     </script>
-  
+
   <style scoped>
   @import '@fortawesome/fontawesome-free/css/all.css';
-  
+
   body {
     font-family: 'Fira Code', monospace;
   }
-  
+
   button:hover {
     transform: scale(1.05);
   }
-  
+
   input::placeholder {
     color: #9CA3AF; /* Cor do placeholder */
   }

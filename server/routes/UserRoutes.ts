@@ -1,3 +1,5 @@
+// server/routes/UserRoutes.ts
+
 import { Router, Request, Response, NextFunction } from "express";
 import UserController from "../controllers/UserController";
 import { verifyToken, verifyOwner } from "../middlewares/authMiddleware";
@@ -8,7 +10,7 @@ const router = Router();
 
 // Middleware para verificar se é o próprio usuário ou o dono
 const verifySelfOrOwner = (req: Request, res: Response, next: NextFunction) => {
-    if (req.user.id === req.params.id || req.user.role === 'owner') {
+    if ((req as any).user.id === req.params.id || (req as any).user.role === 'owner') {
         next();
     } else {
         res.status(403).json({ message: "Acesso proibido." });
@@ -22,9 +24,7 @@ router.post("/users/forgot-password", UserController.forgotPassword);
 router.post("/users/reset-password", UserController.resetPassword);
 
 // --- ROTAS PROTEGIDAS (exigem token) ---
-// ROTA CORRIGIDA
 router.get("/users/me", verifyToken, UserController.getMe); 
-router.put("/users/avatar", verifyToken, UserController.saveAvatar);
 
 // Rota para buscar um usuário específico (dono ou o próprio usuário)
 router.get("/users/:id", verifyToken, verifySelfOrOwner, UserController.getUserById);

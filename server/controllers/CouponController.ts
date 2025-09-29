@@ -1,139 +1,100 @@
+// server/controllers/CouponController.ts
+
 import { Request, Response, RequestHandler } from "express";
 import Coupon from "../models/CouponModel";
+import UserModel from "../models/UserModel"; // << IMPORTADO PARA VERIFICAR O USUÁRIO
+import jwt from 'jsonwebtoken'; // << IMPORTADO PARA PEGAR O ID DO USUÁRIO
 
 class CouponController {
-    // Criar um novo cupom
     static createCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { code, discountType, discountValue, expirationDate, isActive } = req.body;
-
-            // Validação básica
-            if (!code || !discountType || !discountValue || !expirationDate) {
-                res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos." });
-                return;
-            }
-
-            const coupon = await Coupon.create({
-                code,
-                discountType,
-                discountValue,
-                expirationDate,
-                isActive: isActive ?? true, // Define como ativo por padrão
-            });
-
-            res.status(201).json(coupon);
+            const newCoupon = new Coupon(req.body);
+            await newCoupon.save();
+            res.status(201).json(newCoupon);
         } catch (error) {
-            console.error("Erro ao criar cupom:", error);
-            res.status(500).json({ error: "Erro ao criar cupom." });
+            res.status(500).json({ message: "Erro ao criar cupom.", error });
         }
     };
 
-    // Obter todos os cupons
     static getAllCoupons: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const coupons = await Coupon.find(); // Corrigido para usar o método padrão do Mongoose
+            const coupons = await Coupon.find();
             res.status(200).json(coupons);
         } catch (error) {
-            console.error("Erro ao buscar cupons:", error);
-            res.status(500).json({ error: "Erro ao buscar cupons." });
+            res.status(500).json({ message: "Erro ao buscar cupons.", error });
         }
     };
 
-    // Obter um cupom pelo ID
     static getCouponById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const coupon = await Coupon.findById(req.params.id); // Corrigido para usar o método padrão do Mongoose
-
+            const coupon = await Coupon.findById(req.params.id);
             if (!coupon) {
-                res.status(404).json({ error: "Cupom não encontrado." });
+                res.status(404).json({ message: "Cupom não encontrado." });
                 return;
             }
-
             res.status(200).json(coupon);
         } catch (error) {
-            console.error("Erro ao buscar cupom:", error);
-            res.status(500).json({ error: "Erro ao buscar cupom." });
+            res.status(500).json({ message: "Erro ao buscar cupom.", error });
         }
     };
 
-    // Atualizar um cupom
     static updateCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { code, discountType, discountValue, expirationDate, isActive } = req.body;
-
-            // Validação básica
-            if (!code || !discountType || !discountValue || !expirationDate) {
-                res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos." });
+            const updatedCoupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            if (!updatedCoupon) {
+                res.status(404).json({ message: "Cupom não encontrado." });
                 return;
             }
-
-            const coupon = await Coupon.findByIdAndUpdate(
-                req.params.id,
-                {
-                    code,
-                    discountType,
-                    discountValue,
-                    expirationDate,
-                    isActive,
-                },
-                { new: true } // Retorna o documento atualizado
-            );
-
-            if (!coupon) {
-                res.status(404).json({ error: "Cupom não encontrado." });
-                return;
-            }
-
-            res.status(200).json(coupon);
+            res.status(200).json(updatedCoupon);
         } catch (error) {
-            console.error("Erro ao atualizar cupom:", error);
-            res.status(500).json({ error: "Erro ao atualizar cupom." });
+            res.status(500).json({ message: "Erro ao atualizar cupom.", error });
         }
     };
 
-    // Deletar um cupom
     static deleteCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const coupon = await Coupon.findByIdAndDelete(req.params.id); // Corrigido para usar o método padrão do Mongoose
-
-            if (!coupon) {
-                res.status(404).json({ error: "Cupom não encontrado." });
+            const deletedCoupon = await Coupon.findByIdAndDelete(req.params.id);
+            if (!deletedCoupon) {
+                res.status(404).json({ message: "Cupom não encontrado." });
                 return;
             }
-
             res.status(200).json({ message: "Cupom deletado com sucesso." });
         } catch (error) {
-            console.error("Erro ao deletar cupom:", error);
-            res.status(500).json({ error: "Erro ao deletar cupom." });
+            res.status(500).json({ message: "Erro ao deletar cupom.", error });
         }
     };
-
-    // Validar um cupom no carrinho
+    
     static validateCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { code } = req.body;
-
             if (!code) {
-                res.status(400).json({ error: "O código do cupom é obrigatório." });
+                res.status(400).json({ message: "Código do cupom não fornecido." });
+                return;
+            }
+            
+            const coupon = await Coupon.findOne({ code: code.toUpperCase() });
+
+            if (!coupon || !coupon.isActive || new Date(coupon.expirationDate) < new Date()) {
+                res.status(404).json({ message: "Cupom inválido, expirado ou inativo." });
                 return;
             }
 
-            const coupon = await Coupon.findOne({ code: code.toUpperCase() }); // Corrigido para usar o método padrão do Mongoose
+            // << INÍCIO DA LÓGICA DE USO ÚNICO >>
+            const token = req.headers.authorization?.split(' ')[1];
+            if (coupon.isSingleUse && token) {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
+                const user = await UserModel.findById(decoded.id);
 
-            if (!coupon) {
-                res.status(404).json({ error: "Cupom inválido." });
-                return;
+                if (user && user.usedCoupons?.includes(coupon.code)) {
+                    res.status(400).json({ message: "Este cupom já foi utilizado por você." });
+                    return;
+                }
             }
-
-            if (!coupon.isActive || new Date(coupon.expirationDate) < new Date()) {
-                res.status(400).json({ error: "Cupom expirado ou inativo." });
-                return;
-            }
+            // << FIM DA LÓGICA DE USO ÚNICO >>
 
             res.status(200).json(coupon);
         } catch (error) {
-            console.error("Erro ao validar cupom:", error);
-            res.status(500).json({ error: "Erro ao validar cupom." });
+            res.status(500).json({ message: "Erro ao validar cupom.", error });
         }
     };
 }

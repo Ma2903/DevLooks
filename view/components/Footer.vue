@@ -1,68 +1,45 @@
 <template>
-  <!-- Rodapé -->
-  <footer class="bg-[#1a202c] text-white p-4 md:p-6 shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Sobre Nós -->
-      <div>
-        <h3 class="text-lg font-bold text-[#04d1b0] mb-4">Sobre Nós</h3>
-        <p>
-          Somos apaixonados por tecnologia e cultura geek. Oferecemos produtos exclusivos para personalizar seu estilo.
+  <footer class="bg-gray-800 text-gray-400 py-12 px-4 border-t-2 border-emerald-500/20">
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+      
+      <div class="md:col-span-2">
+        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <img src="@/assets/Logo.png" alt="DevLooks Logo" class="h-8">
+          DevLooks
+        </h3>
+        <p class="pr-4">
+          O e-commerce feito para devs. Encontre produtos que celebram a cultura da tecnologia, desde camisetas com piadas de código até acessórios que completam seu setup.
         </p>
       </div>
 
-      <!-- Contato e Redes Sociais -->
       <div>
-        <h3 class="text-lg font-bold text-[#04d1b0] mb-4">Contato</h3>
-        <p>Entre em contato conosco:</p>
-        <ul class="mt-4">
-          <li class="flex items-center space-x-2">
-            <i class="fas fa-envelope text-[#04d1b0]"></i>
-            <span>contato@lojageek.com</span>
-          </li>
-          <li class="flex items-center space-x-2 mt-2">
-            <i class="fas fa-phone text-[#04d1b0]"></i>
-            <span>(11) 99999-9999</span>
-          </li>
-          <li class="flex items-center space-x-2 mt-2">
-            <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
-            <span>Rua Geek, 123 - São Paulo, SP</span>
-          </li>
+        <h3 class="text-lg font-bold text-white mb-4">Institucional</h3>
+        <ul class="space-y-2">
+          <li><router-link to="/about" class="hover:text-emerald-400 transition-colors">Sobre Nós</router-link></li>
+          <li><router-link to="/faq" class="hover:text-emerald-400 transition-colors">Perguntas Frequentes (FAQ)</router-link></li>
+          <li><router-link to="/products" class="hover:text-emerald-400 transition-colors">Todos os Produtos</router-link></li>
         </ul>
       </div>
 
-      <!-- Redes Sociais -->
       <div>
-        <h3 class="text-lg font-bold text-[#04d1b0] mb-4">Siga-nos</h3>
+        <h3 class="text-lg font-bold text-white mb-4">Siga-nos</h3>
         <div class="flex space-x-4">
-          <a href="#" class="hover:text-[#4e44e1]"><i class="fab fa-facebook text-2xl"></i></a>
-          <a href="#" class="hover:text-[#4e44e1]"><i class="fab fa-instagram text-2xl"></i></a>
-          <a href="#" class="hover:text-[#4e44e1]"><i class="fab fa-twitter text-2xl"></i></a>
+          <a href="#" class="text-2xl hover:text-emerald-400 transition-colors"><i class="fab fa-github"></i></a>
+          <a href="#" class="text-2xl hover:text-emerald-400 transition-colors"><i class="fab fa-linkedin"></i></a>
+          <a href="#" class="text-2xl hover:text-emerald-400 transition-colors"><i class="fab fa-instagram"></i></a>
         </div>
       </div>
+
+    </div>
+    <div class="mt-10 pt-6 border-t border-gray-700 text-center text-sm">
+      <p>&copy; 2025 DevLooks. Todos os direitos reservados. Projeto Temático.</p>
     </div>
   </footer>
 </template>
 
-<script>
-export default {
-  name: "Footer",
-  methods: {
-    scrollToSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-      }
-    },
-  },
-};
+<script setup>
 </script>
 
 <style scoped>
-footer {
-  border-top: 2px solid #444444;
-}
-
-footer a:hover {
-  color: #04d1b0;
-}
+@import '@fortawesome/fontawesome-free/css/all.css';
 </style>
