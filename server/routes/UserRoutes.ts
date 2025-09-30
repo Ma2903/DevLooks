@@ -1,41 +1,26 @@
 // server/routes/UserRoutes.ts
 
-import { Router, Request, Response, NextFunction } from "express";
-import UserController from "../controllers/UserController";
-import { verifyToken, verifyOwner } from "../middlewares/authMiddleware";
-import { validate } from "../middlewares/validationMiddleware";
-import { createUserSchema } from "../validators/userValidator";
+import { Router } from 'express';
+import UserController from '../controllers/UserController';
+import { validate } from '../middlewares/validationMiddleware';
+import { createUserSchema } from '../validators/userValidator';
+import { verifyToken } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// Middleware para verificar se é o próprio usuário ou o dono
-const verifySelfOrOwner = (req: Request, res: Response, next: NextFunction) => {
-    if ((req as any).user.id === req.params.id || (req as any).user.role === 'owner') {
-        next();
-    } else {
-        res.status(403).json({ message: "Acesso proibido." });
-    }
-};
+// Rotas públicas
+router.post('/users/register', validate(createUserSchema), UserController.createUser);
+router.post('/users/login', UserController.login);
+router.post('/users/forgot-password', UserController.forgotPassword);
+router.post('/users/reset-password', UserController.resetPassword);
 
-// --- ROTAS PÚBLICAS ---
-router.post("/users", validate(createUserSchema), UserController.createUser);
-router.post("/users/login", UserController.login);
-router.post("/users/forgot-password", UserController.forgotPassword);
-router.post("/users/reset-password", UserController.resetPassword);
+// Rotas protegidas para o próprio usuário
+router.get('/users/me', verifyToken, UserController.getMe);
+router.delete('/users/me', verifyToken, UserController.deleteSelf); // ROTA ADICIONADA AQUI
+router.delete('/users/avatar', verifyToken, UserController.deleteSavedAvatar);
 
-// --- ROTAS PROTEGIDAS (exigem token) ---
-router.get("/users/me", verifyToken, UserController.getMe); 
-
-// Rota para buscar um usuário específico (dono ou o próprio usuário)
-router.get("/users/:id", verifyToken, verifySelfOrOwner, UserController.getUserById);
-
-// Rota para atualizar um usuário (dono ou o próprio usuário)
-router.put("/users/:id", verifyToken, verifySelfOrOwner, UserController.updateUser);
-
-// Rota para deletar um usuário (dono ou o próprio usuário)
-router.delete("/users/:id", verifyToken, verifySelfOrOwner, UserController.deleteUser);
-
-// --- ROTAS DE ADMIN/OWNER ---
-router.get("/users", verifyToken, verifyOwner, UserController.getAllUsers);
+// Rotas protegidas para usuários específicos (si mesmo ou admin)
+router.get('/users/:id', verifyToken, UserController.getUserById);
+router.put('/users/:id', verifyToken, UserController.updateUser);
 
 export default router;

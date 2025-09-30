@@ -118,7 +118,6 @@
           this.loading = true;
           this.loginError = "";
           try {
-            // ✅ CORREÇÃO 2: Use a instância 'api' para a chamada
             const response = await api.post("/api/users/login", {
               email: this.email,
               password: this.password,
@@ -126,30 +125,24 @@
 
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("userData", JSON.stringify(response.data.user));
-            // Dispara o evento correto que o Header.vue está ouvindo
+            
+            // A LINHA MAIS IMPORTANTE: Avisa todo o app que o usuário mudou
             window.dispatchEvent(new Event("auth-change")); 
 
-           await Swal.fire({
-            icon: 'success',
-            title: 'Login realizado com sucesso!',
-            showConfirmButton: false,
-            timer: 1500,
-            background: "#1F2937",
-            color: "#E5E7EB",
-          });
-
-          this.$router.push("/profile");
-
-          } catch (error) {
-            this.loginError = "Verifique suas credenciais.";
-            console.error("Erro ao fazer login:", error.response?.data || error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro ao fazer login',
-              text: 'Verifique suas credenciais.',
+            await Swal.fire({
+              icon: 'success',
+              title: 'Login realizado com sucesso!',
+              showConfirmButton: false,
+              timer: 1500,
               background: "#1F2937",
               color: "#E5E7EB",
             });
+
+            this.$router.push("/profile");
+
+          } catch (error) {
+            this.loginError = "Verifique suas credenciais.";
+            // ...
           }
           this.loading = false;
         }

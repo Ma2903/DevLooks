@@ -2,15 +2,14 @@
 
 import { Router } from 'express';
 import AvatarController from '../controllers/AvatarController';
+import { verifyToken } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// Rota para salvar/definir um avatar
-// POST -> /api/avatar/
-router.post('/', AvatarController.saveAvatar);
+// ROTA PÚBLICA para o proxy (usada pela tag <img> e downloads)
+router.get('/avatar/proxy', AvatarController.proxyAvatar);
 
-// Rota para deletar um avatar da galeria do usuário
-// DELETE -> /api/avatar/
-router.delete('/', AvatarController.deleteAvatar);
+// ROTA PRIVADA para salvar/atualizar o avatar de perfil
+router.put('/users/avatar', verifyToken, AvatarController.saveAvatar);
 
 export default router;

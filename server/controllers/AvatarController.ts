@@ -3,20 +3,31 @@
 import { Request, Response, RequestHandler } from "express";
 import UserModel from "../models/UserModel";
 import jwt from 'jsonwebtoken';
+import axios from 'axios'; // Importe o axios para usar no proxy
 
 class AvatarController {
-    // Método para salvar e definir um avatar
-    static saveAvatar: RequestHandler = async (req: Request, res: Response) => {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ message: 'Token não fornecido' });
+
+   static proxyAvatar: RequestHandler = async (req: Request, res: Response) => {
+        const { url } = req.query;
+        if (typeof url !== 'string') {
+            return res.status(400).send('URL do avatar não fornecida.');
         }
+        try {
+            const response = await axios.get(url, { responseType: 'stream' });
+            response.data.pipe(res);
+        } catch (error) {
+            console.error("Erro no proxy do avatar:", error);
+            res.status(500).send('Erro ao buscar a imagem do avatar.');
+        }
+    };
+
+    static saveAvatar: RequestHandler = async (req: Request, res: Response) => {
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Pega o ID do usuário diretamente do token decodificado pelo middleware 'verifyToken'
+        const userId = (req as any).user.id;
+        const { avatarUrl } = req.body;
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
-            const userId = decoded.id;
-            const { avatarUrl } = req.body;
-
             if (!avatarUrl) {
                 return res.status(400).json({ message: "URL do avatar não fornecida." });
             }
@@ -25,19 +36,18 @@ class AvatarController {
             if (!user) {
                 return res.status(404).json({ message: "Usuário não encontrado." });
             }
-
-            // Verifica se o avatar já existe na galeria para não gastar um passe à toa
+            
             const isExistingAvatar = user.savedAvatars?.includes(avatarUrl);
 
-            // Se for um avatar novo e o usuário não tiver passes, retorna erro
-            // O !user.hasCreatedAvatar permite que o primeiro seja gratuito
             if (!isExistingAvatar && user.hasCreatedAvatar && (!user.avatarPasses || user.avatarPasses <= 0)) {
                 return res.status(403).json({ message: "Você não tem passes para salvar um novo avatar. Adquira um na loja!" });
             }
 
-            // Se for um avatar novo, adiciona à galeria e gasta um passe (se não for o primeiro)
             if (!isExistingAvatar) {
-                user.savedAvatars?.push(avatarUrl);
+                if (!user.savedAvatars) {
+                    user.savedAvatars = [];
+                }
+                user.savedAvatars.push(avatarUrl);
                 if (user.hasCreatedAvatar) {
                     user.avatarPasses = (user.avatarPasses || 0) - 1;
                 }
@@ -48,19 +58,15 @@ class AvatarController {
 
             await user.save();
             
-            const userResponse = user.toObject();
-            delete userResponse.password;
+            const { password, ...userResponse } = user.toObject();
 
             res.status(200).json({ message: "Avatar definido com sucesso!", user: userResponse });
         } catch (error: any) {
-            if (error instanceof jwt.JsonWebTokenError) {
-                return res.status(401).json({ message: 'Token inválido' });
-            }
-            res.status(500).json({ message: 'Erro interno do servidor' });
+            console.error("ERRO EM saveAvatar:", error);
+            res.status(500).json({ message: 'Erro interno do servidor ao salvar avatar' });
         }
     };
 
-    // Método para deletar um avatar da galeria
     static deleteAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
@@ -93,9 +99,9 @@ class AvatarController {
             await user.save();
 
             const userResponse = user.toObject();
-            delete userResponse.password;
+            const { password, ...responseWithoutPassword } = userResponse;
 
-            res.status(200).json({ message: "Avatar excluído com sucesso.", user: userResponse });
+            res.status(200).json({ message: "Avatar excluído com sucesso.", user: responseWithoutPassword });
         } catch (error: any) {
             if (error instanceof jwt.JsonWebTokenError) {
                 res.status(401).json({ message: 'Token inválido' });

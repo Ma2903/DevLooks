@@ -19,15 +19,34 @@
 
         <h2 class="text-xl font-semibold text-white mt-6 mb-4 border-b border-gray-700 pb-2">Endereço</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="mb-4 md:col-span-1">
-            <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
-            <input type="text" id="cep" v-model="userData.address.cep" @input="formatCep" class="form-input" placeholder="00000-000">
+          <div class="mb-4 md:col-span-3 flex items-end gap-2">
+            <div class="flex-grow">
+              <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
+              <input 
+                type="text" 
+                id="cep" 
+                v-model="userData.address.cep" 
+                @input="applyCepMask" 
+                class="form-input" 
+                placeholder="00000-000"
+                maxlength="9"
+              >
+            </div>
+            <button 
+              type="button" 
+              @click="buscarCepManualmente" 
+              class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-colors h-[48px] flex-shrink-0"
+              aria-label="Buscar CEP"
+            >
+              <i class="fas fa-search"></i>
+            </button>
           </div>
+          
           <div class="mb-4 md:col-span-2">
             <label for="street" class="block text-sm font-medium text-gray-300 mb-2">Rua</label>
             <input type="text" id="street" v-model="userData.address.street" class="form-input">
           </div>
-          <div class="mb-4">
+           <div class="mb-4">
             <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
             <input type="text" id="number" v-model="userData.address.number" class="form-input">
           </div>
@@ -79,13 +98,6 @@ export default {
       token: null,
     };
   },
-  watch: {
-    'userData.address.cep'(newCep) {
-      if (newCep && newCep.replace(/\D/g, '').length === 8) {
-        this.fetchAddressFromCep(newCep);
-      }
-    }
-  },
   async created() {
     this.token = localStorage.getItem("token");
     if (!this.token) {
@@ -98,9 +110,13 @@ export default {
         headers: { Authorization: `Bearer ${this.token}` },
       });
       this.userData = res.data;
-      if (!this.userData.address) {
+
+      // *** AQUI ESTÁ A CORREÇÃO PRINCIPAL ***
+      // Garante que `address` seja sempre um objeto.
+      if (typeof this.userData.address !== 'object' || this.userData.address === null) {
         this.userData.address = {};
       }
+      
     } catch (err) {
       console.error("Erro ao buscar dados do usuário:", err);
       Swal.fire({
@@ -111,12 +127,30 @@ export default {
     }
   },
   methods: {
-    formatCep(event) {
-        let value = event.target.value.replace(/\D/g, '');
-        if (value.length > 5) {
-            value = value.slice(0, 5) + '-' + value.slice(5, 8);
-        }
-        this.userData.address.cep = value;
+    applyCepMask(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      if (value.length > 5) {
+          value = value.slice(0, 5) + '-' + value.slice(5, 8);
+      }
+      // Garante que o objeto `address` existe antes de atribuir
+      if (!this.userData.address) {
+        this.userData.address = {};
+      }
+      this.userData.address.cep = value;
+    },
+    buscarCepManualmente() {
+      const cep = this.userData.address.cep;
+      if (cep && cep.length === 9) {
+        this.fetchAddressFromCep(cep);
+      } else {
+        Swal.fire({
+            icon: 'warning', 
+            title: 'CEP Inválido', 
+            text: 'Por favor, digite um CEP válido com 8 dígitos.',
+            background: "#1F2937", 
+            color: "#E5E7EB"
+        });
+      }
     },
     async fetchAddressFromCep(cep) {
       const cleanCep = cep.replace(/\D/g, '');
@@ -124,13 +158,28 @@ export default {
         const response = await axios.get(`https://viacep.com.br/ws/${cleanCep}/json/`);
         const data = response.data;
         if (!data.erro) {
-          this.userData.address.street = data.logouro;
+          this.userData.address.street = data.logradouro;
           this.userData.address.neighborhood = data.bairro;
           this.userData.address.city = data.localidade;
           this.userData.address.state = data.uf;
+        } else {
+           Swal.fire({
+            icon: 'error', 
+            title: 'CEP não encontrado', 
+            text: 'Não foi possível encontrar o endereço para o CEP informado.',
+            background: "#1F2937", 
+            color: "#E5E7EB"
+           });
         }
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
+         Swal.fire({
+            icon: 'error', 
+            title: 'Erro de Rede', 
+            text: 'Ocorreu um erro ao buscar o CEP. Tente novamente.',
+            background: "#1F2937", 
+            color: "#E5E7EB"
+        });
       }
     },
     async handleEdit() {

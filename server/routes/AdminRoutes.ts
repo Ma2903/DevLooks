@@ -6,9 +6,12 @@ import { verifyToken, verifyAdmin, verifyOwner } from "../middlewares/authMiddle
 
 const router = Router();
 
-// Rota para buscar todos os usuários (protegida para Admin e Owner)
-router.get("/users", verifyToken, verifyAdmin, AdminController.getAllUsers);
+// --- CORREÇÃO APLICADA AQUI ---
+// A rota agora é '/admin/users' para corresponder à chamada do frontend
+router.get("/admin/users", verifyToken, verifyAdmin, AdminController.getAllUsers);
 
+
+// As rotas abaixo já estão corretas, pois herdarão o prefixo '/api' do index.ts
 // Rota para buscar um usuário por ID
 router.get("/users/:id", verifyToken, verifyAdmin, AdminController.getUserById);
 
