@@ -1,3 +1,5 @@
+// server/controllers/UserController.ts
+
 import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import UserModel, { IUser } from "../models/UserModel";
@@ -6,13 +8,8 @@ import bcrypt from "bcrypt";
 import CryptoJS from 'crypto-js';
 
 import {
-    JWT_SECRET,
-    CRYPTO_SECRET,
-    MAIL_HOST,
-    MAIL_PORT,
-    MAIL_USER,
-    MAIL_PASS,
-    OWNER_EMAIL
+    JWT_SECRET, CRYPTO_SECRET, MAIL_HOST,
+    MAIL_PORT, MAIL_USER, MAIL_PASS
 } from "../config/config";
 
 const generateToken = (user: IUser): string => {
@@ -30,12 +27,11 @@ function descriptografar(dadoCriptografado: string): string {
 
 class UserController {
 
-    // ... (outros métodos como createUser, login, etc., permanecem iguais)
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.create(req.body);
-            const userResponse = user.toObject();
-            delete userResponse.password; 
+            // CORREÇÃO: Cria um novo objeto sem a senha para a resposta
+            const { password, ...userResponse } = user.toObject();
             res.status(201).json(userResponse);
         } catch (error: any) {
             if (error.code === 11000) {
@@ -50,31 +46,39 @@ class UserController {
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
-            if (!email || !password) {
-                res.status(400).json({ error: "E-mail e senha são obrigatórios." });
-                return;
-            }
-            const user = await UserModel.findOne({ email: email.toLowerCase() });
-            if (!user || !(await bcrypt.compare(password, user.password))) {
+            const userDoc = await UserModel.findOne({ email: email.toLowerCase() });
+            if (!userDoc || !(await bcrypt.compare(password, userDoc.password))) {
                 res.status(401).json({ error: "Credenciais inválidas." });
                 return;
             }
-            const token = generateToken(user);
-            const userResponse = user.toObject();
-            delete userResponse.password;
+            const token = generateToken(userDoc);
+            // CORREÇÃO: Cria um novo objeto sem a senha
+            const { password: _, ...userResponse } = userDoc.toObject();
             res.status(200).json({ message: "Login bem-sucedido.", token, user: userResponse });
         } catch (error) {
-            console.error("Erro no login:", error);
             res.status(500).json({ error: "Erro interno ao tentar fazer login." });
         }
     };
     
     static getMe: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await UserModel.findById(req.user.id).select('-password');
+            const user = await UserModel.findById((req as any).user.id).select('-password');
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
+            }
+            // Lógica de migração de endereço para exibição correta no frontend
+            if (user.address && typeof (user.address as any) === 'string') {
+                const oldAddressString = (user.address as any);
+                (user as any).address = {
+                    street: oldAddressString,
+                    number: (user as any).number || '',
+                    complement: (user as any).complement || '',
+                    neighborhood: (user as any).bairro || '',
+                    cep: (user as any).cep || '',
+                    city: (user as any).city || '',
+                    state: (user as any).state || '',
+                };
             }
             res.status(200).json(user);
         } catch (error) {
@@ -82,6 +86,35 @@ class UserController {
         }
     };
 
+    // --- MÉTODO updateUser RESTAURADO E CORRIGIDO ---
+    static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = await UserModel.findById(req.params.id);
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+
+            // Lógica de migração definitiva (salva a correção no banco)
+            if (user.address && typeof (user.address as any) === 'string') {
+                const oldAddressString = (user.address as any);
+                (user as any).address = { street: oldAddressString };
+            }
+
+            Object.assign(user, req.body);
+            const updatedUser = await user.save();
+
+            // CORREÇÃO: Cria um novo objeto sem a senha
+            const { password, ...userResponse } = updatedUser.toObject();
+            res.status(200).json(userResponse);
+
+        } catch (error) {
+            console.error("ERRO DETALHADO AO ATUALIZAR USUÁRIO:", error);
+            res.status(500).json({ error: "Erro ao atualizar usuário." });
+        }
+    };
+
+    // ... (outros métodos como getAllUsers, getUserById, deleteUser, etc. continuam aqui)
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const users = await UserModel.find().select('-password');
@@ -104,23 +137,6 @@ class UserController {
         }
     };
 
-    static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        try {
-            if (req.body.password) {
-                const salt = await bcrypt.genSalt(10);
-                req.body.password = await bcrypt.hash(req.body.password, salt);
-            }
-            const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
-            if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
-            } else {
-                res.status(200).json(user);
-            }
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao atualizar usuário." });
-        }
-    };
-
     static deleteUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.findByIdAndDelete(req.params.id);
@@ -134,49 +150,6 @@ class UserController {
         }
     };
     
-    // MÉTODO saveAvatar ATUALIZADO
-    static saveAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const userId = req.user?.id;
-        const { avatarUrl } = req.body;
-        try {
-            const user = await UserModel.findById(userId);
-            if (!user) {
-                res.status(404).json({ error: "Usuário não encontrado." });
-                return;
-            }
-
-            // Se o usuário ainda não criou o avatar gratuito
-            if (!user.hasCreatedAvatar) {
-                user.avatarUrl = avatarUrl;
-                user.hasCreatedAvatar = true;
-                user.savedAvatars.push(avatarUrl); // Salva na galeria
-                await user.save();
-
-                const userResponse = user.toObject();
-                delete userResponse.password;
-                res.status(200).json({ message: "Avatar gratuito salvo com sucesso.", user: userResponse });
-            } 
-            // Se já usou o gratuito, verifica se tem passes
-            else if (user.avatarPasses && user.avatarPasses > 0) {
-                user.avatarUrl = avatarUrl;
-                user.avatarPasses -= 1; // Decrementa o número de passes
-                user.savedAvatars.push(avatarUrl); // Salva na galeria
-                await user.save();
-
-                const userResponse = user.toObject();
-                delete userResponse.password;
-                res.status(200).json({ message: "Avatar salvo com sucesso usando um passe.", user: userResponse });
-            } 
-            // Se não tem passes
-            else {
-                res.status(403).json({ error: "Você não tem passes para criar um novo avatar." });
-            }
-        } catch (error) {
-            res.status(500).json({ error: "Erro interno ao salvar avatar." });
-        }
-    };
-    
-    // ... (outros métodos como forgotPassword e resetPassword permanecem iguais)
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;
@@ -227,6 +200,63 @@ class UserController {
             res.status(500).json({ error: "Erro ao redefinir senha." });
         }
     }
+    
+    static deleteSelf: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            // Pega o ID do usuário que vem do token de autenticação
+            const userId = (req as any).user.id;
+            const user = await UserModel.findByIdAndDelete(userId);
+
+            if (!user) {
+                res.status(404).json({ error: "Usuário não encontrado." });
+                return;
+            }
+            
+            res.status(200).json({ message: "Sua conta foi deletada com sucesso." });
+        } catch (error) {
+            console.error("Erro ao deletar o próprio usuário:", error);
+            res.status(500).json({ error: "Erro ao deletar usuário." });
+        }
+    };
+
+    static deleteSavedAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const userId = (req as any).user.id;
+            const { avatarUrl } = req.body; // A URL vem no corpo da requisição
+
+            if (!avatarUrl) {
+                res.status(400).json({ message: "URL do avatar não fornecida." });
+                return;
+            }
+
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                res.status(404).json({ message: "Usuário não encontrado." });
+                return;
+            }
+            
+            // Impede que o avatar de perfil ativo seja excluído
+            if (user.avatarUrl === avatarUrl) {
+                res.status(400).json({ message: "Você não pode excluir seu avatar de perfil ativo." });
+                return;
+            }
+            
+            // Remove a URL do array de avatares salvos
+            await UserModel.updateOne(
+                { _id: userId },
+                { $pull: { savedAvatars: avatarUrl } }
+            );
+            
+            // Busca o usuário atualizado para retornar ao frontend
+            const updatedUser = await UserModel.findById(userId).select('-password');
+
+            res.status(200).json({ message: "Avatar excluído com sucesso.", user: updatedUser });
+
+        } catch (error) {
+            console.error("Erro ao deletar avatar salvo:", error);
+            res.status(500).json({ message: 'Erro interno do servidor.' });
+        }
+    };
 }
 
 export default UserController;

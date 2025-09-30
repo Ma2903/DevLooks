@@ -21,7 +21,7 @@
                 <p v-if="item.selectedSize" class="text-sm text-gray-400 font-semibold ml-6">Tamanho: {{ item.selectedSize }}</p>
                 <p class="text-gray-300 flex items-center gap-1 mt-2">
                   <i class="fas fa-tag"></i>
-                  Preço: <span class="font-bold text-[#04d1b0]">R$ {{ item.price.toFixed(2) }}</span>
+                  Preço: <span class="font-bold text-[#04d1b0]">R$ {{ item.price ? item.price.toFixed(2) : 'N/A' }}</span>
                 </p>
                 <div class="flex items-center mt-4 gap-2">
                   <button @click="updateItemQuantity(index, item.quantity - 1)" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-lg"><i class="fas fa-minus"></i></button>
@@ -68,7 +68,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CouponService from '@/services/CouponService';
-import axios from 'axios';
+// --- CORREÇÃO 1: Importe a instância 'api' ---
+import api from '@/services/main.js';
 import Swal from 'sweetalert2';
 
 const router = useRouter();
@@ -83,10 +84,9 @@ async function fetchCart() {
         return;
     }
     try {
-        const response = await axios.get('/api/cart', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        cartItems.value = response.data;
+        // --- CORREÇÃO 2: Use 'api' em vez de 'axios' ---
+        const response = await api.get('/api/cart');
+        cartItems.value = Array.isArray(response.data) ? response.data : [];
     } catch (error) {
         console.error("Erro ao buscar carrinho:", error);
         cartItems.value = [];
@@ -94,11 +94,9 @@ async function fetchCart() {
 }
 
 async function updateCartOnServer(newCart) {
-    const token = localStorage.getItem('token');
     try {
-        const response = await axios.put('/api/cart/update', { cartItems: newCart }, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        // --- CORREÇÃO 3: Use 'api' em vez de 'axios' ---
+        const response = await api.put('/api/cart/update', { cartItems: newCart });
         cartItems.value = response.data;
     } catch (error) {
         Swal.fire({ title: 'Erro', text: 'Não foi possível atualizar o carrinho.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });

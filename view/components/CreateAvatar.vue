@@ -156,7 +156,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"; // Importa o axios diretamente
 import Swal from "sweetalert2";
 
 export default {
@@ -164,7 +164,15 @@ export default {
   data() {
     return {
       avatarOptions: {
-        topType: 'NoHair', accessoriesType: 'Blank', hairColor: 'BrownDark', facialHairType: 'Blank', clotheType: 'BlazerShirt', eyeType: 'Default', eyebrowType: 'Default', mouthType: 'Default', skinColor: 'Light'
+        topType: 'NoHair', 
+        accessoriesType: 'Blank', 
+        hairColor: 'BrownDark', 
+        facialHairType: 'Blank', 
+        clotheType: 'BlazerShirt', 
+        eyeType: 'Default', 
+        eyebrowType: 'Default', 
+        mouthType: 'Default', 
+        skinColor: 'Light'
       },
       options: {
         topType: ['NoHair', 'LongHairBigHair', 'ShortHairShortFlat', 'LongHairStraight', 'ShortHairTheCaesar', 'Hat', 'WinterHat1', 'Hijab'],
@@ -185,10 +193,8 @@ export default {
     };
   },
   computed: {
-    // LÓGICA ATUALIZADA
     canCreateAvatar() {
       if (!this.user) return false;
-      // Pode criar se ainda não criou o gratuito OU se tem passes
       return !this.user.hasCreatedAvatar || (this.user.avatarPasses && this.user.avatarPasses > 0);
     },
     avatarUrl() {
@@ -197,9 +203,8 @@ export default {
       return `${baseUrl}${params}`;
     },
     proxiedAvatarUrl() {
-      if (!this.avatarUrl) return '';
-      const externalUrl = encodeURIComponent(this.avatarUrl);
-      return `http://localhost:3000/api/avatar/proxy?url=${externalUrl}`;
+      // Usar diretamente a URL do Avataaars
+      return this.avatarUrl;
     }
   },
   async created() {
@@ -209,7 +214,7 @@ export default {
       return;
     }
     try {
-      const res = await axios.get("/api/users/me", {
+      const res = await axios.get("http://localhost:3000/api/users/me", {
         headers: { Authorization: `Bearer ${this.token}` },
       });
       this.user = res.data;
@@ -222,8 +227,7 @@ export default {
     }
   },
   methods: {
-    // ... (seu método 'traduzir' continua igual)
-     traduzir(option) {
+    traduzir(option) {
       const traducoes = {
         'NoHair': 'Careca', 'LongHairBigHair': 'Cabelo Grande', 'ShortHairShortFlat': 'Cabelo Curto', 'LongHairStraight': 'Cabelo Longo Liso', 'ShortHairTheCaesar': 'Corte César', 'Hat': 'Chapéu', 'WinterHat1': 'Gorro', 'Hijab': 'Hijab',
         'BrownDark': 'Castanho Escuro', 'Blonde': 'Loiro', 'Red': 'Ruivo', 'Black': 'Preto', 'PastelPink': 'Rosa Pastel', 'Blue': 'Azul', 'Auburn': 'Ruivo Acobreado', 'SilverGray': 'Grisalho',
@@ -237,113 +241,127 @@ export default {
       };
       return traducoes[option] || option;
     },
-    // MÉTODO saveAvatar ATUALIZADO
+    
     async saveAvatar() {
-        if (!this.user) return;
+      // Seus console.log de debug (pode manter se quiser)
+      if (!this.user) return;
 
-        // Se o usuário já criou o avatar gratuito, pede confirmação
-        if (this.user.hasCreatedAvatar) {
-            const result = await Swal.fire({
-                title: 'Usar um Passe?',
-                text: `Você está prestes a usar 1 dos seus ${this.user.avatarPasses} passes para salvar este avatar. Deseja continuar?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sim, usar passe!',
-                cancelButtonText: 'Cancelar',
-                background: "#1F2937",
-                color: "#E5E7EB"
-            });
-
-            if (!result.isConfirmed) {
-                return; // Aborta se o usuário cancelar
-            }
+      if (this.user.hasCreatedAvatar && this.user.avatarPasses > 0) {
+        const result = await Swal.fire({
+          title: 'Usar um Passe?',
+          text: `Você está prestes a usar 1 dos seus ${this.user.avatarPasses} passes. Deseja continuar?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sim, usar passe!',
+          cancelButtonText: 'Cancelar',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        });
+        if (!result.isConfirmed) {
+          return;
         }
+      }
       
-        try {
-            // A requisição para o backend continua a mesma
-            const response = await axios.put('/api/users/avatar', { avatarUrl: this.avatarUrl }, { headers: { Authorization: `Bearer ${this.token}` } });
-            
-            // ATUALIZA O USUÁRIO LOCAL COM OS DADOS VINDOS DO BACKEND
-            this.user = response.data.user;
-            localStorage.setItem("userData", JSON.stringify(this.user));
-            window.dispatchEvent(new Event("storage"));
+      try {
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Usando o método PUT e a rota correta do AvatarRoutes.ts
+        const response = await axios.put(
+          'http://localhost:3000/api/users/avatar', // Rota correta
+          { avatarUrl: this.avatarUrl }, 
+          { 
+            headers: { 
+              'Authorization': `Bearer ${this.token}`,
+            } 
+          }
+        );
+        
+        this.user = response.data.user;
+        localStorage.setItem("userData", JSON.stringify(this.user));
+        // Dispara o evento para o Header e outros componentes se atualizarem
+        window.dispatchEvent(new Event("auth-change")); 
 
-            await Swal.fire({
-                title: 'Avatar Salvo!',
-                text: 'Seu novo avatar foi salvo com sucesso!',
-                icon: 'success',
-                background: "#1F2937",
-                color: "#E5E7EB",
-            });
+        await Swal.fire({
+          title: 'Avatar Salvo!',
+          text: response.data.message || 'Seu novo avatar foi salvo com sucesso!',
+          icon: 'success',
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
 
-            this.$router.push('/profile');
-        } catch (error) {
-            Swal.fire({
-                title: 'Erro ao Salvar',
-                text: error.response?.data?.error || 'Não foi possível salvar seu avatar.',
-                icon: 'error',
-                background: "#1F2937",
-                color: "#E5E7EB"
-            });
-        }
+        this.$router.push('/profile');
+        
+      } catch (error) {
+        let errorMessage = error.response?.data?.message || error.response?.data?.error || 'Não foi possível salvar seu avatar.';
+        Swal.fire({
+          title: 'Erro ao Salvar', text: errorMessage, icon: 'error',
+          background: "#1F2937", color: "#E5E7EB"
+        });
+      }
     },
-    // ... (seus métodos de download 'downloadSVG' e 'downloadPNG' continuam iguais)
+    
     async downloadSVG() {
-        this.isDownloading = true;
-        try {
-            const response = await axios.get(this.proxiedAvatarUrl, { responseType: 'blob' });
-            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/svg+xml' }));
+      this.isDownloading = true;
+      try {
+        const response = await axios.get(`http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/svg+xml' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'avatar.svg');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Erro ao baixar SVG:", error);
+        Swal.fire('Erro', 'Não foi possível baixar o SVG.', 'error');
+      } finally {
+        this.isDownloading = false;
+      }
+    },
+    
+    async downloadPNG() {
+      this.isDownloading = true;
+      try {
+        const response = await axios.get(`http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'text' });
+        const svgText = response.data;
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = this.pngSize;
+          canvas.height = this.pngSize;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, this.pngSize, this.pngSize);
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'avatar.svg');
+            link.download = 'avatar.png';
             document.body.appendChild(link);
             link.click();
             link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Erro ao baixar SVG:", error);
-            Swal.fire('Erro', 'Não foi possível baixar o SVG.', 'error');
-        } finally {
+            URL.revokeObjectURL(url);
             this.isDownloading = false;
-        }
-    },
-    async downloadPNG() {
-        this.isDownloading = true;
-        try {
-            const response = await axios.get(this.proxiedAvatarUrl, { responseType: 'text' });
-            const svgText = response.data;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = this.pngSize;
-            canvas.height = this.pngSize;
-            const ctx = canvas.getContext('2d');
-            
-            const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, this.pngSize, this.pngSize);
-                const pngUrl = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = pngUrl;
-                link.download = 'avatar.png';
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                this.isDownloading = false;
-            };
-            const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(svgBlob);
-            img.src = url;
-        } catch (error) {
-            console.error("Erro ao converter para PNG:", error);
-            Swal.fire('Erro', 'Não foi possível baixar o PNG.', 'error');
-            this.isDownloading = false;
-        }
+          }, 'image/png');
+        };
+        img.onerror = () => {
+          Swal.fire('Erro', 'Não foi possível carregar a imagem para conversão.', 'error');
+          this.isDownloading = false;
+        };
+        const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        img.src = url;
+      } catch (error) {
+        Swal.fire('Erro', 'Não foi possível baixar o PNG.', 'error');
+        this.isDownloading = false;
+      }
     }
   }
 };
 </script>
 
 <style scoped>
+/* Seus estilos continuam iguais */
 @import '@fortawesome/fontawesome-free/css/all.css';
 
 .select-input {

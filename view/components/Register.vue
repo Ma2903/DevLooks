@@ -187,69 +187,75 @@ export default {
     }
   },
   methods: {
-    async fetchAddress() {
-      const cep = this.form.cep.replace(/\D/g, "");
-      if (cep.length === 8) {
-        try {
-          this.loadingCep = true;
-          const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-          if (response.data.erro) {
-            Swal.fire({
-              icon: 'error',
-              title: 'CEP não encontrado',
-              text: 'Por favor, verifique o CEP digitado.',
-              background: "#1F2937",
-              color: "#E5E7EB",
-            });
-          } else {
-            this.form.address = response.data.logradouro;
-            this.form.bairro = response.data.bairro;
-            this.form.city = response.data.localidade;
-            this.form.state = response.data.uf;
-          }
-        } catch (error) {
-          console.error("Erro ao buscar CEP:", error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Erro na Consulta',
-            text: 'Não foi possível consultar o CEP. Tente novamente mais tarde.',
-            background: "#1F2937",
-            color: "#E5E7EB",
-          });
-        } finally {
-          this.loadingCep = false;
-        }
-      }
-    },
     async handleRegister() {
       if(this.form.password !== this.form.confirmPassword){
         Swal.fire({
-          icon: 'error', title: 'Erro', text: 'As senhas não coincidem!',
-          background: "#1F2937", color: "#E5E7EB",
+          icon: 'error', 
+          title: 'Erro', 
+          text: 'As senhas não coincidem!',
+          background: "#1F2937", 
+          color: "#E5E7EB",
         });
         return;
       }
 
       this.loading = true;
+      
       try {
-        await api.post("/api/users", this.form);
+        // Garante que campos vazios sejam enviados com valores adequados
+        const dataToSend = {
+          name: this.form.name,
+          email: this.form.email,
+          cpf: this.form.cpf,
+          password: this.form.password,
+          telephone: this.form.telephone,
+          // Se os campos de endereço estiverem vazios, envia um valor padrão
+          address: this.form.address || 'A definir',
+          number: this.form.number || 'S/N',
+          complement: this.form.complement || '',
+          bairro: this.form.bairro || 'A definir',
+          cep: this.form.cep || '00000-000',
+          city: this.form.city || 'A definir',
+          state: this.form.state || 'A definir',
+          country: this.form.country || 'Brasil'
+        };
+        
+        await api.post("/api/users", dataToSend);
+        
         await Swal.fire({
-          icon: 'success', title: 'Cadastro realizado!',
+          icon: 'success', 
+          title: 'Cadastro realizado!',
           text: 'Você será redirecionado para o login.',
-          background: "#1F2937", color: "#E5E7EB",
-          timer: 2000, showConfirmButton: false,
+          background: "#1F2937", 
+          color: "#E5E7EB",
+          timer: 2000, 
+          showConfirmButton: false,
         });
+        
         this.$router.push("/login");
+        
       } catch (error) {
+        let errorMessage = 'Não foi possível realizar o cadastro.';
+        
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response?.data?.details) {
+          errorMessage = error.response.data.details.map(d => d.message).join(', ');
+        } else if (error.response?.data?.error) {
+          errorMessage = error.response.data.error;
+        }
+        
         Swal.fire({
-          icon: 'error', title: 'Erro no Cadastro',
-          text: error.response?.data?.message || 'Não foi possível realizar o cadastro.',
-          background: "#1F2937", color: "#E5E7EB",
+          icon: 'error', 
+          title: 'Erro no Cadastro',
+          text: errorMessage,
+          background: "#1F2937", 
+          color: "#E5E7EB",
         });
       } finally {
         this.loading = false;
       }
-    },
+    }
   },
 };
 </script>

@@ -1,35 +1,44 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200 p-8">
+  <div class="min-h-screen bg-gray-900 text-gray-200 p-8">
     <div class="max-w-4xl mx-auto">
-      <h1 class="text-4xl font-bold text-center mb-8 text-white">Histórico de Compras</h1>
-      <div v-if="loading" class="text-center">
-        <p class="text-lg">Carregando histórico...</p>
+      <h1 class="text-4xl font-bold text-center mb-10 text-white flex items-center justify-center gap-3">
+        <i class="fas fa-receipt text-[#04d1b0]"></i>
+        Histórico de Compras
+      </h1>
+      <div v-if="loading" class="text-center py-10">
+        <i class="fas fa-spinner fa-spin text-3xl text-[#04d1b0]"></i>
+        <p class="mt-2">Carregando seu histórico...</p>
       </div>
-      <div v-else-if="orders.length === 0" class="text-center bg-gray-800 p-8 rounded-lg">
-        <p class="text-lg">Você ainda não fez nenhuma compra.</p>
+      <div v-else-if="orders.length === 0" class="text-center bg-gray-800 p-8 rounded-lg shadow-lg">
+        <p class="text-xl"><i class="fas fa-ghost mr-2"></i>Você ainda não fez nenhuma compra.</p>
       </div>
       <div v-else>
-        <div v-for="order in orders" :key="order._id" class="bg-gray-800 rounded-lg shadow-lg mb-6 p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-[#04d1b0]">Pedido #{{ order._id }}</h2>
-            <p class="text-gray-400">{{ new Date(order.createdAt).toLocaleDateString() }}</p>
+        <div v-for="order in orders" :key="order._id" class="bg-gray-800 rounded-lg shadow-lg mb-6 p-6 border-l-4 border-[#04d1b0]">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-[#04d1b0]">Pedido #{{ order._id.slice(-6) }}</h2>
+              <p class="text-gray-400 text-sm">{{ new Date(order.createdAt).toLocaleDateString('pt-BR') }}</p>
+            </div>
+            <span class="px-3 py-1 mt-2 sm:mt-0 rounded-full text-sm font-bold bg-yellow-500/20 text-yellow-300">
+              {{ order.status || 'Processando' }}
+            </span>
           </div>
           <div>
             <ul>
-              <li v-for="item in order.items" :key="item._id" class="flex items-center justify-between py-2 border-b border-gray-700">
+              <li v-for="item in order.items" :key="item.productId" class="flex items-center justify-between py-3 border-b border-gray-700 last:border-b-0">
                 <div class="flex items-center">
-                  <img :src="getImageUrl(item.image)" :alt="item.name" class="w-16 h-16 object-cover rounded-md mr-4">
+                  <img :src="getImageUrl(item.image)" :alt="item.name" class="w-16 h-16 object-cover rounded-md mr-4 border-2 border-gray-700">
                   <div>
-                    <p class="font-semibold">{{ item.name }}</p>
-                    <p class="text-sm text-gray-400">{{ item.quantity }} x R$ {{ item.price.toFixed(2) }}</p>
+                    <p class="font-semibold text-white">{{ item.name }}</p>
+                    <p class="text-sm text-gray-400">{{ item.quantity }} x R$ {{ item.price ? item.price.toFixed(2) : '0.00' }}</p>
                   </div>
                 </div>
-                <p class="font-semibold">R$ {{ (item.quantity * item.price).toFixed(2) }}</p>
+                <p class="font-semibold text-gray-300">R$ {{ item.price && item.quantity ? (item.quantity * item.price).toFixed(2) : '0.00' }}</p>
               </li>
             </ul>
           </div>
-          <div class="text-right mt-4">
-            <p class="text-lg font-bold">Total: <span class="text-[#04d1b0]">R$ {{ order.total.toFixed(2) }}</span></p>
+          <div class="text-right mt-4 border-t border-gray-700 pt-4">
+            <p class="text-lg font-bold">Total do Pedido: <span class="text-[#04d1b0] text-xl">R$ {{ order.total ? order.total.toFixed(2) : 'N/A' }}</span></p>
           </div>
         </div>
       </div>
@@ -38,7 +47,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// --- CORREÇÃO DE IMPORTAÇÃO ---
+import api from '@/services/main.js';
 
 export default {
   name: 'OrderHistory',
@@ -55,12 +65,9 @@ export default {
     async fetchOrderHistory() {
       this.loading = true;
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('/api/orders/history', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // --- CORREÇÃO NA CHAMADA API ---
+        // Usa a instância 'api' que já tem o interceptor de token
+        const response = await api.get('/api/orders/history');
         this.orders = response.data;
       } catch (error) {
         console.error('Erro ao buscar o histórico de pedidos:', error);
@@ -76,3 +83,7 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@import '@fortawesome/fontawesome-free/css/all.css';
+</style>

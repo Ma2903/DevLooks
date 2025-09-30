@@ -68,7 +68,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// --- CORREÇÃO 1: Importe a instância 'api' ---
+import api from '@/services/main.js';
 import Swal from 'sweetalert2';
 
 export default {
@@ -77,26 +78,24 @@ export default {
     return {
       checkoutData: null,
       paymentMethod: null,
-      selectedInstallment: 1, // Parcela padrão
+      selectedInstallment: 1,
     };
   },
   computed: {
-    // Calcula as opções de parcelamento
     installmentOptions() {
       if (!this.checkoutData) return [];
-      
       const total = this.checkoutData.finalTotal;
       const options = [];
-      const maxInstallments = 12; // Máximo de 12 parcelas
-      const interestRate = 0.015; // Exemplo: 1.5% de juros ao mês para mais de 3x
+      const maxInstallments = 12;
+      const interestRate = 0.015;
 
       for (let i = 1; i <= maxInstallments; i++) {
-        if (i <= 3) { // Até 3x sem juros
+        if (i <= 3) {
           options.push({
             installments: i,
             label: `${i}x de R$ ${(total / i).toFixed(2)} (sem juros)`
           });
-        } else { // Acima de 3x com juros
+        } else {
           const totalWithInterest = total * (1 + interestRate * (i - 3));
           options.push({
             installments: i,
@@ -114,9 +113,7 @@ export default {
   },
   methods: {
     async finalizePurchase() {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
+      // Não precisa pegar o token aqui, o interceptor já faz isso.
       const payload = {
         cartItems: this.checkoutData.cartItems,
         couponCode: this.checkoutData.appliedCoupon ? this.checkoutData.appliedCoupon.code : null,
@@ -133,19 +130,23 @@ export default {
           background: "#1F2937", color: "#E5E7EB", allowOutsideClick: false,
         });
 
-        await axios.post('/api/orders/checkout', payload, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        // --- CORREÇÃO 2: Use 'api.post' ---
+        // A URL agora é relativa, pois a base já está no 'main.js'
+        await api.post('/api/orders/checkout', payload);
+        // Não é mais necessário enviar os headers, o interceptor faz isso.
 
         localStorage.removeItem('checkoutData');
-        window.dispatchEvent(new Event('storage'));
+        
+        // Dispara um evento para o Header atualizar o contador do carrinho
+        window.dispatchEvent(new Event('cart-updated')); 
 
         await Swal.fire({
           icon: 'success', title: 'Compra Realizada!', text: 'Seu pedido foi processado com sucesso!',
           background: "#1F2937", color: "#E5E7EB",
         });
         
-        this.$router.push('/order-history');
+        // Redireciona para o histórico de compras
+        this.$router.push('/my-orders');
 
       } catch (error) {
         Swal.fire({

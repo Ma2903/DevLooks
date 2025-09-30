@@ -1,10 +1,11 @@
 // server/models/UserModel.ts
 
 import { Schema, model, Document } from "mongoose";
-import bcrypt from "bcrypt"; // Corrigido de bcryptjs para bcrypt
+import bcrypt from "bcrypt";
 
-// Interface para um item no carrinho
-interface ICartItem extends Document {
+// --- CORREÇÃO AQUI ---
+// A interface para um subdocumento não precisa estender 'Document'
+interface ICartItem {
     productId: Schema.Types.ObjectId;
     quantity: number;
     selectedSize?: string;
@@ -13,20 +14,24 @@ interface ICartItem extends Document {
     image: string;
 }
 
-// Interface para o documento do usuário (Mantendo sua estrutura original)
+// O restante do arquivo continua igual...
+interface IAddress {
+    street?: string;
+    number?: string;
+    complement?: string;
+    neighborhood?: string;
+    cep?: string;
+    city?: string;
+    state?: string;
+}
+
 export interface IUser extends Document {
     name: string;
     email: string;
     cpf: string;
     password: string;
     telephone: string;
-    address: string;
-    number?: string;
-    complement?: string;
-    bairro?: string;
-    cep: string;
-    city: string;
-    state: string;
+    address: IAddress;
     country: string;
     role: 'user' | 'admin' | 'owner';
     status: string;
@@ -35,14 +40,15 @@ export interface IUser extends Document {
     avatarPasses?: number;
     savedAvatars?: string[];
     hasMadePurchase?: boolean;
-    usedCoupons?: string[]; // << Campo adicionado para a lógica de cupons
-    cart: ICartItem[];
+    usedCoupons?: string[];
+    cart: ICartItem[]; // Agora usa a interface correta
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
 
+// Nenhuma alteração necessária nos schemas
 const cartItemSchema = new Schema<ICartItem>({
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, min: 1 },
@@ -52,19 +58,24 @@ const cartItemSchema = new Schema<ICartItem>({
     image: { type: String, required: true },
 }, { _id: false });
 
+const AddressSchema = new Schema<IAddress>({
+    street: { type: String },
+    number: { type: String },
+    complement: { type: String },
+    neighborhood: { type: String },
+    cep: { type: String },
+    city: { type: String },
+    state: { type: String },
+}, { _id: false });
+
+
 const UserSchema = new Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     cpf: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     telephone: { type: String, required: true },
-    address: { type: String },
-    number: { type: String },
-    complement: { type: String },
-    bairro: { type: String },
-    cep: { type: String },
-    city: { type: String },
-    state: { type: String },
+    address: { type: AddressSchema },
     country: { type: String },
     role: { type: String, default: "user", enum: ['user', 'admin', 'owner'] },
     status: { type: String, default: "active" },
@@ -73,13 +84,12 @@ const UserSchema = new Schema<IUser>({
     avatarPasses: { type: Number, default: 0 },
     savedAvatars: { type: [String], default: [] },
     hasMadePurchase: { type: Boolean, default: false },
-    usedCoupons: { type: [String], default: [] }, // << Campo adicionado
+    usedCoupons: { type: [String], default: [] },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     cart: { type: [cartItemSchema], default: [] },
 }, { timestamps: true });
 
-// Middleware para criptografar a senha antes de salvar
 UserSchema.pre<IUser>('save', async function(next) {
     if (!this.isModified('password')) {
         return next();

@@ -9,7 +9,6 @@ import SingleProduct from './pages/singleProduto.vue';
 import CreateAvatar from './components/CreateAvatar.vue';
 import Profile from './components/Profile.vue';
 import Cart from './components/Cart.vue';
-import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
 import OrderHistory from './pages/OrderHistory.vue';
 import ResetPassword from './components/ResetPassword.vue';
 import ConfirmReset from './components/ConfirmReset.vue';
@@ -25,9 +24,16 @@ import CouponForm from './pages/CouponForm.vue';
 import AboutUs from './pages/AboutUs.vue';
 import FAQ from './pages/FAQ.vue';
 
+// --- ROTAS DO CHECKOUT (Importe os componentes de cada etapa) ---
+import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
+import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
+import CheckoutReview from './pages/checkout/CheckoutReview.vue';
+import CheckoutPayment from './pages/checkout/CheckoutPayment.vue';
+
+
 const routes = [
-  // <<-- ROTAS PÚBLICAS (Acessíveis para todos) -->>
-  { path: '/', name: 'Home', component: Home }, // A Home agora é pública
+  // Rotas Públicas
+  { path: '/', name: 'Home', component: Home },
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
   { path: '/products', name: 'ProductList', component: ProductList },
@@ -37,15 +43,27 @@ const routes = [
   { path: '/about', name: 'AboutUs', component: AboutUs },
   { path: '/faq', name: 'FAQ', component: FAQ },
   
-  // <<-- ROTAS PROTEGIDAS (Exigem login) -->>
+  // Rotas Protegidas
   { path: '/create-avatar', component: CreateAvatar, meta: { requiresAuth: true } },
   { path: '/profile', component: Profile, meta: { requiresAuth: true } },
   { path: '/cart', component: Cart, meta: { requiresAuth: true } },
-  { path: '/checkout', component: CheckoutWrapper, meta: { requiresAuth: true } },
   { path: '/my-orders', component: OrderHistory, meta: { requiresAuth: true } },
   { path: '/edit-user/:id', component: EditUser, meta: { requiresAuth: true } },
+
+  // --- CORREÇÃO PRINCIPAL AQUI: ROTA DE CHECKOUT COM FILHAS ---
+  { 
+    path: '/checkout', 
+    component: CheckoutWrapper, 
+    meta: { requiresAuth: true },
+    children: [
+      { path: '', redirect: '/checkout/address' }, // Redireciona /checkout para a primeira etapa
+      { path: 'address', name: 'CheckoutAddress', component: CheckoutAddress },
+      { path: 'review', name: 'CheckoutReview', component: CheckoutReview },
+      { path: 'payment', name: 'CheckoutPayment', component: CheckoutPayment },
+    ]
+  },
   
-  // <<-- ROTAS DE ADMIN (Exigem login e permissão de admin/owner) -->>
+  // Rotas de Admin
   { path: '/admin/products', component: AdminProducts, meta: { requiresAdmin: true } },
   { path: '/admin/products/add', component: AddProduct, meta: { requiresAdmin: true } },
   { path: '/admin/products/edit/:id', component: EditProduct, meta: { requiresAdmin: true } },
@@ -71,26 +89,22 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-  const userStr = localStorage.getItem('user');
+  const userStr = localStorage.getItem('userData'); // Corrigido para pegar 'userData'
   let user = null;
   if(userStr) user = JSON.parse(userStr);
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
 
-  // 1. Se a rota precisa de login E o usuário não tem token, redireciona para a página de login.
   if (requiresAuth && !token) {
     next('/login');
   } 
-  // 2. Se a rota precisa de permissão de admin E o usuário não é admin/owner, redireciona para a home.
   else if (requiresAdmin && (!user || (user.role !== 'admin' && user.role !== 'owner'))) {
     next('/');
   }
-  // 3. Se o usuário já está logado e tenta acessar as páginas de Login ou Registro, redireciona para o perfil.
   else if ((to.name === 'Login' || to.name === 'Register') && token) {
     next('/profile');
   }
-  // 4. Em todos os outros casos, permite a navegação.
   else {
     next();
   }

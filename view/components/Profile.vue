@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center p-4">
+  <div class="min-h-screen bg-gray-900 text-gray-200 p-4 flex items-center justify-center">
+
     <div v-if="loading" class="text-center">
       <i class="fas fa-spinner fa-spin text-4xl text-emerald-400"></i>
       <p class="text-xl mt-4">Carregando dados do perfil...</p>
@@ -32,6 +33,9 @@
             <router-link to="/my-orders" class="w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
               <i class="fas fa-receipt"></i>Meus Pedidos
             </router-link>
+            <button @click="confirmAccountDeletion" class="w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-trash-alt"></i>Deletar Conta
+            </button>
         </div>
       </div>
 
@@ -113,16 +117,10 @@ function logout(force = false) {
     return;
   }
   Swal.fire({
-    title: 'Você tem certeza?',
-    text: "Você será desconectado.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#10B981',
-    cancelButtonColor: '#EF4444',
-    confirmButtonText: 'Sim, quero sair!',
-    cancelButtonText: 'Cancelar',
-    background: "#1F2937",
-    color: "#E5E7EB"
+    title: 'Você tem certeza?', text: "Você será desconectado.", icon: 'warning',
+    showCancelButton: true, confirmButtonColor: '#10B981', cancelButtonColor: '#EF4444',
+    confirmButtonText: 'Sim, quero sair!', cancelButtonText: 'Cancelar',
+    background: "#1F2937", color: "#E5E7EB"
   }).then((result) => {
     if (result.isConfirmed) {
       performLogout();
@@ -132,7 +130,7 @@ function logout(force = false) {
 
 async function changeProfilePicture(avatarUrl) {
   try {
-    const response = await api.post('/api/avatar', { avatarUrl });
+    const response = await api.put('/api/users/avatar', { avatarUrl });
     user.value = response.data.user;
     localStorage.setItem('userData', JSON.stringify(user.value));
     window.dispatchEvent(new Event('auth-change'));
@@ -141,7 +139,8 @@ async function changeProfilePicture(avatarUrl) {
       background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false
     });
   } catch (error) {
-    Swal.fire({ icon: 'error', title: 'Erro', text: 'Não foi possível alterar a foto de perfil.', background: "#1F2937", color: "#E5E7EB" });
+    const errorMessage = error.response?.data?.message || 'Não foi possível alterar a foto de perfil.';
+    Swal.fire({ icon: 'error', title: 'Erro', text: errorMessage, background: "#1F2937", color: "#E5E7EB" });
   }
 }
 
@@ -154,9 +153,9 @@ function confirmAvatarDelete(avatarUrl) {
     return;
   }
   Swal.fire({
-    title: 'Excluir Avatar?', text: "Esta ação é irreversível.", icon: 'warning', showCancelButton: true,
-    confirmButtonColor: '#d33', cancelButtonText: 'Cancelar', confirmButtonText: 'Sim, excluir!',
-    background: "#1F2937", color: "#E5E7EB"
+    title: 'Excluir Avatar?', text: "Esta ação é irreversível.", icon: 'warning',
+    showCancelButton: true, confirmButtonColor: '#d33', cancelButtonText: 'Cancelar',
+    confirmButtonText: 'Sim, excluir!', background: "#1F2937", color: "#E5E7EB"
   }).then((result) => {
     if (result.isConfirmed) {
       deleteAvatar(avatarUrl);
@@ -166,11 +165,20 @@ function confirmAvatarDelete(avatarUrl) {
 
 async function deleteAvatar(avatarUrl) {
   try {
-    const response = await api.delete('/api/avatar', { data: { avatarUrl } });
+    // Chama a nova rota DELETE com a URL no corpo da requisição
+    const response = await api.delete('/api/users/avatar', { data: { avatarUrl } });
     user.value = response.data.user;
     localStorage.setItem('userData', JSON.stringify(user.value));
     window.dispatchEvent(new Event('auth-change'));
-    Swal.fire({ icon: 'success', title: 'Excluído!', text: 'O avatar foi removido.', background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false });
+    Swal.fire({ 
+      icon: 'success', 
+      title: 'Excluído!', 
+      text: 'O avatar foi removido da sua galeria.', 
+      background: "#1F2937", 
+      color: "#E5E7EB", 
+      timer: 2000, 
+      showConfirmButton: false 
+    });
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Não foi possível excluir o avatar.';
     Swal.fire({ icon: 'error', title: 'Erro', text: errorMessage, background: "#1F2937", color: "#E5E7EB" });
@@ -178,13 +186,9 @@ async function deleteAvatar(avatarUrl) {
 }
 
 async function exportAvatar(avatarUrl, format) {
-  const isSvg = avatarUrl.includes('avataaars.io');
-  if (format === 'svg' && !isSvg) {
-    Swal.fire({ icon: 'info', title: 'Ops!', text: 'A exportação para SVG só está disponível para avatares vetoriais.', background: "#1F2937", color: "#E5E7EB" });
-    return;
-  }
   try {
-    const response = await axios.get(avatarUrl, { responseType: 'blob' });
+    const proxyUrl = `http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(avatarUrl)}`;
+    const response = await axios.get(proxyUrl, { responseType: 'blob' });
     const blob = new Blob([response.data]);
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -195,11 +199,48 @@ async function exportAvatar(avatarUrl, format) {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error(`Erro ao exportar ${format.toUpperCase()}:`, error);
     Swal.fire({
-      title: 'Erro de Download', text: `Não foi possível baixar o avatar.`, icon: 'error',
+      title: 'Erro de Download', text: 'Não foi possível baixar o avatar.', icon: 'error',
       background: "#1F2937", color: "#E5E7EB",
     });
+  }
+}
+
+// --- FUNÇÕES PARA DELETAR A CONTA ADICIONADAS AQUI ---
+function confirmAccountDeletion() {
+  Swal.fire({
+    title: 'Deletar sua conta?',
+    text: "Esta ação é permanente e não pode ser desfeita. Todos os seus dados, incluindo perfil, avatares e histórico de compras, serão apagados.",
+    icon: 'error',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonText: 'Cancelar',
+    confirmButtonText: 'Sim, deletar minha conta!',
+    background: "#1F2937",
+    color: "#E5E7EB"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteAccount();
+    }
+  });
+}
+
+async function deleteAccount() {
+  try {
+    await api.delete('/api/users/me'); // Chama a nova rota no backend
+    await Swal.fire({
+      title: 'Conta Deletada!',
+      text: 'Sua conta foi removida com sucesso.',
+      icon: 'success',
+      background: "#1F2937",
+      color: "#E5E7EB",
+      timer: 3000,
+      showConfirmButton: false,
+    });
+    logout(true); // Força o logout e redireciona
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao deletar sua conta.';
+    Swal.fire({ icon: 'error', title: 'Erro', text: errorMessage, background: "#1F2937", color: "#E5E7EB" });
   }
 }
 </script>

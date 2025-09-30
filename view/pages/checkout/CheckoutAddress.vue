@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import axios from "@/services/main";
+import api from "@/services/main.js"; // Use a instância configurada do Axios
 import Swal from 'sweetalert2';
 
 export default {
@@ -96,13 +96,8 @@ export default {
       addressChoice: 'profile',
       profileAddress: {},
       newAddress: {
-        street: "",
-        number: "",
-        complement: "",
-        neighborhood: "",
-        city: "",
-        state: "",
-        cep: ""
+        street: "", number: "", complement: "", neighborhood: "",
+        city: "", state: "", cep: ""
       },
     };
   },
@@ -122,23 +117,32 @@ export default {
     async fetchUserData() {
       this.loading = true;
       try {
-        const token = localStorage.getItem('token');
-        // --- CORREÇÃO AQUI: MUDADO DE .post PARA .get ---
-        const response = await axios.get('/api/users/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await api.get('/api/users/me');
         const userData = response.data;
-        this.profileAddress = {
-          street: userData.address,
-          number: userData.number,
-          complement: userData.complement,
-          neighborhood: userData.bairro,
-          city: userData.city,
-          state: userData.state,
-          cep: userData.cep
-        };
+        
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Agora mapeamos os campos do objeto 'address' corretamente.
+        if (userData.address && typeof userData.address === 'object') {
+          this.profileAddress = {
+            street: userData.address.street || '',
+            number: userData.address.number || '',
+            complement: userData.address.complement || '',
+            neighborhood: userData.address.neighborhood || '',
+            city: userData.address.city || '',
+            state: userData.address.state || '',
+            cep: userData.address.cep || ''
+          };
+        } else {
+          // Fallback para o caso de o endereço ainda estar no formato antigo (improvável, mas seguro)
+          this.profileAddress = { street: userData.address || '', /* ... */ };
+        }
+        
       } catch (error) {
         console.error("Erro ao buscar dados do utilizador:", error);
+         Swal.fire({
+            icon: 'error', title: 'Erro', text: 'Não foi possível carregar os dados do seu perfil.',
+            background: '#1F2937', color: '#E5E7EB'
+        });
       } finally {
         this.loading = false;
       }
@@ -146,14 +150,12 @@ export default {
     
     async fetchAddressFromCep(cep) {
       try {
-        const response = await axios.get(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
+        // Usando a instância 'api' para buscar o CEP para manter o padrão
+        const response = await api.get(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
         if (response.data.erro) {
           Swal.fire({
-            icon: 'error',
-            title: 'CEP não encontrado',
-            text: 'Por favor, verifique o CEP digitado.',
-            background: '#1F2937',
-            color: '#E5E7EB'
+            icon: 'error', title: 'CEP não encontrado', text: 'Por favor, verifique o CEP digitado.',
+            background: '#1F2937', color: '#E5E7EB'
           });
           return;
         }
@@ -163,19 +165,11 @@ export default {
         this.newAddress.state = response.data.uf;
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro de Rede',
-          text: 'Não foi possível buscar o CEP. Verifique sua conexão.',
-          background: '#1F2937',
-          color: '#E5E7EB'
-        });
       }
     },
     
     goToReview() {
       let shippingAddress = null;
-      
       if (this.addressChoice === 'profile') {
         shippingAddress = this.profileAddress;
       } else {
@@ -183,11 +177,8 @@ export default {
         for (const field of requiredFields) {
           if (!this.newAddress[field]) {
             Swal.fire({
-              icon: 'warning',
-              title: 'Campos Obrigatórios',
-              text: `Por favor, preencha o campo '${field}' do novo endereço.`,
-              background: '#1F2937',
-              color: '#E5E7EB'
+              icon: 'warning', title: 'Campos Obrigatórios', text: `Por favor, preencha o campo '${field}' do novo endereço.`,
+              background: '#1F2937', color: '#E5E7EB'
             });
             return;
           }
@@ -197,13 +188,6 @@ export default {
       
       const checkoutDataString = localStorage.getItem('checkoutData');
       if (!checkoutDataString) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro',
-          text: 'Não foi possível encontrar os dados do carrinho. Por favor, tente novamente a partir do carrinho.',
-          background: '#1F2937',
-          color: '#E5E7EB'
-        });
         this.$router.push('/cart');
         return;
       }

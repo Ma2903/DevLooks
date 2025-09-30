@@ -125,16 +125,23 @@ export default {
       this.selectedSize = size;
     },
     async addToCart() {
+      // --- DEBUG 1: Início da Função ---
+      console.log('--- Iniciando addToCart ---');
+
       const token = localStorage.getItem('token');
       if (!token) {
+          // --- DEBUG 2: Verificação de Token ---
+          console.log('DEBUG: Usuário não logado. Redirecionando para /login.');
           Swal.fire({ title: 'Login Necessário', text: 'Você precisa fazer login para adicionar itens ao carrinho.', icon: 'info', background: "#1F2937", color: "#E5E7EB" })
               .then(() => this.$router.push('/login'));
           return;
       }
 
       if (this.product.category === 'camisetas' && !this.selectedSize) {
-        Swal.fire({ icon: 'warning', title: 'Tamanho não selecionado', text: 'Por favor, selecione um tamanho.', background: "#1F2937", color: "#E5E7EB" });
-        return;
+          // --- DEBUG 3: Verificação de Tamanho ---
+          console.log('DEBUG: Categoria é camiseta, mas nenhum tamanho foi selecionado.');
+          Swal.fire({ icon: 'warning', title: 'Tamanho não selecionado', text: 'Por favor, selecione um tamanho.', background: "#1F2937", color: "#E5E7EB" });
+          return;
       }
 
       try {
@@ -147,13 +154,18 @@ export default {
               image: this.product.image
           };
 
-          await axios.post('/api/cart/add', cartItem, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
+          // --- DEBUG 4: Dados que serão enviados ---
+          console.log('DEBUG: Preparando para enviar o seguinte item para a API:', cartItem);
+
+          // Use a instância 'axios' que já tem o interceptor de token
+          await axios.post('/api/cart/add', cartItem);
+
+          // --- DEBUG 5: Sucesso na API ---
+          console.log('DEBUG: API retornou sucesso. Exibindo SweetAlert.');
 
           Swal.fire({
               title: "Produto Adicionado!",
-              text: `${this.quantity}x "${this.product.name}" (Tamanho: ${this.selectedSize || 'Único'}) adicionado.`,
+              text: `${this.quantity}x "${this.product.name}" foi adicionado.`,
               icon: "success",
               background: "#1F2937",
               color: "#E5E7EB",
@@ -166,6 +178,8 @@ export default {
               }
           });
       } catch (error) {
+          // --- DEBUG 6: Erro na API ---
+          console.error('DEBUG: Erro ao chamar a API /api/cart/add.', error.response || error);
           Swal.fire({ title: 'Erro', text: 'Não foi possível adicionar o item ao carrinho.', icon: 'error', background: "#1F2937", color: "#E5E7EB" });
       }
     },
