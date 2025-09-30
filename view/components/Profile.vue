@@ -36,9 +36,6 @@
             <button @click="confirmAccountDeletion" class="w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
                 <i class="fas fa-trash-alt"></i>Deletar Conta
             </button>
-            <button @click="confirmAccountDeletion" class="w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
-                <i class="fas fa-trash-alt"></i>Deletar Conta
-            </button>
         </div>
       </div>
 
@@ -124,10 +121,6 @@ function logout(force = false) {
     showCancelButton: true, confirmButtonColor: '#10B981', cancelButtonColor: '#EF4444',
     confirmButtonText: 'Sim, quero sair!', cancelButtonText: 'Cancelar',
     background: "#1F2937", color: "#E5E7EB"
-    title: 'Você tem certeza?', text: "Você será desconectado.", icon: 'warning',
-    showCancelButton: true, confirmButtonColor: '#10B981', cancelButtonColor: '#EF4444',
-    confirmButtonText: 'Sim, quero sair!', cancelButtonText: 'Cancelar',
-    background: "#1F2937", color: "#E5E7EB"
   }).then((result) => {
     if (result.isConfirmed) {
       performLogout();
@@ -138,7 +131,6 @@ function logout(force = false) {
 async function changeProfilePicture(avatarUrl) {
   try {
     const response = await api.put('/api/users/avatar', { avatarUrl });
-    const response = await api.put('/api/users/avatar', { avatarUrl });
     user.value = response.data.user;
     localStorage.setItem('userData', JSON.stringify(user.value));
     window.dispatchEvent(new Event('auth-change'));
@@ -147,8 +139,6 @@ async function changeProfilePicture(avatarUrl) {
       background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false
     });
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Não foi possível alterar a foto de perfil.';
-    Swal.fire({ icon: 'error', title: 'Erro', text: errorMessage, background: "#1F2937", color: "#E5E7EB" });
     const errorMessage = error.response?.data?.message || 'Não foi possível alterar a foto de perfil.';
     Swal.fire({ icon: 'error', title: 'Erro', text: errorMessage, background: "#1F2937", color: "#E5E7EB" });
   }
@@ -166,9 +156,6 @@ function confirmAvatarDelete(avatarUrl) {
     title: 'Excluir Avatar?', text: "Esta ação é irreversível.", icon: 'warning',
     showCancelButton: true, confirmButtonColor: '#d33', cancelButtonText: 'Cancelar',
     confirmButtonText: 'Sim, excluir!', background: "#1F2937", color: "#E5E7EB"
-    title: 'Excluir Avatar?', text: "Esta ação é irreversível.", icon: 'warning',
-    showCancelButton: true, confirmButtonColor: '#d33', cancelButtonText: 'Cancelar',
-    confirmButtonText: 'Sim, excluir!', background: "#1F2937", color: "#E5E7EB"
   }).then((result) => {
     if (result.isConfirmed) {
       deleteAvatar(avatarUrl);
@@ -180,20 +167,9 @@ async function deleteAvatar(avatarUrl) {
   try {
     // Chama a nova rota DELETE com a URL no corpo da requisição
     const response = await api.delete('/api/users/avatar', { data: { avatarUrl } });
-    // Chama a nova rota DELETE com a URL no corpo da requisição
-    const response = await api.delete('/api/users/avatar', { data: { avatarUrl } });
     user.value = response.data.user;
     localStorage.setItem('userData', JSON.stringify(user.value));
     window.dispatchEvent(new Event('auth-change'));
-    Swal.fire({ 
-      icon: 'success', 
-      title: 'Excluído!', 
-      text: 'O avatar foi removido da sua galeria.', 
-      background: "#1F2937", 
-      color: "#E5E7EB", 
-      timer: 2000, 
-      showConfirmButton: false 
-    });
     Swal.fire({ 
       icon: 'success', 
       title: 'Excluído!', 
@@ -224,7 +200,6 @@ async function exportAvatar(avatarUrl, format) {
     window.URL.revokeObjectURL(url);
   } catch (error) {
     Swal.fire({
-      title: 'Erro de Download', text: 'Não foi possível baixar o avatar.', icon: 'error',
       title: 'Erro de Download', text: 'Não foi possível baixar o avatar.', icon: 'error',
       background: "#1F2937", color: "#E5E7EB",
     });

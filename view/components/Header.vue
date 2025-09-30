@@ -17,7 +17,7 @@
       <div class="hidden md:flex items-center space-x-6">
         <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors">
           <i class="fas fa-shopping-cart text-xl"></i>
-          <span v-if="cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+          <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
         </router-link>
         
         <div v-if="user" class="relative">
@@ -51,7 +51,7 @@
       <div class="md:hidden flex items-center">
         <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors mr-4">
           <i class="fas fa-shopping-cart text-xl"></i>
-           <span v-if="cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+           <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
         </router-link>
         <button @click="isMobileMenuOpen = !isMobileMenuOpen">
           <i class="fas fa-bars text-2xl"></i>
@@ -81,7 +81,6 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
-import SearchBar from './Search-bar.vue';
 
 const router = useRouter();
 const user = ref(null);
@@ -89,7 +88,6 @@ const cartItemCount = ref(0);
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 
-// Propriedade computada para verificar se o usuário é admin
 const isAdmin = computed(() => {
   return user.value && (user.value.role === 'admin' || user.value.role === 'owner');
 });
@@ -98,41 +96,31 @@ const updateUserState = () => {
   const storedUser = localStorage.getItem('userData');
   user.value = storedUser ? JSON.parse(storedUser) : null;
   
-  // A lógica do carrinho pode permanecer a mesma
-  const storedCart = localStorage.getItem('cart');
-  if (storedCart) {
-    const cart = JSON.parse(storedCart);
-    cartItemCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+  // Se houver um usuário, atualiza a contagem do carrinho, senão, zera.
+  if (user.value) {
+    updateCartCount();
   } else {
     cartItemCount.value = 0;
   }
 };
 
-onMounted(() => {
-  updateUserState();
-  // Escuta por um evento 'auth-change' para se atualizar
-  window.addEventListener('auth-change', updateUserState);
-  window.addEventListener('cart-updated', updateCartCount);
-});
-
-// A função updateCartCount precisa ser definida também
 const updateCartCount = () => {
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
         const cart = JSON.parse(storedCart);
-        cartItemCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+        cartItemCount.value = cart.length; 
     } else {
         cartItemCount.value = 0;
     }
 };
 
+onMounted(() => {
+  updateUserState();
+  window.addEventListener('auth-change', updateUserState);
+  window.addEventListener('cart-updated', updateCartCount);
+});
 
 const toggleDropdown = () => isDropdownOpen.value = !isDropdownOpen.value;
-
-const handleSearch = (query) => {
-  isMobileMenuOpen.value = false;
-  router.push({ path: '/products', query: { q: query } });
-};
 
 const logout = () => {
   isDropdownOpen.value = false;
@@ -147,7 +135,8 @@ const logout = () => {
     if (result.isConfirmed) {
       localStorage.removeItem('token');
       localStorage.removeItem('userData');
-      // Dispara o evento para que o header se atualize
+      localStorage.removeItem('cart'); // Limpa o carrinho ao sair
+
       window.dispatchEvent(new Event('auth-change'));
       router.push('/');
 
