@@ -1,18 +1,28 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-gray-200">
     <div class="container mx-auto py-12 px-4">
-      <div class="flex justify-between items-center mb-8">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-8">
         <h1 class="text-4xl font-bold text-[#04d1b0] flex items-center gap-3">
           <i class="fas fa-tags"></i>
           Gerenciar Cupons
         </h1>
-        <router-link
-          to="/admin/coupons/add"
-          class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 flex items-center gap-2"
-        >
-          <i class="fas fa-plus-circle"></i>
-          Novo Cupom
-        </router-link>
+        <div class="flex items-center gap-4 mt-4 md:mt-0">
+          <button @click="exportData('json')" 
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
+            <i class="fas fa-file-code"></i> Exportar JSON
+          </button>
+          <button @click="exportData('csv')" 
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
+            <i class="fas fa-file-csv"></i> Exportar CSV
+          </button>
+          <router-link
+            to="/admin/coupons/add"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:opacity-90 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-300 flex items-center gap-2"
+          >
+            <i class="fas fa-plus-circle"></i>
+            Novo Cupom
+          </router-link>
+        </div>
       </div>
 
       <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700">
@@ -75,6 +85,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import CouponService from '@/services/CouponService';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const coupons = ref([]);
@@ -128,6 +139,30 @@ async function confirmarExclusao(coupon) {
       }
     }
   });
+}
+
+// FUNÇÃO DE EXPORTAÇÃO ADICIONADA
+async function exportData(format) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:3000/api/admin/export?type=coupons&format=${format}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      responseType: 'blob',
+    });
+    
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `relatorio_cupons.${format}`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+  } catch (error) {
+    console.error(`Erro ao exportar para ${format}:`, error);
+    Swal.fire('Erro', 'Não foi possível exportar o relatório.', 'error');
+  }
 }
 
 onMounted(fetchCoupons);

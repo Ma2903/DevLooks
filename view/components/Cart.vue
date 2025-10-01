@@ -37,20 +37,89 @@
         <div class="w-full lg:w-1/3">
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-[#04d1b0] sticky top-8">
                 <h2 class="text-2xl font-bold text-white mb-6"><i class="fas fa-receipt"></i> Resumo do Pedido</h2>
+                
+                <!-- Sistema de CEP e Cálculo de Frete -->
                 <div class="mb-4">
-                    <label for="coupon" class="block text-gray-300 mb-2 font-semibold">Cupom</label>
+                    <label for="cep" class="block text-gray-300 mb-2 font-semibold">
+                        <i class="fas fa-truck mr-1"></i> Calcular Frete
+                    </label>
+                    <div class="flex">
+                        <input 
+                            type="text" 
+                            id="cep" 
+                            v-model="cep" 
+                            @input="applyCepMask"
+                            @keyup.enter="calculateShipping" 
+                            class="flex-1 px-4 py-2 rounded-l-lg bg-gray-900 border border-gray-700" 
+                            placeholder="00000-000"
+                            maxlength="9"
+                        />
+                        <button 
+                            @click="calculateShipping" 
+                            :disabled="loadingShipping"
+                            class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-5 rounded-r-lg disabled:opacity-50"
+                        >
+                            <i v-if="!loadingShipping" class="fas fa-calculator"></i>
+                            <i v-else class="fas fa-spinner fa-spin"></i>
+                        </button>
+                    </div>
+                    <div v-if="shippingError" class="text-red-400 text-sm mt-2">
+                        <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
+                    </div>
+                    <div v-if="shippingCost !== null && !shippingError" class="mt-3 p-3 bg-gray-700 rounded-lg">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-300">SEDEX</span>
+                            <span class="text-[#04d1b0] font-bold">R$ {{ shippingCost.toFixed(2) }}</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">
+                            <i class="fas fa-clock"></i> {{ shippingTime }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="coupon" class="block text-gray-300 mb-2 font-semibold">Cupom de Desconto</label>
                     <div class="flex">
                         <input type="text" id="coupon" v-model="couponCodeInput" @keyup.enter="handleApplyCoupon" class="flex-1 px-4 py-2 rounded-l-lg bg-gray-900 border border-gray-700" placeholder="Digite seu cupom"/>
                         <button @click="handleApplyCoupon" class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-5 rounded-r-lg">Aplicar</button>
                     </div>
                 </div>
+                
                 <hr class="border-gray-700 my-4" />
                 <div class="space-y-2 text-lg">
-                    <div class="flex justify-between text-gray-300"><span>Subtotal ({{ totalItems }} itens)</span><span>R$ {{ subtotal.toFixed(2) }}</span></div>
-                    <div v-if="appliedCoupon" class="flex justify-between text-[#04d1b0]"><span>Desconto ({{ appliedCoupon.code }})</span><span>- R$ {{ discountAmount.toFixed(2) }}</span></div>
-                    <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl"><span>Total</span><span class="text-[#04d1b0]">R$ {{ finalTotal.toFixed(2) }}</span></div>
+                    <div class="flex justify-between text-gray-300">
+                        <span>Subtotal ({{ totalItems }} itens)</span>
+                        <span>R$ {{ subtotal.toFixed(2) }}</span>
+                    </div>
+                    <div v-if="appliedCoupon" class="flex justify-between text-[#04d1b0]">
+                        <span>Desconto ({{ appliedCoupon.code }})</span>
+                        <span>- R$ {{ discountAmount.toFixed(2) }}</span>
+                    </div>
+                    <div v-if="shippingCost !== null" class="flex justify-between text-gray-300">
+                        <span>Frete</span>
+                        <span>R$ {{ shippingCost.toFixed(2) }}</span>
+                    </div>
+                    <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl">
+                        <span>Total</span>
+                        <span class="text-[#04d1b0]">R$ {{ finalTotalWithShipping.toFixed(2) }}</span>
+                    </div>
                 </div>
-                <button @click="goToCheckout" class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg mt-6 text-lg"><i class="fas fa-credit-card"></i> Finalizar Compra</button>
+                
+                <div v-if="subtotal >= 150" class="mt-3 p-2 bg-green-900/30 rounded-lg text-green-400 text-sm text-center">
+                    <i class="fas fa-gift"></i> Parabéns! Você ganhou frete grátis!
+                </div>
+                
+                <button 
+                    @click="goToCheckout" 
+                    :disabled="shippingCost === null && subtotal < 150"
+                    class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg mt-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <i class="fas fa-credit-card"></i> Finalizar Compra
+                </button>
+                
+                <div v-if="shippingCost === null && subtotal < 150" class="text-xs text-gray-400 text-center mt-2">
+                    Calcule o frete para continuar
+                </div>
             </div>
         </div>
       </div>
@@ -68,7 +137,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CouponService from '@/services/CouponService';
-// --- CORREÇÃO 1: Importe a instância 'api' ---
 import api from '@/services/main.js';
 import Swal from 'sweetalert2';
 
@@ -76,6 +144,11 @@ const router = useRouter();
 const cartItems = ref([]);
 const couponCodeInput = ref('');
 const appliedCoupon = ref(null);
+const cep = ref('');
+const shippingCost = ref(null);
+const shippingTime = ref('');
+const loadingShipping = ref(false);
+const shippingError = ref('');
 
 async function fetchCart() {
     const token = localStorage.getItem('token');
@@ -84,7 +157,6 @@ async function fetchCart() {
         return;
     }
     try {
-        // --- CORREÇÃO 2: Use 'api' em vez de 'axios' ---
         const response = await api.get('/api/cart');
         cartItems.value = Array.isArray(response.data) ? response.data : [];
     } catch (error) {
@@ -95,7 +167,6 @@ async function fetchCart() {
 
 async function updateCartOnServer(newCart) {
     try {
-        // --- CORREÇÃO 3: Use 'api' em vez de 'axios' ---
         const response = await api.put('/api/cart/update', { cartItems: newCart });
         cartItems.value = response.data;
     } catch (error) {
@@ -141,8 +212,51 @@ async function handleApplyCoupon(isSilent = false) {
     if (!isSilent) Swal.fire({ title: 'Sucesso!', text: `Cupom "${validCoupon.code}" aplicado!`, icon: 'success', background: '#1f2937', color: '#e5e7eb' });
   } catch (error) {
     appliedCoupon.value = null;
-    if (!isSilent) Swal.fire({ title: 'Erro!', text: error.response?.data?.error || 'Erro.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });
+    if (!isSilent) Swal.fire({ title: 'Erro!', text: error.response?.data?.message || 'Cupom inválido.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });
   }
+}
+
+function applyCepMask(event) {
+    let value = event.target.value.replace(/\D/g, '');
+    if (value.length > 5) {
+        value = value.slice(0, 5) + '-' + value.slice(5, 8);
+    }
+    cep.value = value;
+}
+
+async function calculateShipping() {
+    if (!cep.value || cep.value.length !== 9) {
+        shippingError.value = 'Por favor, digite um CEP válido';
+        return;
+    }
+    
+    // Se o subtotal for >= 150, frete grátis
+    if (subtotal.value >= 150) {
+        shippingCost.value = 0;
+        shippingTime.value = '3-5 dias úteis';
+        shippingError.value = '';
+        return;
+    }
+    
+    loadingShipping.value = true;
+    shippingError.value = '';
+    
+    try {
+        const response = await api.post('/api/shipping/calculate', { 
+            cep: cep.value 
+        });
+        
+        shippingCost.value = response.data.cost;
+        shippingTime.value = response.data.deliveryTime;
+        
+    } catch (error) {
+        console.error('Erro ao calcular frete:', error);
+        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete para este CEP';
+        shippingCost.value = null;
+        shippingTime.value = '';
+    } finally {
+        loadingShipping.value = false;
+    }
 }
 
 function getImageUrl(imagePath) {
@@ -174,12 +288,27 @@ function goToCheckout() {
         });
         return;
     }
+    
+    // Verifica se o frete foi calculado (exceto se for frete grátis)
+    if (subtotal.value < 150 && shippingCost.value === null) {
+        Swal.fire({
+            title: 'Atenção',
+            text: 'Por favor, calcule o frete antes de prosseguir.',
+            icon: 'warning',
+            background: "#1F2937",
+            color: "#E5E7EB"
+        });
+        return;
+    }
+    
     localStorage.setItem('checkoutData', JSON.stringify({
         cartItems: cartItems.value,
         appliedCoupon: appliedCoupon.value,
         subtotal: subtotal.value,
         discountAmount: discountAmount.value,
-        finalTotal: finalTotal.value
+        shippingCost: shippingCost.value || 0,
+        finalTotal: finalTotalWithShipping.value,
+        cep: cep.value
     }));
     
     router.push('/checkout/address');
@@ -194,6 +323,10 @@ const discountAmount = computed(() => {
   return 0;
 });
 const finalTotal = computed(() => Math.max(0, subtotal.value - discountAmount.value));
+const finalTotalWithShipping = computed(() => {
+    const shipping = shippingCost.value || 0;
+    return finalTotal.value + shipping;
+});
 
 onMounted(fetchCart);
 </script>

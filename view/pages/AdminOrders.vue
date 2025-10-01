@@ -5,6 +5,12 @@
         <i class="fas fa-dollar-sign"></i>
         Gerenciamento de Vendas
       </h1>
+      <button @click="exportData('json')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
+        <i class="fas fa-file-code"></i> Exportar JSON
+      </button>
+      <button @click="exportData('csv')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
+        <i class="fas fa-file-csv"></i> Exportar CSV
+      </button>
       <div v-if="loading" class="text-center p-10">
         <i class="fas fa-spinner fa-spin text-3xl text-[#04d1b0]"></i>
         <p>A carregar pedidos...</p>
@@ -149,6 +155,29 @@ export default {
           }
         }
       });
+    },
+    // --- FUNÇÃO DE EXPORTAÇÃO ADICIONADA ---
+    async exportData(format) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`/api/admin/export?type=orders&format=${format}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          responseType: 'blob',
+        });
+        
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `relatorio_vendas.${format}`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        
+      } catch (error) {
+        console.error(`Erro ao exportar para ${format}:`, error);
+        Swal.fire('Erro', 'Não foi possível exportar o relatório.', 'error');
+      }
     },
   },
 };
