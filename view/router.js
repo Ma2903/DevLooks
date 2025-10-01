@@ -1,6 +1,7 @@
 // view/router.js
 
 import { createRouter, createWebHistory } from 'vue-router';
+// Seus imports de componentes estão corretos e foram mantidos
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
 import Register from './components/Register.vue';
@@ -23,14 +24,12 @@ import AdminCoupons from './pages/AdminCoupons.vue';
 import CouponForm from './pages/CouponForm.vue';
 import AboutUs from './pages/AboutUs.vue';
 import FAQ from './pages/FAQ.vue';
-
-// --- ROTAS DO CHECKOUT (Importe os componentes de cada etapa) ---
 import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
 import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
 import CheckoutReview from './pages/checkout/CheckoutReview.vue';
 import CheckoutPayment from './pages/checkout/CheckoutPayment.vue';
 
-
+// Sua estrutura de rotas está ótima e foi mantida
 const routes = [
   // Rotas Públicas
   { path: '/', name: 'Home', component: Home },
@@ -50,13 +49,13 @@ const routes = [
   { path: '/my-orders', component: OrderHistory, meta: { requiresAuth: true } },
   { path: '/edit-user/:id', component: EditUser, meta: { requiresAuth: true } },
 
-  // --- CORREÇÃO PRINCIPAL AQUI: ROTA DE CHECKOUT COM FILHAS ---
+  // Rota de Checkout com filhas
   { 
     path: '/checkout', 
     component: CheckoutWrapper, 
     meta: { requiresAuth: true },
     children: [
-      { path: '', redirect: '/checkout/address' }, // Redireciona /checkout para a primeira etapa
+      { path: '', redirect: '/checkout/address' },
       { path: 'address', name: 'CheckoutAddress', component: CheckoutAddress },
       { path: 'review', name: 'CheckoutReview', component: CheckoutReview },
       { path: 'payment', name: 'CheckoutPayment', component: CheckoutPayment },
@@ -79,33 +78,45 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    } else {
-      return { top: 0 };
-    }
+    return savedPosition ? savedPosition : { top: 0 };
   },
 });
 
+// --- INÍCIO DA CORREÇÃO NA LÓGICA DE PROTEÇÃO DE ROTAS ---
 router.beforeEach((to, from, next) => {
+  // 1. Pega as informações do localStorage de forma segura
   const token = localStorage.getItem('token');
-  const userStr = localStorage.getItem('userData'); // Corrigido para pegar 'userData'
+  const userString = localStorage.getItem('user'); // Padronizado para 'user'
   let user = null;
-  if(userStr) user = JSON.parse(userStr);
 
+  // 2. Tenta fazer o parse do usuário APENAS se ele existir e for válido
+  if (userString && userString !== 'undefined') {
+    try {
+      user = JSON.parse(userString);
+    } catch (e) {
+      // Se o JSON no localStorage estiver corrompido, limpa tudo
+      console.error("Erro ao analisar dados do usuário, limpando sessão:", e);
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
+  }
+
+  // 3. Define as regras de acesso com base nas metas da rota
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
 
-  if (requiresAuth && !token) {
-    next('/login');
-  } 
-  else if (requiresAdmin && (!user || (user.role !== 'admin' && user.role !== 'owner'))) {
-    next('/');
-  }
-  else if ((to.name === 'Login' || to.name === 'Register') && token) {
-    next('/profile');
-  }
-  else {
+  // 4. Lógica de redirecionamento
+  if ((requiresAuth || requiresAdmin) && !user) {
+    // Se a rota é protegida (para usuário ou admin) e não há usuário logado, vai para o login
+    next({ name: 'Login' });
+  } else if (requiresAdmin && user.role !== 'admin' && user.role !== 'owner') {
+    // Se a rota é de admin, mas o usuário não tem a permissão, vai para a home
+    next({ name: 'Home' });
+  } else if ((to.name === 'Login' || to.name === 'Register') && user) {
+    // Se o usuário já está logado, não deixa ele ver as páginas de login/registro
+    next({ name: 'Profile' });
+  } else {
+    // Em todos os outros casos, permite a navegação
     next();
   }
 });

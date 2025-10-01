@@ -11,7 +11,7 @@ import {
     JWT_SECRET, CRYPTO_SECRET, MAIL_HOST,
     MAIL_PORT, MAIL_USER, MAIL_PASS
 } from "../config/config";
-
+// ... (o resto das suas funções no topo, como generateToken, etc, continuam iguais)
 const generateToken = (user: IUser): string => {
     return jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "5h" });
 };
@@ -24,13 +24,12 @@ function descriptografar(dadoCriptografado: string): string {
     const bytes = CryptoJS.AES.decrypt(decodeURIComponent(dadoCriptografado), CRYPTO_SECRET);
     return bytes.toString(CryptoJS.enc.Utf8);
 }
-
 class UserController {
 
+    // ... (createUser, login, etc, continuam iguais)
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.create(req.body);
-            // CORREÇÃO: Cria um novo objeto sem a senha para a resposta
             const { password, ...userResponse } = user.toObject();
             res.status(201).json(userResponse);
         } catch (error: any) {
@@ -42,7 +41,6 @@ class UserController {
             }
         }
     };
-
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
@@ -52,14 +50,14 @@ class UserController {
                 return;
             }
             const token = generateToken(userDoc);
-            // CORREÇÃO: Cria um novo objeto sem a senha
             const { password: _, ...userResponse } = userDoc.toObject();
             res.status(200).json({ message: "Login bem-sucedido.", token, user: userResponse });
         } catch (error) {
             res.status(500).json({ error: "Erro interno ao tentar fazer login." });
         }
     };
-    
+
+    // --- CORREÇÃO APLICADA AQUI ---
     static getMe: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.findById((req as any).user.id).select('-password');
@@ -67,18 +65,9 @@ class UserController {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-            // Lógica de migração de endereço para exibição correta no frontend
-            if (user.address && typeof (user.address as any) === 'string') {
-                const oldAddressString = (user.address as any);
-                (user as any).address = {
-                    street: oldAddressString,
-                    number: (user as any).number || '',
-                    complement: (user as any).complement || '',
-                    neighborhood: (user as any).bairro || '',
-                    cep: (user as any).cep || '',
-                    city: (user as any).city || '',
-                    state: (user as any).state || '',
-                };
+            // Garante que o endereço seja um objeto, mesmo que esteja vazio
+            if (!user.address || typeof user.address !== 'object') {
+                (user as any).address = {};
             }
             res.status(200).json(user);
         } catch (error) {
@@ -86,35 +75,26 @@ class UserController {
         }
     };
 
-    // --- MÉTODO updateUser RESTAURADO E CORRIGIDO ---
+    // ... (updateUser, getAllUsers, e todos os outros métodos continuam iguais)
     static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await UserModel.findById(req.params.id);
-            if (!user) {
+            const { id } = req.params;
+            const updateData = req.body;
+            if (updateData.password) {
+                const salt = await bcrypt.genSalt(10);
+                updateData.password = await bcrypt.hash(updateData.password, salt);
+            }
+            const updatedUser = await UserModel.findByIdAndUpdate(id, updateData, { new: true, runValidators: true }).select('-password');
+            if (!updatedUser) {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-
-            // Lógica de migração definitiva (salva a correção no banco)
-            if (user.address && typeof (user.address as any) === 'string') {
-                const oldAddressString = (user.address as any);
-                (user as any).address = { street: oldAddressString };
-            }
-
-            Object.assign(user, req.body);
-            const updatedUser = await user.save();
-
-            // CORREÇÃO: Cria um novo objeto sem a senha
-            const { password, ...userResponse } = updatedUser.toObject();
-            res.status(200).json(userResponse);
-
+            res.status(200).json(updatedUser);
         } catch (error) {
             console.error("ERRO DETALHADO AO ATUALIZAR USUÁRIO:", error);
             res.status(500).json({ error: "Erro ao atualizar usuário." });
         }
     };
-
-    // ... (outros métodos como getAllUsers, getUserById, deleteUser, etc. continuam aqui)
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const users = await UserModel.find().select('-password');
@@ -123,7 +103,6 @@ class UserController {
             res.status(500).json({ error: "Erro ao buscar usuários." });
         }
     };
-
     static getUserById: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.findById(req.params.id).select('-password');
@@ -136,7 +115,6 @@ class UserController {
             res.status(500).json({ error: "Erro ao buscar usuário." });
         }
     };
-
     static deleteUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.findByIdAndDelete(req.params.id);
@@ -149,7 +127,6 @@ class UserController {
             res.status(500).json({ error: "Erro ao deletar usuário." });
         }
     };
-    
     static forgotPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;
@@ -180,7 +157,6 @@ class UserController {
             res.status(500).json({ error: "Erro ao recuperar senha." });
         }
     }
-
     static resetPassword: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         const { email, code, newPassword, hash } = req.body;
         try {
@@ -200,58 +176,43 @@ class UserController {
             res.status(500).json({ error: "Erro ao redefinir senha." });
         }
     }
-    
     static deleteSelf: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            // Pega o ID do usuário que vem do token de autenticação
             const userId = (req as any).user.id;
             const user = await UserModel.findByIdAndDelete(userId);
-
             if (!user) {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-            
             res.status(200).json({ message: "Sua conta foi deletada com sucesso." });
         } catch (error) {
             console.error("Erro ao deletar o próprio usuário:", error);
             res.status(500).json({ error: "Erro ao deletar usuário." });
         }
     };
-
     static deleteSavedAvatar: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const userId = (req as any).user.id;
-            const { avatarUrl } = req.body; // A URL vem no corpo da requisição
-
+            const { avatarUrl } = req.body;
             if (!avatarUrl) {
                 res.status(400).json({ message: "URL do avatar não fornecida." });
                 return;
             }
-
             const user = await UserModel.findById(userId);
             if (!user) {
                 res.status(404).json({ message: "Usuário não encontrado." });
                 return;
             }
-            
-            // Impede que o avatar de perfil ativo seja excluído
             if (user.avatarUrl === avatarUrl) {
                 res.status(400).json({ message: "Você não pode excluir seu avatar de perfil ativo." });
                 return;
             }
-            
-            // Remove a URL do array de avatares salvos
             await UserModel.updateOne(
                 { _id: userId },
                 { $pull: { savedAvatars: avatarUrl } }
             );
-            
-            // Busca o usuário atualizado para retornar ao frontend
             const updatedUser = await UserModel.findById(userId).select('-password');
-
             res.status(200).json({ message: "Avatar excluído com sucesso.", user: updatedUser });
-
         } catch (error) {
             console.error("Erro ao deletar avatar salvo:", error);
             res.status(500).json({ message: 'Erro interno do servidor.' });

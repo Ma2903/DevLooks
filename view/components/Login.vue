@@ -76,8 +76,7 @@
 </template>
 
  <script>
-    // ✅ CORREÇÃO 1: Troque a importação do axios
-    import api from "@/services/main.js"; // Importe sua instância configurada
+    import api from "@/services/main.js";
     import Swal from "sweetalert2";
 
     export default {
@@ -124,9 +123,12 @@
             });
 
             localStorage.setItem("token", response.data.token);
-            localStorage.setItem("userData", JSON.stringify(response.data.user));
+
+            // --- AQUI ESTÁ A CORREÇÃO CRÍTICA ---
+            // Padronizamos a chave para 'user', que é o que o router.js espera encontrar.
+            localStorage.setItem("user", JSON.stringify(response.data.user));
             
-            // A LINHA MAIS IMPORTANTE: Avisa todo o app que o usuário mudou
+            // Avisa todo o app que o usuário mudou
             window.dispatchEvent(new Event("auth-change")); 
 
             await Swal.fire({
@@ -138,11 +140,12 @@
               color: "#E5E7EB",
             });
 
+            // Agora o redirecionamento vai funcionar!
             this.$router.push("/profile");
 
           } catch (error) {
+            console.error("Erro no login:", error);
             this.loginError = "Verifique suas credenciais.";
-            // ...
           }
           this.loading = false;
         }
@@ -162,6 +165,6 @@
   }
 
   input::placeholder {
-    color: #9CA3AF; /* Cor do placeholder */
+    color: #9CA3AF;
   }
   </style>

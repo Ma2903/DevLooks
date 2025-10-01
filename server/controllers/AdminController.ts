@@ -2,20 +2,20 @@
 
 import { Request, Response, RequestHandler } from 'express';
 import UserModel from '../models/UserModel';
+// Garantindo que os outros models que você usa continuem importados
 import ProductModel from '../models/ProductModel';
 import CouponModel from '../models/CouponModel';
 import OrderModel from '../models/OrderModel';
 
-// --- INÍCIO DA IMPLEMENTAÇÃO DO PADRÃO ADAPTER ---
 
-// 1. Interface (Alvo) que nosso sistema espera
+// 1. Interface (Alvo) que nosso sistema espera.
 interface IDataExporter {
   export(data: any[]): string;
   getContentType(): string;
   getFileExtension(): string;
 }
 
-// 2. Implementação Concreta para o formato nativo (JSON)
+// 2. Implementação Concreta para o formato nativo (JSON).
 class JsonExporter implements IDataExporter {
   export(data: any[]): string {
     return JSON.stringify(data, null, 2);
@@ -28,7 +28,7 @@ class JsonExporter implements IDataExporter {
   }
 }
 
-// 3. Classe "Externa" que queremos adaptar (simula uma biblioteca que só converte para CSV)
+// 3. Classe "Externa" que queremos adaptar (simula uma biblioteca de CSV).
 class CsvLibrary {
   convertToCsv(jsonData: any[]): string {
     if (!jsonData || jsonData.length === 0) {
@@ -57,7 +57,7 @@ class CsvLibrary {
   }
 }
 
-// 4. O Adapter que faz a ponte entre a nossa interface e a biblioteca externa
+// 4. O Adapter que faz a ponte entre a nossa interface e a biblioteca externa.
 class CsvAdapter implements IDataExporter {
   private csvLibrary: CsvLibrary;
 
@@ -78,9 +78,8 @@ class CsvAdapter implements IDataExporter {
   }
 }
 
-// --- FIM DA IMPLEMENTAÇÃO DO PADRÃO ADAPTER ---
-
 class AdminController {
+    // Seus métodos existentes (CRUD de usuário e extração de dados) permanecem intactos.
     static getAllUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const users = await UserModel.find().select('-password');
@@ -145,7 +144,7 @@ class AdminController {
         }
     };
 
-    // NOVO MÉTODO PARA EXPORTAR DADOS USANDO O ADAPTER
+    // NOVO MÉTODO PARA EXPORTAR DADOS (O seu já estava correto)
     static exportUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { format } = req.query; 

@@ -51,7 +51,7 @@
       <div class="md:hidden flex items-center">
         <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors mr-4">
           <i class="fas fa-shopping-cart text-xl"></i>
-           <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+            <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
         </router-link>
         <button @click="isMobileMenuOpen = !isMobileMenuOpen">
           <i class="fas fa-bars text-2xl"></i>
@@ -62,14 +62,23 @@
     <transition name="fade">
       <div v-if="isMobileMenuOpen" class="md:hidden mt-4 absolute top-full left-0 w-full bg-gray-800 shadow-lg">
         <nav class="flex flex-col space-y-1 px-2 py-3">
+          <router-link to="/" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-home w-6"></i> Home</router-link>
+           <router-link to="/products" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-box-open w-6"></i> Produtos</router-link>
+           <router-link to="/create-avatar" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-paint-brush w-6"></i> Criar Avatar</router-link>
+           <router-link to="/about" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-users w-6"></i> Sobre Nós</router-link>
+           <router-link to="/faq" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-question-circle w-6"></i> FAQ</router-link>
+
           <div class="border-t border-gray-700 pt-4 mt-2">
               <div v-if="isAdmin" class="border-t border-gray-700 pt-2 mt-2">
-                 <router-link to="/admin/products" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-box-open w-6"></i> Gerenciar Produtos</router-link>
-                 <router-link to="/admin/users" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-users-cog w-6"></i> Gerenciar Usuários</router-link>
-                 <router-link to="/admin/orders" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-dollar-sign w-6"></i> Gerenciar Vendas</router-link>
-                 <router-link to="/admin/coupons" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-tags w-6"></i> Gerenciar Cupons</router-link>
+                  <router-link to="/admin/products" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-box-open w-6"></i> Gerenciar Produtos</router-link>
+                  <router-link to="/admin/users" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-users-cog w-6"></i> Gerenciar Usuários</router-link>
+                  <router-link to="/admin/orders" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-dollar-sign w-6"></i> Gerenciar Vendas</router-link>
+                  <router-link to="/admin/coupons" class="mobile-link" @click="isMobileMenuOpen = false"><i class="fas fa-tags w-6"></i> Gerenciar Cupons</router-link>
               </div>
               <a v-if="user" @click="logout" href="#" class="mobile-link"><i class="fas fa-sign-out-alt w-6"></i> Sair</a>
+              <router-link v-else to="/login" class="mobile-link" @click="isMobileMenuOpen = false">
+                <i class="fas fa-sign-in-alt w-6"></i> Entrar
+              </router-link>
               </div>
         </nav>
       </div>
@@ -92,32 +101,24 @@ const isAdmin = computed(() => {
   return user.value && (user.value.role === 'admin' || user.value.role === 'owner');
 });
 
+// --- LÓGICA CORRIGIDA ---
 const updateUserState = () => {
-  const storedUser = localStorage.getItem('userData');
-  user.value = storedUser ? JSON.parse(storedUser) : null;
+  // 1. Lendo da chave correta: 'user'
+  const storedUser = localStorage.getItem('user');
+  const userObj = storedUser && storedUser !== 'undefined' ? JSON.parse(storedUser) : null;
+  user.value = userObj;
   
-  // Se houver um usuário, atualiza a contagem do carrinho, senão, zera.
-  if (user.value) {
-    updateCartCount();
+  if (userObj && Array.isArray(userObj.cart)) {
+    cartItemCount.value = userObj.cart.reduce((total, item) => total + item.quantity, 0);
   } else {
     cartItemCount.value = 0;
   }
 };
 
-const updateCartCount = () => {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-        const cart = JSON.parse(storedCart);
-        cartItemCount.value = cart.length; 
-    } else {
-        cartItemCount.value = 0;
-    }
-};
-
 onMounted(() => {
   updateUserState();
   window.addEventListener('auth-change', updateUserState);
-  window.addEventListener('cart-updated', updateCartCount);
+  window.addEventListener('cart-updated', updateUserState);
 });
 
 const toggleDropdown = () => isDropdownOpen.value = !isDropdownOpen.value;
@@ -134,8 +135,9 @@ const logout = () => {
   }).then((result) => {
     if (result.isConfirmed) {
       localStorage.removeItem('token');
-      localStorage.removeItem('userData');
-      localStorage.removeItem('cart'); // Limpa o carrinho ao sair
+      // 2. Removendo a chave correta: 'user'
+      localStorage.removeItem('user');
+      localStorage.removeItem('cart');
 
       window.dispatchEvent(new Event('auth-change'));
       router.push('/');
@@ -156,7 +158,7 @@ watch(() => router.currentRoute.value, () => {
 </script>
 
 <style scoped>
-/* SEUS ESTILOS CONTINUAM AQUI... */
+/* SEUS ESTILOS ORIGINAIS ESTÃO AQUI */
 @import '@fortawesome/fontawesome-free/css/all.css';
 
 .router-link-exact-active { color: #34d399; }
