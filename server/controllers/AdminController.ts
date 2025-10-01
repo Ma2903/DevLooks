@@ -128,45 +128,56 @@ class AdminController {
         }
     };
 
-    static extractData: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    static exportData: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const users = await UserModel.find().select('-password');
-            const products = await ProductModel.find();
-            res.status(200).json({
-                message: "Dados extraídos com sucesso!",
-                totalUsers: users.length,
-                totalProducts: products.length,
-                users,
-                products
-            });
-        } catch (error) {
-            res.status(500).json({ message: 'Erro ao extrair dados', error });
-        }
-    };
+            const { format = 'json', type } = req.query; // Recebe 'type' para decidir o que exportar
+            let data;
+            let fileName = `${type}`;
 
-    // NOVO MÉTODO PARA EXPORTAR DADOS (O seu já estava correto)
-    static exportUsers: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { format } = req.query; 
-            const users = await UserModel.find().select('-password -cart -__v -resetPasswordToken -resetPasswordExpires').lean();
+            // Um switch para buscar os dados corretos com base no tipo
+            switch (type) {
+                case 'products':
+                    data = await ProductModel.find().lean();
+                    fileName = 'relatorio_produtos';
+                    break;
+                case 'orders':
+                    data = await OrderModel.find().populate('user', 'name email').lean();
+                    fileName = 'relatorio_vendas';
+                    break;
+                case 'coupons':
+                    data = await CouponModel.find().lean();
+                    fileName = 'relatorio_cupons';
+                    break;
+                case 'users':
+                default: // 'users' é o padrão
+                    data = await UserModel.find().select('-password -cart -__v').lean();
+                    fileName = 'relatorio_usuarios';
+                    break;
+            }
+
+            if (!data) {
+                res.status(404).json({ message: "Tipo de relatório não encontrado." });
+                return;
+            }
 
             let exporter: IDataExporter;
-
+            // A lógica do Adapter decide o formato (JSON ou CSV)
             if (format === 'csv') {
                 exporter = new CsvAdapter();
             } else {
-                exporter = new JsonExporter(); // Padrão é JSON
+                exporter = new JsonExporter();
             }
 
-            const exportedData = exporter.export(users);
-            const fileName = `relatorio_usuarios.${exporter.getFileExtension()}`;
+            const exportedData = exporter.export(data);
+            const fullFileName = `${fileName}.${exporter.getFileExtension()}`;
 
             res.setHeader('Content-Type', exporter.getContentType());
-            res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-            res.send(exportedData);
+            res.setHeader('Content-Disposition', `attachment; filename=${fullFileName}`);
+            res.status(200).send(exportedData);
 
         } catch (error) {
-            res.status(500).json({ message: 'Erro ao exportar dados de usuários', error });
+            console.error("ERRO AO EXPORTAR DADOS:", error);
+            res.status(500).json({ message: 'Erro ao exportar dados', error });
         }
     };
 }

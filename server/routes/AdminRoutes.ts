@@ -10,12 +10,12 @@ router.get("/admin/users", verifyToken, verifyAdmin, AdminController.getAllUsers
 router.get("/users/:id", verifyToken, verifyAdmin, AdminController.getUserById);
 router.put("/users/:id", verifyToken, verifyAdmin, AdminController.updateUser);
 router.delete("/users/:id", verifyToken, verifyOwner, AdminController.deleteUser);
-router.get("/admin/extract", AdminController.extractData);
+router.get("/admin/extract", AdminController.exportData);
 
 
 // --- CORREÇÃO APLICADA AQUI ---
 // A rota agora é '/admin/export' e usa 'verifyAdmin'
-router.get("/admin/export", verifyToken, verifyAdmin, AdminController.exportUsers);
+router.get("/admin/export", verifyToken, verifyAdmin, AdminController.exportData);
 
 
 export default router;
