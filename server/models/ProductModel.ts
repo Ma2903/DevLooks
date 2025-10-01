@@ -2,6 +2,7 @@ import { Schema, model, Document } from "mongoose";
 
 // Interface para o documento do produto
 export interface IProduct extends Document {
+    _id: string | number;
     name: string;
     description: string;
     price: number;
