@@ -150,6 +150,8 @@
 <script>
 import ProductService from '../services/ProductService';
 import Swal from 'sweetalert2';
+// Importe o serviço de API centralizado
+import api from '@/services/main.js';
 
 export default {
   name: "Home",
@@ -173,7 +175,6 @@ export default {
       if (!imagePath) {
         return 'https://i.imgur.com/L1e3z0x.png'; // Placeholder
       }
-      // Remove o 'public\' do caminho para a URL ficar correta
       const cleanPath = imagePath.replace(/^public[\\/]/, '');
       return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
     },
@@ -182,8 +183,6 @@ export default {
       this.error = null;
       try {
         let products = await ProductService.getBestSellingProducts();
-
-        // Se não houver 'mais vendidos', busca os últimos lançamentos
         if (products.length === 0) {
           const titleElement = document.querySelector('#products-section-title');
           if (titleElement) {
@@ -199,37 +198,61 @@ export default {
         this.loading = false;
       }
     },
-    addToCart(produto) {
-      const cart = localStorage.getItem("cart");
-      const cartItems = cart ? JSON.parse(cart) : [];
-      const existingItem = cartItems.find((item) => item._id === produto._id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cartItems.push({ ...produto, quantity: 1 });
+    // --- FUNÇÃO addToCart CORRIGIDA ---
+    async addToCart(produto) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire({
+          title: 'Login Necessário',
+          text: 'Você precisa fazer login para adicionar itens ao carrinho.',
+          icon: 'info',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        }).then(() => this.$router.push('/login'));
+        return;
       }
-      localStorage.setItem("cart", JSON.stringify(cartItems));
 
-      Swal.fire({
-        title: "Produto Adicionado!",
-        text: `"${produto.name}" foi adicionado ao carrinho.`,
-        icon: "success",
-        background: "#1a202c",
-        color: "#e2e8f0",
-        showCancelButton: true,
-        confirmButtonText: "Ir para o Carrinho",
-        cancelButtonText: "Continuar Comprando",
-        customClass: {
-          popup: "rounded-lg shadow-lg",
-          confirmButton: "bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-4 rounded-lg mx-2",
-          cancelButton: "bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg mx-2",
-        },
-        buttonsStyling: false,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.$router.push("/cart");
-        }
-      });
+      // Se o produto for uma camiseta com tamanhos, redireciona para a página do produto
+      if (produto.category === 'camisetas' && produto.sizes && produto.sizes.length > 0) {
+        this.$router.push(`/products/${produto._id}`);
+        return;
+      }
+
+      try {
+        const cartItem = {
+          productId: produto._id,
+          quantity: 1,
+          name: produto.name,
+          price: produto.price,
+          image: produto.image
+        };
+
+        // Usa a instância 'api' para enviar o item para o backend
+        await api.post('/api/cart/add', cartItem);
+        
+        // Dispara um evento para o Header atualizar o contador do carrinho
+        window.dispatchEvent(new Event('cart-updated'));
+
+        Swal.fire({
+          title: "Produto Adicionado!",
+          icon: "success",
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+
+      } catch (error) {
+        Swal.fire({
+          title: 'Erro',
+          text: 'Não foi possível adicionar o item ao carrinho.',
+          icon: 'error',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        });
+      }
     },
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
