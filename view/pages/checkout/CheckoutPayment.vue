@@ -5,155 +5,89 @@
       Pagamento
     </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="space-y-4">
-        <h3 class="text-xl font-semibold text-white">Escolha como pagar:</h3>
-        
-        <div @click="paymentMethod = 'credit_card'" :class="paymentMethod === 'credit_card' ? 'payment-option-selected' : 'payment-option'">
-          <i class="fas fa-credit-card"></i><span>Cartão de Crédito</span>
-        </div>
-        <div @click="paymentMethod = 'pix'" :class="paymentMethod === 'pix' ? 'payment-option-selected' : 'payment-option'">
-          <i class="fab fa-pix"></i><span>PIX</span>
-        </div>
-        <div @click="paymentMethod = 'boleto'" :class="paymentMethod === 'boleto' ? 'payment-option-selected' : 'payment-option'">
-          <i class="fas fa-barcode"></i><span>Boleto Bancário</span>
-        </div>
-
-        <div v-if="paymentMethod === 'credit_card'" class="mt-6 space-y-4 animate-fade-in-fast bg-gray-800 p-4 rounded-lg border border-gray-700">
-          <input type="text" placeholder="Número do Cartão (xxxx xxxx xxxx xxxx)" class="input-style">
-          <input type="text" placeholder="Nome no Cartão" class="input-style">
-          <div class="flex gap-4">
-            <input type="text" placeholder="Validade (MM/AA)" class="input-style">
-            <input type="text" placeholder="CVV" class="input-style">
-          </div>
-          <div>
-            <label for="installments" class="block text-sm font-medium text-gray-300 mb-2">Parcelas</label>
-            <select id="installments" v-model="selectedInstallment" class="input-style">
-              <option v-for="option in installmentOptions" :key="option.installments" :value="option.installments">
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-gray-800 p-6 rounded-lg border-t-4 border-[#04d1b0]">
-        <h3 class="text-xl font-semibold mb-4 text-white">Resumo do Pedido</h3>
-        <div v-if="checkoutData" class="space-y-3 text-lg">
-          <div class="flex justify-between text-gray-300">
-            <span>Subtotal</span>
-            <span>R$ {{ checkoutData.subtotal.toFixed(2) }}</span>
-          </div>
-          <div v-if="checkoutData.appliedCoupon" class="flex justify-between text-[#04d1b0]">
-            <span>Desconto ({{ checkoutData.appliedCoupon.code }})</span>
-            <span>- R$ {{ checkoutData.discountAmount.toFixed(2) }}</span>
-          </div>
-          <div class="border-t border-gray-700 pt-3 mt-3 flex justify-between font-bold text-2xl text-white">
-            <span>Total a Pagar</span>
-            <span class="text-[#04d1b0]">R$ {{ checkoutData.finalTotal.toFixed(2) }}</span>
-          </div>
-        </div>
-      </div>
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
+      <p class="text-gray-300 text-lg">
+        Você será redirecionado para o ambiente seguro do Mercado Pago para finalizar a sua compra.
+      </p>
+      <img src="https://logopng.com.br/logos/mercado-pago-106.svg" alt="Mercado Pago Logo" class="h-12 mx-auto mt-4"/>
     </div>
 
     <div class="mt-8 flex justify-between items-center">
-      <router-link to="/checkout/review" class="text-gray-400 hover:text-white transition font-semibold">
+      <button @click="goBack" class="text-gray-400 hover:text-white transition font-semibold">
         <i class="fas fa-arrow-left mr-2"></i> Voltar para Revisão
-      </router-link>
-      <button @click="finalizePurchase" :disabled="!paymentMethod" class="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-        <i class="fas fa-lock mr-2"></i> Finalizar Compra
+      </button>
+      <button @click="initiatePayment" :disabled="isLoading" class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-8 rounded-lg text-lg transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span v-if="isLoading">
+          <i class="fas fa-spinner fa-spin mr-2"></i>Aguarde...
+        </span>
+        <span v-else>
+          Ir para Pagamento <i class="fas fa-arrow-right ml-2"></i>
+        </span>
       </button>
     </div>
   </div>
 </template>
 
 <script>
-// --- CORREÇÃO 1: Importe a instância 'api' ---
-import api from '@/services/main.js';
+import api from '@/services/main';
 import Swal from 'sweetalert2';
 
 export default {
   name: "CheckoutPayment",
   data() {
     return {
-      checkoutData: null,
-      paymentMethod: null,
-      selectedInstallment: 1,
+      checkoutData: {},
+      isLoading: false,
     };
   },
-  computed: {
-    installmentOptions() {
-      if (!this.checkoutData) return [];
-      const total = this.checkoutData.finalTotal;
-      const options = [];
-      const maxInstallments = 12;
-      const interestRate = 0.015;
-
-      for (let i = 1; i <= maxInstallments; i++) {
-        if (i <= 3) {
-          options.push({
-            installments: i,
-            label: `${i}x de R$ ${(total / i).toFixed(2)} (sem juros)`
-          });
-        } else {
-          const totalWithInterest = total * (1 + interestRate * (i - 3));
-          options.push({
-            installments: i,
-            label: `${i}x de R$ ${(totalWithInterest / i).toFixed(2)} (com juros)`
-          });
-        }
-      }
-      return options;
+  created() {
+    const data = localStorage.getItem('checkoutData');
+    if (data) {
+      this.checkoutData = JSON.parse(data);
+    } else {
+      // Se não houver dados, volta para o carrinho para segurança
+      this.$router.push('/cart');
     }
   },
-  created() {
-    const data = localStorage.getItem("checkoutData");
-    if (data) { this.checkoutData = JSON.parse(data); } 
-    else { this.$router.push('/cart'); }
-  },
   methods: {
-    async finalizePurchase() {
-      // Não precisa pegar o token aqui, o interceptor já faz isso.
-      const payload = {
-        cartItems: this.checkoutData.cartItems,
-        couponCode: this.checkoutData.appliedCoupon ? this.checkoutData.appliedCoupon.code : null,
-        shippingCost: 0,
-        shippingAddress: this.checkoutData.shippingAddress,
-        paymentMethod: this.paymentMethod,
-        installments: this.paymentMethod === 'credit_card' ? this.selectedInstallment : 1,
-      };
-
+    goBack() {
+      this.$router.push('/checkout/review');
+    },
+    async initiatePayment() {
+      this.isLoading = true;
       try {
-        Swal.fire({
-          title: 'Processando pagamento...', text: 'Por favor, aguarde.',
-          didOpen: () => { Swal.showLoading() },
-          background: "#1F2937", color: "#E5E7EB", allowOutsideClick: false,
-        });
+        // 1. Monta o payload com os dados do localStorage
+        const payload = {
+          items: this.checkoutData.cartItems.map(item => ({
+            product: item.product._id || item.product, // Garante que apenas o ID seja enviado
+            quantity: item.quantity,
+          })),
+          shippingAddress: this.checkoutData.shippingAddress,
+          shippingCost: this.checkoutData.shippingCost,
+          couponCode: this.checkoutData.appliedCoupon ? this.checkoutData.appliedCoupon.code : null,
+        };
 
-        // --- CORREÇÃO 2: Use 'api.post' ---
-        // A URL agora é relativa, pois a base já está no 'main.js'
-        await api.post('/api/orders/checkout', payload);
-        // Não é mais necessário enviar os headers, o interceptor faz isso.
+        // 2. Chama a API de checkout do nosso back-end
+        const response = await api.post('/api/orders/checkout', payload);
 
-        localStorage.removeItem('checkoutData');
-        
-        // Dispara um evento para o Header atualizar o contador do carrinho
-        window.dispatchEvent(new Event('cart-updated')); 
-
-        await Swal.fire({
-          icon: 'success', title: 'Compra Realizada!', text: 'Seu pedido foi processado com sucesso!',
-          background: "#1F2937", color: "#E5E7EB",
-        });
-        
-        // Redireciona para o histórico de compras
-        this.$router.push('/my-orders');
+        // 3. Pega o link de pagamento retornado pelo back-end e redireciona o utilizador
+        if (response.data && response.data.payment_url) {
+          window.location.href = response.data.payment_url;
+        } else {
+          throw new Error('URL de pagamento não recebida do servidor.');
+        }
 
       } catch (error) {
+        console.error('Erro ao iniciar pagamento:', error);
         Swal.fire({
-          icon: 'error', title: 'Erro na Compra',
-          text: error.response?.data?.error || 'Não foi possível finalizar a sua compra.',
-          background: "#1F2937", color: "#E5E7EB"
+          icon: 'error',
+          title: 'Erro ao Iniciar Pagamento',
+          text: error.response?.data?.message || 'Não foi possível comunicar com o servidor de pagamentos. Por favor, tente novamente.',
+          background: "#1F2937",
+          color: "#E5E7EB",
         });
+      } finally {
+        this.isLoading = false;
       }
     }
   }
@@ -161,50 +95,5 @@ export default {
 </script>
 
 <style scoped>
-.payment-option {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  background-color: #1f2937;
-  border: 2px solid transparent;
-  font-weight: 600;
-}
-.payment-option:hover {
-  border-color: #4b5563;
-}
-.payment-option-selected {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  background-color: #374151;
-  border: 2px solid #04d1b0;
-  font-weight: 600;
-}
-.input-style {
-  width: 100%;
-  background-color: #1f2937;
-  border: 2px solid #4b5563;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  color: #fff;
-  transition: all 0.2s;
-}
-.input-style:focus {
-  outline: none;
-  border-color: #04d1b0;
-}
-.animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
-.animate-fade-in-fast { animation: fadeIn 0.3s ease-in-out; }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* Estilos mantidos para consistência visual se necessário */
 </style>
