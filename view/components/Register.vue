@@ -152,7 +152,7 @@ export default {
   data() {
     return {
       form: {
-        name: "", email: "", cpf: "", telephone: "",
+        name: "", email: "", cpf: "", telephone: "", // CORRIGIDO AQUI
         address: "", number: "", complement: "", bairro: "", cep: "", city: "", state: "",
         country: "Brasil", password: "", confirmPassword: "",
       },
@@ -172,7 +172,7 @@ export default {
         .replace(/(\d{3})(\d)/, '$1.$2')
         .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     },
-    'form.telephone'(newValue) {
+    'form.telephone'(newValue) { // CORRIGIDO AQUI
       if (!newValue) return;
       const digits = newValue.replace(/\D/g, '').slice(0, 11);
       if (digits.length > 10) this.form.telephone = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
@@ -251,7 +251,7 @@ export default {
           email: this.form.email,
           cpf: this.form.cpf,
           password: this.form.password,
-          telephone: this.form.telephone,
+          telephone: this.form.telephone, // CORRIGIDO AQUI
           address: this.form.address,
           number: this.form.number,
           complement: this.form.complement,
@@ -262,8 +262,6 @@ export default {
           country: this.form.country
         };
         
-        // --- CORREÇÃO APLICADA AQUI ---
-        // A rota correta é '/api/users/register'
         await api.post("/api/users/register", dataToSend);
         
         await Swal.fire({

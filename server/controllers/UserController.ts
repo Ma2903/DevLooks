@@ -11,7 +11,7 @@ import {
     JWT_SECRET, CRYPTO_SECRET, MAIL_HOST,
     MAIL_PORT, MAIL_USER, MAIL_PASS
 } from "../config/config";
-// ... (o resto das suas funções no topo, como generateToken, etc, continuam iguais)
+
 const generateToken = (user: IUser): string => {
     return jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "5h" });
 };
@@ -26,21 +26,48 @@ function descriptografar(dadoCriptografado: string): string {
 }
 class UserController {
 
-    // ... (createUser, login, etc, continuam iguais)
     static createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const user = await UserModel.create(req.body);
-            const { password, ...userResponse } = user.toObject();
+            const { name, email, cpf, password, telephone, address, number, complement, bairro, cep, city, state, country } = req.body;
+
+            // --- CORREÇÃO DEFINITIVA ---
+            // Monta o objeto de endereço no formato que o UserModel espera.
+            const addressObject = {
+                street: address,
+                number: number,
+                complement: complement,
+                neighborhood: bairro,
+                cep: cep,
+                city: city,
+                state: state,
+            };
+
+            // Cria o payload final com o objeto de endereço aninhado.
+            const newUserPayload = {
+                name,
+                email,
+                cpf,
+                password,
+                telephone,
+                address: addressObject, // Passa o objeto aninhado
+                country,
+            };
+
+            const user = await UserModel.create(newUserPayload);
+            const { password: _, ...userResponse } = user.toObject();
             res.status(201).json(userResponse);
+            
         } catch (error: any) {
             if (error.code === 11000) {
                 const field = Object.keys(error.keyValue)[0];
                 res.status(409).json({ message: `O ${field} informado já está em uso.` });
             } else {
+                console.error("Erro detalhado ao criar usuário:", error);
                 res.status(500).json({ message: "Erro ao criar usuário", error: error.message });
             }
         }
     };
+
     static login: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email, password } = req.body;
@@ -57,7 +84,6 @@ class UserController {
         }
     };
 
-    // --- CORREÇÃO APLICADA AQUI ---
     static getMe: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserModel.findById((req as any).user.id).select('-password');
@@ -65,7 +91,6 @@ class UserController {
                 res.status(404).json({ error: "Usuário não encontrado." });
                 return;
             }
-            // Garante que o endereço seja um objeto, mesmo que esteja vazio
             if (!user.address || typeof user.address !== 'object') {
                 (user as any).address = {};
             }
@@ -75,7 +100,6 @@ class UserController {
         }
     };
 
-    // ... (updateUser, getAllUsers, e todos os outros métodos continuam iguais)
     static updateUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { id } = req.params;
