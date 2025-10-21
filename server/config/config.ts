@@ -15,3 +15,6 @@ export const MAIL_PORT = process.env.MAIL_PORT;
 export const MAIL_USER = process.env.MAIL_USER;
 export const MAIL_PASS = process.env.MAIL_PASS;
 export const OWNER_EMAIL = process.env.OWNER_EMAIL;
+
+// Credenciais do MercadoPago
+export const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || "APP_USR-2527278991117877-102021-f0327e03ea48f78a1f760a5ad5276ac7-2937731178";
