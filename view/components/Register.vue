@@ -14,8 +14,8 @@
             <div class="relative flex items-center">
               <i class="fas fa-user absolute left-4 text-gray-400 z-10"></i>
               <input type="text" id="name" v-model="form.name"
-                     class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="Digite seu nome completo" required />
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Digite seu nome completo" required />
             </div>
           </div>
 
@@ -24,8 +24,8 @@
             <div class="relative flex items-center">
               <i class="fas fa-envelope absolute left-4 text-gray-400 z-10"></i>
               <input type="email" id="email" v-model="form.email"
-                     class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="exemplo@email.com" required />
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="exemplo@email.com" required />
             </div>
           </div>
 
@@ -34,8 +34,8 @@
             <div class="relative flex items-center">
               <i class="fas fa-id-card absolute left-4 text-gray-400 z-10"></i>
               <input type="text" id="cpf" v-model="form.cpf"
-                     class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="000.000.000-00" required />
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="000.000.000-00" required />
             </div>
           </div>
 
@@ -44,8 +44,8 @@
             <div class="relative flex items-center">
               <i class="fas fa-phone absolute left-4 text-gray-400 z-10"></i>
               <input type="tel" id="telephone" v-model="form.telephone"
-                     class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="(11) 99999-9999" required />
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="(11) 99999-9999" required />
             </div>
           </div>
 
@@ -54,8 +54,8 @@
             <div class="relative flex items-center">
               <i class="fas fa-lock absolute left-4 text-gray-400 z-10"></i>
               <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password"
-                     class="w-full p-3 pl-12 pr-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="Mínimo 6 caracteres" required />
+                      class="w-full p-3 pl-12 pr-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Mínimo 6 caracteres" required />
               <button type="button" @click="showPassword = !showPassword" class="absolute right-4 text-gray-400 focus:outline-none"><i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i></button>
             </div>
           </div>
@@ -65,8 +65,8 @@
             <div class="relative flex items-center">
               <i class="fas fa-lock absolute left-4 text-gray-400 z-10"></i>
               <input :type="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" v-model="form.confirmPassword"
-                     class="w-full p-3 pl-12 pr-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="Confirme sua senha" required />
+                      class="w-full p-3 pl-12 pr-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Confirme sua senha" required />
               <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute right-4 text-gray-400 focus:outline-none"><i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i></button>
             </div>
           </div>
@@ -76,52 +76,53 @@
             <div class="relative flex items-center">
               <i class="fas fa-map-pin absolute left-4 text-gray-400 z-10"></i>
               <input type="text" id="cep" v-model="form.cep" @blur="fetchAddress"
-                     class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="00000-000" required />
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="00000-000" required />
+              <i v-show="loadingCep" class="fas fa-spinner animate-spin absolute right-4 text-gray-400"></i>
             </div>
           </div>
 
           <div class="md:col-span-2">
-            <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
+            <label for="address" class="block text-sm font-medium text-gray-300 mb-2">Endereço (Rua/Avenida)</label>
             <input type="text" id="address" v-model="form.address"
-                   class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                   placeholder="Preenchido pelo CEP" />
+                    class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                    placeholder="Preenchido pelo CEP" />
           </div>
           
           <div class="grid grid-cols-2 gap-x-4 md:col-span-2">
               <div>
                 <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
                 <input type="text" id="number" v-model="form.number"
-                       class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                       placeholder="Ex: 123" required />
+                        class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                        placeholder="Ex: 123" required />
               </div>
               <div>
                 <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento</label>
                 <input type="text" id="complement" v-model="form.complement"
-                       class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                       placeholder="Apto, Bloco, etc."/>
+                        class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                        placeholder="Apto, Bloco, etc."/>
               </div>
           </div>
 
           <div>
             <label for="bairro" class="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
             <input type="text" id="bairro" v-model="form.bairro"
-                   class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                   placeholder="Preenchido pelo CEP" />
+                    class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                    placeholder="Preenchido pelo CEP" />
           </div>
 
           <div class="grid grid-cols-2 gap-x-4">
             <div>
               <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
               <input type="text" id="city" v-model="form.city"
-                     class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="Preenchido pelo CEP" />
+                      class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Preenchido pelo CEP" />
             </div>
             <div>
               <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
               <input type="text" id="state" v-model="form.state"
-                     class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
-                     placeholder="Preenchido pelo CEP" />
+                      class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Preenchido pelo CEP" />
             </div>
           </div>
           
@@ -158,10 +159,9 @@ export default {
       showPassword: false,
       showConfirmPassword: false,
       loading: false,
-      loadingCep: false, // Propriedade para o loading do CEP
+      loadingCep: false,
     };
   },
-  // SUAS MÁSCARAS ESTÃO DE VOLTA AQUI, INTACTAS!
   watch: {
     'form.cpf'(newValue) {
       if (!newValue) return;
@@ -187,6 +187,50 @@ export default {
     }
   },
   methods: {
+    async fetchAddress() {
+      const cep = this.form.cep.replace(/\D/g, '');
+
+      if (cep.length === 8) {
+        this.loadingCep = true;
+        try {
+          const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+          const data = response.data;
+
+          if (!data.erro) {
+            this.form.address = data.logradouro;
+            this.form.bairro = data.bairro;
+            this.form.city = data.localidade;
+            this.form.state = data.uf;
+          } else {
+            Swal.fire({
+              icon: 'warning', 
+              title: 'CEP não encontrado', 
+              text: 'Por favor, verifique o número digitado.',
+              background: "#1F2937", 
+              color: "#E5E7EB",
+            });
+            this.clearAddressFields();
+          }
+        } catch (error) {
+          console.error('Erro ao buscar CEP:', error);
+          Swal.fire({
+            icon: 'error', 
+            title: 'Erro de Rede', 
+            text: 'Não foi possível consultar o CEP. Tente novamente.',
+            background: "#1F2937", 
+            color: "#E5E7EB",
+          });
+        } finally {
+            this.loadingCep = false;
+        }
+      }
+    },
+    clearAddressFields() {
+      this.form.address = '';
+      this.form.bairro = '';
+      this.form.city = '';
+      this.form.state = '';
+    },
     async handleRegister() {
       if(this.form.password !== this.form.confirmPassword){
         Swal.fire({
@@ -202,25 +246,25 @@ export default {
       this.loading = true;
       
       try {
-        // Garante que campos vazios sejam enviados com valores adequados
         const dataToSend = {
           name: this.form.name,
           email: this.form.email,
           cpf: this.form.cpf,
           password: this.form.password,
           telephone: this.form.telephone,
-          // Se os campos de endereço estiverem vazios, envia um valor padrão
-          address: this.form.address || 'A definir',
-          number: this.form.number || 'S/N',
-          complement: this.form.complement || '',
-          bairro: this.form.bairro || 'A definir',
-          cep: this.form.cep || '00000-000',
-          city: this.form.city || 'A definir',
-          state: this.form.state || 'A definir',
-          country: this.form.country || 'Brasil'
+          address: this.form.address,
+          number: this.form.number,
+          complement: this.form.complement,
+          bairro: this.form.bairro,
+          cep: this.form.cep,
+          city: this.form.city,
+          state: this.form.state,
+          country: this.form.country
         };
         
-        await api.post("/api/users", dataToSend);
+        // --- CORREÇÃO APLICADA AQUI ---
+        // A rota correta é '/api/users/register'
+        await api.post("/api/users/register", dataToSend);
         
         await Swal.fire({
           icon: 'success', 
