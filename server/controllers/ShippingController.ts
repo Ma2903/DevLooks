@@ -1,6 +1,7 @@
 // server/controllers/ShippingController.ts
 import { Request, Response, RequestHandler } from "express";
 import Correios from "node-correios";
+import { CORREIOS_CEP_ORIGEM } from "../config/config";
 
 const correios = new Correios();
 
@@ -9,7 +10,7 @@ class ShippingController {
         // CORREÇÃO: Aceita 'cep' ou 'cepDestino' do corpo da requisição
         const { cep, cepDestino } = req.body;
         const finalCepDestino = cep || cepDestino;
-        const cepOrigem = process.env.CORREIOS_CEP_ORIGEM;
+        const cepOrigem = CORREIOS_CEP_ORIGEM;
 
         if (!finalCepDestino || !cepOrigem) {
             res.status(400).json({ error: "CEP de origem ou destino não fornecido." });
@@ -41,7 +42,7 @@ class ShippingController {
                 deliveryTime: `${result[0].PrazoEntrega} dias úteis`
             });
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Erro ao calcular frete com Correios:", error);
             res.status(500).json({ error: error.message || "Erro ao calcular o frete." });
         }

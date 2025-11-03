@@ -21,6 +21,8 @@ import cartRoutes from './routes/CartRoutes';
 import adminRoutes from './routes/AdminRoutes';
 import avatarRoutes from './routes/AvatarRoutes';
 import shippingRoutes from './routes/ShippingRoutes';
+import aiRoutes from './routes/AIRoutes';
+import notificationRoutes from './routes/NotificationRoutes';
 
 const app = express();
 
@@ -50,6 +52,8 @@ app.use('/api', orderRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', shippingRoutes);
+app.use('/api', aiRoutes);
+app.use('/api', notificationRoutes);
 
 app.listen(port, () => {
     console.log(`✅ API Rodando em http://localhost:${port}`);

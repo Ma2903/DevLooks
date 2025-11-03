@@ -129,6 +129,94 @@ class ProductController {
             res.status(500).json({ message: 'Erro ao buscar produtos recentes', error: error.message });
         }
     };
+
+    static addReview: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productId = req.params.id;
+            const userId = (req as any).user.id;
+            const { rating, comment, images } = req.body;
+
+            // Validação
+            if (!rating || rating < 1 || rating > 5) {
+                res.status(400).json({ message: 'Nota deve ser entre 1 e 5' });
+                return;
+            }
+            if (!comment || comment.trim() === '') {
+                res.status(400).json({ message: 'Comentário é obrigatório' });
+                return;
+            }
+
+            // Verifica se o produto existe
+            const product = await ProductModel.findById(productId);
+            if (!product) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+
+            // Verificação de segurança: usuário comprou e recebeu o produto?
+            const userOrder = await Order.findOne({
+                user: userId,
+                'items.productId': productId,
+                status: 'Entregue'
+            });
+
+            if (!userOrder) {
+                res.status(403).json({ 
+                    message: 'Você só pode avaliar produtos que já comprou e recebeu' 
+                });
+                return;
+            }
+
+            // Verifica se o usuário já avaliou este produto
+            const existingReview = product.reviews?.find(
+                review => review.user.toString() === userId
+            );
+
+            if (existingReview) {
+                res.status(400).json({ message: 'Você já avaliou este produto' });
+                return;
+            }
+
+            // Adiciona a review
+            if (!product.reviews) product.reviews = [];
+            product.reviews.push({
+                user: userId as any,
+                rating: Number(rating),
+                comment: comment.trim(),
+                images: images || [],
+                createdAt: new Date()
+            });
+
+            await product.save();
+
+            // Popula o usuário para retornar info completa
+            const updatedProduct = await ProductModel.findById(productId).populate('reviews.user', 'name');
+            
+            res.status(201).json({ 
+                message: 'Avaliação adicionada com sucesso',
+                product: updatedProduct
+            });
+        } catch (error: any) {
+            console.error('Erro ao adicionar avaliação:', error);
+            res.status(500).json({ message: 'Erro ao adicionar avaliação', error: error.message });
+        }
+    };
+
+    static getProductReviews: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productId = req.params.id;
+            const product = await ProductModel.findById(productId).populate('reviews.user', 'name');
+            
+            if (!product) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+
+            res.status(200).json({ reviews: product.reviews || [] });
+        } catch (error: any) {
+            res.status(500).json({ message: 'Erro ao buscar avaliações', error: error.message });
+        }
+    };
     
     static uploadImage = upload.single('imagem');
 }

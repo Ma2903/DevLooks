@@ -3,6 +3,7 @@ import OrderModel from "../models/OrderModel";
 import UserModel from "../models/UserModel";
 import ProductModel from "../models/ProductModel";
 import CouponModel from "../models/CouponModel";
+import NotificationService from "../services/NotificationService";
 // SDK v2: Novas importações
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { MERCADOPAGO_ACCESS_TOKEN } from "../config/config";
@@ -75,7 +76,11 @@ class OrderController {
             }
 
              if (couponCode) {
-                const coupon = await CouponModel.findOne({ code: couponCode, is_active: true });
+                // Cria uma RegExp que ignora o case (opção 'i')
+                const coupon = await CouponModel.findOne({ 
+                    code: { $regex: new RegExp('^' + couponCode + '$', 'i') }, 
+                    is_active: true 
+                });
                 if (coupon) {
                     if (new Date() > coupon.expires_at) {
                          console.warn(`[Checkout Warn] Tentativa de usar cupão expirado: ${couponCode}`);
@@ -171,6 +176,14 @@ class OrderController {
             if (!order) {
                 return res.status(404).json({ message: 'Pedido não encontrado' });
             }
+            
+            // Padrão Observer: Notifica o usuário sobre a mudança de status
+            await NotificationService.notifyOrderStatusChange(
+                order.user.toString(),
+                String(order._id),
+                status
+            );
+            
             res.json(order);
         } catch (error) {
              console.error(`Erro ao atualizar status do pedido ${req.params.id}:`, error);

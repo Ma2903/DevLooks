@@ -66,17 +66,20 @@ export default {
       this.loading = true;
       this.resetSuccess = "";
       this.resetError = "";
-      try{
-        axios.post('/api/users/forgot-password', { email: this.email })
-          .then(response => {
-            this.$router.push("/confirm-reset?hash=" + response.data.code + "&email=" + response.data.email);
-          });
-      }catch (error) {
+      try {
+        // Use await para esperar a resposta
+        const response = await axios.post('/api/users/forgot-password', { email: this.email });
+        
+        // Sucesso: redireciona
+        this.$router.push("/confirm-reset?hash=" + response.data.code + "&email=" + response.data.email);
+
+      } catch (error) {
+        // Erro: exibe a mensagem de erro
         this.resetError = "Erro ao enviar o link de redefinição. Verifique seu email.";
         console.error("Erro ao enviar o link de redefinição:", error);
+      } finally {
+        this.loading = false;
       }
-          // this.$router.push("/confirm-reset");ar
-      this.loading = false;
     },
   },
 };

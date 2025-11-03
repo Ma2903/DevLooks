@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
-    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl flex flex-col md:flex-row" v-if="product && product.name">
+  <div class="min-h-screen bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200 py-10">
+    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl mx-auto flex flex-col md:flex-row" v-if="product && product.name">
       <div class="w-full md:w-1/2 h-96 flex flex-col items-center justify-center overflow-hidden bg-gray-800 rounded-lg mb-6 md:mb-0 md:mr-6 p-4">
         <div class="relative group w-full h-72 flex items-center justify-center">
           <img
@@ -71,6 +71,113 @@
         </div>
       </div>
     </div>
+
+    <!-- Seção de Avaliações -->
+    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl mx-auto" v-if="product && product.name">
+      <h2 class="text-3xl font-bold text-[#04d1b0] mb-6 flex items-center gap-3">
+        <i class="fas fa-star"></i> Avaliações do Produto
+      </h2>
+
+      <!-- Formulário de Avaliação (apenas se usuário comprou) -->
+      <div v-if="userCanReview" class="bg-gray-800 p-6 rounded-lg mb-8">
+        <h3 class="text-xl font-semibold mb-4 text-white">Deixe sua avaliação</h3>
+        <form @submit.prevent="submitReview">
+          <div class="mb-4">
+            <label class="block text-gray-300 mb-2">Nota:</label>
+            <div class="flex gap-2">
+              <button
+                v-for="star in 5"
+                :key="star"
+                type="button"
+                @click="reviewForm.rating = star"
+                class="text-3xl transition-colors"
+                :class="star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-600'"
+              >
+                <i class="fas fa-star"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-300 mb-2">Comentário:</label>
+            <textarea
+              v-model="reviewForm.comment"
+              class="w-full p-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-[#04d1b0]"
+              rows="4"
+              placeholder="Conte sua experiência com o produto..."
+              required
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+          >
+            <i class="fas fa-paper-plane"></i> Enviar Avaliação
+          </button>
+        </form>
+      </div>
+
+      <!-- Resumo por IA -->
+      <div v-if="aiSummary && reviews.length > 0" class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg mb-6 border-l-4 border-purple-500">
+        <h3 class="text-xl font-semibold mb-3 text-purple-300 flex items-center gap-2">
+          <i class="fas fa-robot"></i> Resumo por IA
+        </h3>
+        <p class="text-gray-300">{{ aiSummary }}</p>
+        <div v-if="sentimentStats" class="mt-4 flex gap-4">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-thumbs-up text-green-400"></i>
+            <span class="text-sm">{{ sentimentStats.percentages.positivo }}% Positivo</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-thumbs-down text-red-400"></i>
+            <span class="text-sm">{{ sentimentStats.percentages.negativo }}% Negativo</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-minus-circle text-gray-400"></i>
+            <span class="text-sm">{{ sentimentStats.percentages.neutro }}% Neutro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Avaliações -->
+      <div v-if="reviews.length > 0" class="space-y-4">
+        <div
+          v-for="review in reviews"
+          :key="review._id"
+          class="bg-gray-800 p-6 rounded-lg"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="font-semibold text-white">{{ review.user?.name || 'Usuário' }}</p>
+              <div class="flex items-center gap-1 mt-1">
+                <i
+                  v-for="star in 5"
+                  :key="star"
+                  class="fas fa-star text-sm"
+                  :class="star <= review.rating ? 'text-yellow-400' : 'text-gray-600'"
+                ></i>
+              </div>
+            </div>
+            <span class="text-gray-400 text-sm">
+              {{ formatDate(review.createdAt) }}
+            </span>
+          </div>
+          <p class="text-gray-300">{{ review.comment }}</p>
+          <div v-if="review.images && review.images.length > 0" class="flex gap-2 mt-4">
+            <img
+              v-for="(image, idx) in review.images"
+              :key="idx"
+              :src="getImageUrl(image)"
+              class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80"
+              @click="openImageModal(image)"
+            />
+          </div>
+        </div>
+      </div>
+      <div v-else class="text-center text-gray-400 py-8">
+        <i class="fas fa-comment-slash text-4xl mb-3"></i>
+        <p>Este produto ainda não possui avaliações.</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -87,11 +194,23 @@ export default {
       quantity: 1,
       userType: "user",
       selectedSize: null,
+      reviews: [],
+      userCanReview: false,
+      reviewForm: {
+        rating: 5,
+        comment: '',
+        images: []
+      },
+      aiSummary: '',
+      sentimentStats: null
     };
   },
-  created() {
+  async created() {
     const productId = this.$route.params.id;
-    this.fetchProduct(productId);
+    await this.fetchProduct(productId);
+    await this.fetchReviews(productId);
+    await this.checkIfUserCanReview(productId);
+    
     const userDataRaw = localStorage.getItem("userData");
     if (userDataRaw && userDataRaw !== "undefined") {
       const userData = JSON.parse(userDataRaw);
@@ -189,6 +308,130 @@ export default {
     decreaseQuantity() {
       if (this.quantity > 1) this.quantity--;
     },
+    async fetchReviews(productId) {
+      try {
+        const response = await axios.get(`/api/products/${productId}/reviews`);
+        this.reviews = response.data.reviews || [];
+        
+        // Gera resumo e análise de sentimento se houver avaliações
+        if (this.reviews.length > 0) {
+          await this.generateAISummary();
+          await this.analyzeSentiments();
+        }
+      } catch (error) {
+        console.error('Erro ao carregar avaliações:', error);
+      }
+    },
+    async generateAISummary() {
+      try {
+        const comments = this.reviews.map(r => r.comment);
+        const response = await axios.post('/api/ai/summary', { comments });
+        this.aiSummary = response.data.summary;
+      } catch (error) {
+        console.error('Erro ao gerar resumo por IA:', error);
+      }
+    },
+    async analyzeSentiments() {
+      try {
+        const comments = this.reviews.map(r => r.comment);
+        const response = await axios.post('/api/ai/sentiment-stats', { comments });
+        this.sentimentStats = response.data;
+      } catch (error) {
+        console.error('Erro ao analisar sentimentos:', error);
+      }
+    },
+    async checkIfUserCanReview(productId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.userCanReview = false;
+        return;
+      }
+
+      try {
+        // Busca o histórico de pedidos do usuário
+        const response = await axios.get('/api/orders/history');
+        const orders = response.data;
+
+        // Verifica se o usuário comprou e recebeu este produto
+        const hasPurchased = orders.some(order => 
+          order.status === 'Entregue' && 
+          order.items.some(item => item.productId === productId)
+        );
+
+        // Verifica se o usuário já avaliou este produto
+        const userDataRaw = localStorage.getItem("userData");
+        let userId = null;
+        if (userDataRaw && userDataRaw !== "undefined") {
+          const userData = JSON.parse(userDataRaw);
+          userId = userData.id || userData.user?.id;
+        }
+
+        const hasReviewed = this.reviews.some(review => 
+          review.user?._id === userId
+        );
+
+        this.userCanReview = hasPurchased && !hasReviewed;
+      } catch (error) {
+        console.error('Erro ao verificar permissão de avaliação:', error);
+        this.userCanReview = false;
+      }
+    },
+    async submitReview() {
+      if (!this.reviewForm.rating || !this.reviewForm.comment.trim()) {
+        Swal.fire({
+          title: 'Atenção',
+          text: 'Por favor, preencha a nota e o comentário.',
+          icon: 'warning',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+        return;
+      }
+
+      try {
+        await axios.post(`/api/products/${this.product._id}/reviews`, {
+          rating: this.reviewForm.rating,
+          comment: this.reviewForm.comment,
+          images: this.reviewForm.images
+        });
+
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Sua avaliação foi enviada com sucesso!',
+          icon: 'success',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+
+        // Recarrega as avaliações
+        await this.fetchReviews(this.product._id);
+        
+        // Reseta o formulário
+        this.reviewForm = { rating: 5, comment: '', images: [] };
+        this.userCanReview = false;
+      } catch (error) {
+        console.error('Erro ao enviar avaliação:', error);
+        Swal.fire({
+          title: 'Erro',
+          text: error.response?.data?.message || 'Não foi possível enviar sua avaliação.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+      }
+    },
+    formatDate(date) {
+      if (!date) return '';
+      return new Date(date).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+    },
+    openImageModal(image) {
+      // Abre a imagem em uma modal ou nova aba
+      window.open(this.getImageUrl(image), '_blank');
+    }
   },
 };
 </script>

@@ -7,18 +7,50 @@ const api = axios.create({
   baseURL: 'http://localhost:3000/',
 });
 
-// Isso é um "interceptor". Ele age como um porteiro para todas as requisições.
-// Antes de qualquer requisição sair do seu app, ele vai pegar o token e anexá-lo.
+// Interceptor de REQUISIÇÃO - Adiciona o token antes de enviar
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Adiciona o cabeçalho de autorização em todas as chamadas da API
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor de RESPOSTA - Trata erros de autenticação (token expirado)
+api.interceptors.response.use(
+  (response) => {
+    // Se a resposta for bem-sucedida, apenas retorna
+    return response;
+  },
+  (error) => {
+    // Se o erro for 401 (não autorizado) e o token expirou
+    if (error.response?.status === 401) {
+      const isTokenExpired = error.response?.data?.expired;
+      
+      // Limpa o localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('cart');
+      
+      // Dispara evento para atualizar o estado da aplicação
+      window.dispatchEvent(new Event('auth-change'));
+      
+      // Se estiver em uma página que requer autenticação, redireciona para login
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+        window.location.href = '/login';
+      }
+      
+      // Mostra mensagem amigável
+      if (isTokenExpired) {
+        console.warn('⚠️  Sessão expirada. Redirecionando para login...');
+      }
+    }
+    
     return Promise.reject(error);
   }
 );

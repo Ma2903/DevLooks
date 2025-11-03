@@ -18,3 +18,9 @@ export const OWNER_EMAIL = process.env.OWNER_EMAIL;
 
 // Credenciais do MercadoPago
 export const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || "APP_USR-2527278991117877-102021-f0327e03ea48f78a1f760a5ad5276ac7-2937731178";
+
+// API Key do Google Gemini para funcionalidades de IA
+export const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+
+// CEP de origem para cálculo de frete (Correios)
+export const CORREIOS_CEP_ORIGEM = process.env.CORREIOS_CEP_ORIGEM || '19200009';

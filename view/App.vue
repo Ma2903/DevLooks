@@ -1,29 +1,53 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onUnmounted } from 'vue';
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
+import Swal from 'sweetalert2';
 
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 
-const currentPage = ref('login'); // Página inicial alterada para 'login'
-const user = ref(null); // Estado para armazenar os dados do usuário logado
+const currentPage = ref('login');
+const user = ref(null);
 
 const navigateTo = (page) => {
   currentPage.value = page;
 };
 
 const handleLogin = (userData) => {
-  user.value = userData; // Armazena os dados do usuário logado
-  currentPage.value = 'home'; // Redireciona para a página inicial
+  user.value = userData;
+  currentPage.value = 'home';
 };
 
 const navigateToUrl = (url) => {
   // window.location.href = 'http://localhost:5173/' + url;
 };
 
-onMounted (() => {
+// Listener para detectar quando o token expira (disparado pelo interceptor do axios)
+const handleAuthChange = () => {
+  const token = localStorage.getItem('token');
+  if (!token && user.value) {
+    // Token foi removido mas usuário ainda estava logado - significa que expirou
+    user.value = null;
+    Swal.fire({
+      title: 'Sessão Expirada',
+      text: 'Sua sessão expirou. Por favor, faça login novamente.',
+      icon: 'warning',
+      confirmButtonText: 'Ok, entendi',
+      background: '#1F2937',
+      color: '#E5E7EB',
+      confirmButtonColor: '#10B981'
+    });
+  }
+};
+
+onMounted(() => {
   navigateToUrl('login');
+  window.addEventListener('auth-change', handleAuthChange);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('auth-change', handleAuthChange);
 });
 </script>
 

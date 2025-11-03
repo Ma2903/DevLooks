@@ -15,6 +15,41 @@
       </nav>
 
       <div class="hidden md:flex items-center space-x-6">
+        <!-- Notificações -->
+        <div v-if="user" class="relative">
+          <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors">
+            <i class="fas fa-bell text-xl"></i>
+            <span v-if="notificationCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ notificationCount }}</span>
+          </button>
+          <transition name="fade-scale">
+            <div v-if="isNotificationsOpen" class="absolute right-0 mt-2 w-80 bg-gray-700 rounded-md shadow-lg py-2 z-50 border border-gray-600 max-h-96 overflow-y-auto">
+              <div class="px-4 py-2 border-b border-gray-600 flex justify-between items-center">
+                <p class="text-sm font-semibold text-white">Notificações</p>
+                <button v-if="notifications.length > 0" @click="markAllAsRead" class="text-xs text-emerald-400 hover:text-emerald-300">
+                  Marcar todas como lidas
+                </button>
+              </div>
+              <div v-if="notifications.length === 0" class="px-4 py-8 text-center text-gray-400">
+                <i class="fas fa-bell-slash text-3xl mb-2"></i>
+                <p class="text-sm">Nenhuma notificação</p>
+              </div>
+              <div v-else>
+                <div v-for="notification in notifications" :key="notification._id" 
+                  class="px-4 py-3 hover:bg-gray-600 transition-colors cursor-pointer border-b border-gray-600 last:border-b-0"
+                  @click="markAsRead(notification._id)">
+                  <div class="flex items-start gap-2">
+                    <i class="fas fa-circle text-emerald-400 text-xs mt-1"></i>
+                    <div class="flex-1">
+                      <p class="text-sm text-white">{{ notification.message }}</p>
+                      <p class="text-xs text-gray-400 mt-1">{{ formatDate(notification.createdAt) }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
+
         <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors">
           <i class="fas fa-shopping-cart text-xl"></i>
           <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
@@ -87,15 +122,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
+import api from '@/services/main.js';
 
 const router = useRouter();
 const user = ref(null);
 const cartItemCount = ref(0);
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
+const isNotificationsOpen = ref(false);
+const notifications = ref([]);
+const notificationCount = ref(0);
+let notificationInterval = null;
 
 const isAdmin = computed(() => {
   return user.value && (user.value.role === 'admin' || user.value.role === 'owner');
@@ -119,9 +159,89 @@ onMounted(() => {
   updateUserState();
   window.addEventListener('auth-change', updateUserState);
   window.addEventListener('cart-updated', updateUserState);
+  
+  // Inicia o polling de notificações se o usuário estiver logado
+  if (user.value) {
+    fetchNotifications();
+    notificationInterval = setInterval(fetchNotifications, 30000); // A cada 30 segundos
+  }
 });
 
-const toggleDropdown = () => isDropdownOpen.value = !isDropdownOpen.value;
+onUnmounted(() => {
+  window.removeEventListener('auth-change', updateUserState);
+  window.removeEventListener('cart-updated', updateUserState);
+  if (notificationInterval) {
+    clearInterval(notificationInterval);
+  }
+});
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+  if (isDropdownOpen.value) {
+    isNotificationsOpen.value = false;
+  }
+};
+
+const toggleNotifications = () => {
+  isNotificationsOpen.value = !isNotificationsOpen.value;
+  if (isNotificationsOpen.value) {
+    isDropdownOpen.value = false;
+  }
+};
+
+const fetchNotifications = async () => {
+  if (!user.value) return;
+  
+  try {
+    const response = await api.get('/api/notifications/unread');
+    notifications.value = response.data.notifications || [];
+    notificationCount.value = response.data.count || 0;
+  } catch (error) {
+    console.error('Erro ao buscar notificações:', error);
+  }
+};
+
+const markAsRead = async (notificationId) => {
+  try {
+    await api.post('/api/notifications/mark-read', { notificationIds: [notificationId] });
+    notifications.value = notifications.value.filter(n => n._id !== notificationId);
+    notificationCount.value = Math.max(0, notificationCount.value - 1);
+  } catch (error) {
+    console.error('Erro ao marcar notificação como lida:', error);
+  }
+};
+
+const markAllAsRead = async () => {
+  try {
+    await api.post('/api/notifications/mark-all-read');
+    notifications.value = [];
+    notificationCount.value = 0;
+    isNotificationsOpen.value = false;
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Todas as notificações foram marcadas como lidas.',
+      icon: 'success',
+      background: '#1F2937',
+      color: '#E5E7EB',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  } catch (error) {
+    console.error('Erro ao marcar todas as notificações como lidas:', error);
+  }
+};
+
+const formatDate = (date) => {
+  if (!date) return '';
+  const now = new Date();
+  const notifDate = new Date(date);
+  const diff = Math.floor((now - notifDate) / 1000); // diferença em segundos
+
+  if (diff < 60) return 'Agora mesmo';
+  if (diff < 3600) return `${Math.floor(diff / 60)} min atrás`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h atrás`;
+  return notifDate.toLocaleDateString('pt-BR');
+};
 
 const logout = () => {
   isDropdownOpen.value = false;
@@ -154,6 +274,19 @@ const logout = () => {
 watch(() => router.currentRoute.value, () => {
   isMobileMenuOpen.value = false;
   isDropdownOpen.value = false;
+  isNotificationsOpen.value = false;
+});
+
+watch(user, (newUser) => {
+  if (newUser && !notificationInterval) {
+    fetchNotifications();
+    notificationInterval = setInterval(fetchNotifications, 30000);
+  } else if (!newUser && notificationInterval) {
+    clearInterval(notificationInterval);
+    notificationInterval = null;
+    notifications.value = [];
+    notificationCount.value = 0;
+  }
 });
 </script>
 

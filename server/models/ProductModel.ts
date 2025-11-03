@@ -15,6 +15,8 @@ export interface IProduct extends Document {
         user: Schema.Types.ObjectId;
         rating: number;
         comment: string;
+        images?: string[];
+        createdAt?: Date;
     }[];
     brand?: string;
     sku?: string;
@@ -35,8 +37,10 @@ const ProductSchema = new Schema<IProduct>({
     images: [{ type: String }],
     reviews: [{
         user: { type: Schema.Types.ObjectId, ref: 'User' },
-        rating: { type: Number, required: true },
+        rating: { type: Number, required: true, min: 1, max: 5 },
         comment: { type: String, required: true },
+        images: [{ type: String }],
+        createdAt: { type: Date, default: Date.now },
     }],
     brand: { type: String },
     sku: { type: String, unique: true, sparse: true },

@@ -18,36 +18,32 @@
         </div>
       </div>
 
-      <div class="bg-gray-800 shadow-lg rounded-lg overflow-x-auto">
+      <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
         <table class="w-full text-left">
-          <thead class="bg-gray-700">
+          <thead class="bg-gradient-to-r from-emerald-600 to-cyan-600">
             <tr>
               <th class="p-4 uppercase text-sm font-semibold">Nome</th>
               <th class="p-4 uppercase text-sm font-semibold">Email</th>
               <th class="p-4 uppercase text-sm font-semibold">Role</th>
-              <th class="p-4 uppercase text-sm font-semibold">Status</th>
               <th class="p-4 uppercase text-sm font-semibold text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in users" :key="user._id" class="border-b border-gray-700 hover:bg-gray-700/50">
-              <td class="p-4">{{ user.name }}</td>
-              <td class="p-4">{{ user.email }}</td>
+            <tr v-for="user in users" :key="user._id" class="border-b border-gray-700 hover:bg-gray-700/50 transition-all">
+              <td class="p-4 font-medium">{{ user.name }}</td>
+              <td class="p-4 text-gray-400">{{ user.email }}</td>
               <td class="p-4">
-                <span :class="roleClass(user.role)" class="px-2 py-1 rounded-full text-xs font-bold text-gray-900">
+                <span :class="roleClass(user.role)" class="px-3 py-1 rounded-full text-xs font-bold text-gray-900">
                   {{ user.role }}
                 </span>
               </td>
-              <td class="p-4">
-                <span :class="user.status === 'active' ? 'text-green-400' : 'text-yellow-400'">
-                  {{ user.status }}
-                </span>
-              </td>
               <td class="p-4 flex justify-center items-center gap-3">
-                <router-link :to="`/admin/users/edit/${user._id}`" class="text-blue-400 hover:text-blue-300">
+                <router-link :to="`/admin/users/edit/${user._id}`" 
+                  class="text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
                   <i class="fas fa-edit"></i> Editar
                 </router-link>
-                <button @click="confirmDelete(user._id)" class="text-red-500 hover:text-red-400">
+                <button @click="confirmDelete(user._id)" 
+                  class="text-red-500 hover:text-red-400 transition-colors flex items-center gap-1">
                   <i class="fas fa-trash-alt"></i> Excluir
                 </button>
               </td>

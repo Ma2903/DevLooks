@@ -18,18 +18,29 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
         try {
             token = req.headers.authorization.split(' ')[1];
 
-            // Adicione este log para depuração
-            console.log('Verificando token com o segredo:', JWT_SECRET);
-
             const decoded = jwt.verify(token, JWT_SECRET);
             req.user = decoded;
             next();
-        } catch (error) {
-            console.error("ERRO ao verificar o token:", error);
-            res.status(401).json({ message: "Não autorizado, token inválido." });
+        } catch (error: any) {
+            // Tratamento específico para token expirado
+            if (error.name === 'TokenExpiredError') {
+                console.warn("⚠️  Token expirado. Usuário precisa fazer login novamente.");
+                res.status(401).json({ 
+                    message: "Sua sessão expirou. Por favor, faça login novamente.",
+                    expired: true 
+                });
+                return;
+            }
+            
+            // Outros erros de token
+            console.error("❌ Erro ao verificar token:", error.message);
+            res.status(401).json({ 
+                message: "Token inválido. Por favor, faça login novamente.",
+                expired: false 
+            });
         }
     } else {
-        res.status(401).json({ message: "Não autorizado, token não fornecido." });
+        res.status(401).json({ message: "Token não fornecido. Por favor, faça login." });
     }
 };
 

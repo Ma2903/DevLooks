@@ -66,13 +66,13 @@
                     <div v-if="shippingError" class="text-red-400 text-sm mt-2">
                         <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
                     </div>
-                    <div v-if="shippingCost !== null && !shippingError" class="mt-3 p-3 bg-gray-700 rounded-lg">
+                    <div v-if="shippingCost !== null && shippingCost !== undefined && !shippingError" class="mt-3 p-3 bg-gray-700 rounded-lg">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-300">SEDEX</span>
-                            <span class="text-[#04d1b0] font-bold">R$ {{ shippingCost.toFixed(2) }}</span>
+                            <span class="text-[#04d1b0] font-bold">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
                         </div>
                         <div class="text-xs text-gray-400 mt-1">
-                            <i class="fas fa-clock"></i> {{ shippingTime }}
+                            <i class="fas fa-clock"></i> {{ shippingTime || 'Calculando...' }}
                         </div>
                     </div>
                 </div>
@@ -95,9 +95,9 @@
                         <span>Desconto ({{ appliedCoupon.code }})</span>
                         <span>- R$ {{ discountAmount.toFixed(2) }}</span>
                     </div>
-                    <div v-if="shippingCost !== null" class="flex justify-between text-gray-300">
+                    <div v-if="shippingCost !== null && shippingCost !== undefined" class="flex justify-between text-gray-300">
                         <span>Frete</span>
-                        <span>R$ {{ shippingCost.toFixed(2) }}</span>
+                        <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
                     </div>
                     <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl">
                         <span>Total</span>
@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import CouponService from '@/services/CouponService';
 import api from '@/services/main.js';
@@ -226,7 +226,7 @@ function applyCepMask(event) {
 
 async function calculateShipping() {
     if (!cep.value || cep.value.length !== 9) {
-        shippingError.value = 'Por favor, digite um CEP válido';
+        shippingError.value = 'Por favor, digite um CEP válido (formato: 00000-000)';
         return;
     }
     
@@ -235,22 +235,28 @@ async function calculateShipping() {
         shippingCost.value = 0;
         shippingTime.value = '3-5 dias úteis';
         shippingError.value = '';
+        await nextTick();
         return;
     }
     
     loadingShipping.value = true;
     shippingError.value = '';
+    await nextTick();
     
     try {
         const response = await api.post('/api/shipping/calculate', { 
             cep: cep.value 
         });
         
+        // Atualiza todos os estados de uma vez
         shippingCost.value = response.data.cost;
         shippingTime.value = response.data.deliveryTime;
+        shippingError.value = '';
         
     } catch (error) {
-        console.error('Erro ao calcular frete:', error);
+        console.error('❌ Erro ao calcular frete:', error);
+        
+        // Atualiza todos os estados de erro de uma vez
         shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete para este CEP';
         shippingCost.value = null;
         shippingTime.value = '';

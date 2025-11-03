@@ -19,7 +19,7 @@
               <h2 class="text-xl font-bold text-[#04d1b0]">Pedido #{{ order._id.slice(-6) }}</h2>
               <p class="text-gray-400 text-sm">{{ new Date(order.createdAt).toLocaleDateString('pt-BR') }}</p>
             </div>
-            <span class="px-3 py-1 mt-2 sm:mt-0 rounded-full text-sm font-bold bg-yellow-500/20 text-yellow-300">
+            <span :class="getStatusClass(order.status || 'Processando')" class="px-3 py-1 mt-2 sm:mt-0 rounded-full text-sm font-bold">
               {{ order.status || 'Processando' }}
             </span>
           </div>
@@ -79,6 +79,15 @@ export default {
       if (!imagePath) return '';
       const cleanPath = imagePath.replace(/^public[\\/]/, '');
       return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
+    },
+    getStatusClass(status) {
+      switch (status) {
+        case 'Processando': return 'bg-yellow-500/20 text-yellow-300';
+        case 'Enviado': return 'bg-blue-500/20 text-blue-300';
+        case 'Entregue': return 'bg-green-500/20 text-green-300';
+        case 'Cancelado': return 'bg-red-500/20 text-red-300';
+        default: return 'bg-gray-500/20 text-gray-300';
+      }
     },
   },
 };
