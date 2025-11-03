@@ -63,16 +63,19 @@
                             <i v-else class="fas fa-spinner fa-spin"></i>
                         </button>
                     </div>
-                    <div v-if="shippingError" class="text-red-400 text-sm mt-2">
-                        <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
-                    </div>
-                    <div v-if="shippingCost !== null && shippingCost !== undefined && !shippingError" class="mt-3 p-3 bg-gray-700 rounded-lg">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-300">SEDEX</span>
-                            <span class="text-[#04d1b0] font-bold">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                    <!-- Wrapper fixo que sempre existe no DOM -->
+                    <div class="min-h-[60px]">
+                        <div v-if="shippingError" class="text-red-400 text-sm mt-2 fade-in">
+                            <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
                         </div>
-                        <div class="text-xs text-gray-400 mt-1">
-                            <i class="fas fa-clock"></i> {{ shippingTime || 'Calculando...' }}
+                        <div v-else-if="hasShippingInfo" class="mt-3 p-3 bg-gray-700 rounded-lg fade-in">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-300">SEDEX</span>
+                                <span class="text-[#04d1b0] font-bold">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                            </div>
+                            <div class="text-xs text-gray-400 mt-1">
+                                <i class="fas fa-clock"></i> {{ shippingTime || 'Calculando...' }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,7 +98,7 @@
                         <span>Desconto ({{ appliedCoupon.code }})</span>
                         <span>- R$ {{ discountAmount.toFixed(2) }}</span>
                     </div>
-                    <div v-if="shippingCost !== null && shippingCost !== undefined" class="flex justify-between text-gray-300">
+                    <div v-if="hasShippingInfo" class="flex justify-between text-gray-300 fade-in">
                         <span>Frete</span>
                         <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
                     </div>
@@ -105,7 +108,7 @@
                     </div>
                 </div>
                 
-                <div v-if="subtotal >= 150" class="mt-3 p-2 bg-green-900/30 rounded-lg text-green-400 text-sm text-center">
+                <div v-show="subtotal >= 150" class="mt-3 p-2 bg-green-900/30 rounded-lg text-green-400 text-sm text-center">
                     <i class="fas fa-gift"></i> Parabéns! Você ganhou frete grátis!
                 </div>
                 
@@ -149,6 +152,12 @@ const shippingCost = ref(null);
 const shippingTime = ref('');
 const loadingShipping = ref(false);
 const shippingError = ref('');
+const shippingReady = ref(false); // Nova flag para controlar quando mostrar o resultado
+
+// Computed property para controlar visibilidade do shipping
+const hasShippingInfo = computed(() => {
+    return shippingReady.value && shippingCost.value !== null && shippingCost.value !== undefined && !shippingError.value;
+});
 
 async function fetchCart() {
     const token = localStorage.getItem('token');
@@ -225,43 +234,97 @@ function applyCepMask(event) {
 }
 
 async function calculateShipping() {
+    // Validação básica
     if (!cep.value || cep.value.length !== 9) {
-        shippingError.value = 'Por favor, digite um CEP válido (formato: 00000-000)';
+        Swal.fire({
+            icon: 'error',
+            title: 'CEP Inválido',
+            text: 'Por favor, digite um CEP válido no formato: 00000-000',
+            background: '#1F2937',
+            color: '#E5E7EB'
+        });
         return;
     }
     
-    // Se o subtotal for >= 150, frete grátis
+    // Frete grátis para compras acima de R$ 150
     if (subtotal.value >= 150) {
-        shippingCost.value = 0;
-        shippingTime.value = '3-5 dias úteis';
+        // Esconde resultados anteriores primeiro
+        shippingReady.value = false;
+        loadingShipping.value = false;
+        
+        // Aguarda antes de mostrar resultado
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Atualiza com frete grátis
         shippingError.value = '';
-        await nextTick();
+        shippingCost.value = 0;
+        shippingTime.value = 'Frete Grátis!';
+        shippingReady.value = true;
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Frete Grátis!',
+            text: 'Parabéns! Sua compra tem frete grátis.',
+            background: '#1F2937',
+            color: '#E5E7EB',
+            confirmButtonColor: '#04d1b0'
+        });
         return;
     }
     
+    // Reseta estados antes de calcular
+    shippingReady.value = false;
     loadingShipping.value = true;
     shippingError.value = '';
-    await nextTick();
+    shippingCost.value = null;
+    shippingTime.value = '';
     
     try {
         const response = await api.post('/api/shipping/calculate', { 
             cep: cep.value 
         });
         
-        // Atualiza todos os estados de uma vez
-        shippingCost.value = response.data.cost;
-        shippingTime.value = response.data.deliveryTime;
-        shippingError.value = '';
+        console.log('✅ Frete calculado:', response.data);
+        
+        // Salva os dados temporariamente
+        const tempCost = response.data.cost;
+        const tempTime = response.data.deliveryTime;
+        
+        // Desliga loading e aguarda
+        loadingShipping.value = false;
+        
+        // Aguarda antes de atualizar qualquer dado do frete
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Agora atualiza tudo de uma vez
+        shippingCost.value = tempCost;
+        shippingTime.value = tempTime;
+        shippingReady.value = true;
         
     } catch (error) {
+        // Se o erro é do Vue, não tenta atualizar nada
+        if (error.message && error.message.includes('insertBefore')) {
+            console.error('❌ Erro de renderização Vue:', error);
+            return;
+        }
+        
         console.error('❌ Erro ao calcular frete:', error);
         
-        // Atualiza todos os estados de erro de uma vez
-        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete para este CEP';
-        shippingCost.value = null;
-        shippingTime.value = '';
-    } finally {
         loadingShipping.value = false;
+        
+        // Aguarda antes de mostrar erro
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete. Tente novamente.';
+        shippingReady.value = false;
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro ao calcular frete',
+            text: error.response?.data?.error || 'Não foi possível calcular o frete. Tente novamente.',
+            background: '#1F2937',
+            color: '#E5E7EB'
+        });
     }
 }
 
@@ -339,4 +402,19 @@ onMounted(fetchCart);
 
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
