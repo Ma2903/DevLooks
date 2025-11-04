@@ -217,6 +217,50 @@ class ProductController {
             res.status(500).json({ message: 'Erro ao buscar avaliações', error: error.message });
         }
     };
+
+    static checkUserCanReview: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productId = req.params.id;
+            const userId = (req as any).user.id;
+
+            // Verifica se o produto existe
+            const product = await ProductModel.findById(productId);
+            if (!product) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+
+            // Verifica se já avaliou
+            const existingReview = product.reviews?.find(
+                review => review.user.toString() === userId
+            );
+
+            if (existingReview) {
+                res.status(200).json({ canReview: false, reason: 'Você já avaliou este produto' });
+                return;
+            }
+
+            // Verifica se comprou e recebeu
+            const userOrder = await Order.findOne({
+                user: userId,
+                'items.productId': productId,
+                status: 'Entregue'
+            });
+
+            if (!userOrder) {
+                res.status(200).json({ 
+                    canReview: false, 
+                    reason: 'Você só pode avaliar produtos que já comprou e recebeu' 
+                });
+                return;
+            }
+
+            res.status(200).json({ canReview: true });
+        } catch (error: any) {
+            console.error('Erro ao verificar permissão de avaliação:', error);
+            res.status(500).json({ message: 'Erro ao verificar permissão', error: error.message });
+        }
+    };
     
     static uploadImage = upload.single('imagem');
 }

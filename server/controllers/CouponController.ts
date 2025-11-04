@@ -72,16 +72,20 @@ class CouponController {
                 return;
             }
             
-            const coupon = await Coupon.findOne({ code: code.toUpperCase() });
+            // Busca case-insensitive usando RegExp
+            const coupon = await Coupon.findOne({ 
+                code: { $regex: new RegExp('^' + code + '$', 'i') } 
+            });
 
-            if (!coupon || !coupon.isActive || new Date(coupon.expirationDate) < new Date()) {
+            if (!coupon || !coupon.is_active || new Date(coupon.expires_at) < new Date()) {
                 res.status(404).json({ message: "Cupom inválido, expirado ou inativo." });
                 return;
             }
 
             // << INÍCIO DA LÓGICA DE USO ÚNICO >>
             const token = req.headers.authorization?.split(' ')[1];
-            if (coupon.isSingleUse && token) {
+            // Removi a verificação de isSingleUse pois não existe no schema
+            if (token) {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
                 const user = await UserModel.findById(decoded.id);
 

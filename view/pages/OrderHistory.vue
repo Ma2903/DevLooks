@@ -82,11 +82,11 @@ export default {
     },
     getStatusClass(status) {
       switch (status) {
-        case 'Processando': return 'bg-yellow-500/20 text-yellow-300';
-        case 'Enviado': return 'bg-blue-500/20 text-blue-300';
-        case 'Entregue': return 'bg-green-500/20 text-green-300';
-        case 'Cancelado': return 'bg-red-500/20 text-red-300';
-        default: return 'bg-gray-500/20 text-gray-300';
+        case 'Processando': return 'bg-yellow-500/30 text-yellow-400 border border-yellow-500/50';
+        case 'Enviado': return 'bg-blue-500/30 text-blue-400 border border-blue-500/50';
+        case 'Entregue': return 'bg-green-500/30 text-green-400 border border-green-500/50';
+        case 'Cancelado': return 'bg-red-500/30 text-red-400 border border-red-500/50';
+        default: return 'bg-gray-500/30 text-gray-400 border border-gray-500/50';
       }
     },
   },

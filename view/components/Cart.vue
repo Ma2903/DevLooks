@@ -280,8 +280,33 @@ async function calculateShipping() {
     shippingTime.value = '';
     
     try {
+        // Calcula peso e dimensões totais do carrinho
+        let totalWeight = 0;
+        let maxHeight = 0;
+        let maxWidth = 0;
+        let maxLength = 0;
+        
+        for (const item of cartItems.value) {
+            // Peso padrão por produto se não especificado: 0.5kg
+            const itemWeight = item.weight || 0.5;
+            totalWeight += itemWeight * item.quantity;
+            
+            // Dimensões padrão se não especificadas
+            const itemDimensions = item.dimensions || { height: 10, width: 15, length: 20 };
+            
+            // Usa as maiores dimensões encontradas (empilhamento)
+            if (itemDimensions.height > maxHeight) maxHeight = itemDimensions.height;
+            if (itemDimensions.width > maxWidth) maxWidth = itemDimensions.width;
+            if (itemDimensions.length > maxLength) maxLength = itemDimensions.length;
+        }
+        
+        console.log('📦 Peso total do carrinho:', totalWeight.toFixed(2), 'kg');
+        console.log('📏 Dimensões máximas:', { height: maxHeight, width: maxWidth, length: maxLength });
+        
         const response = await api.post('/api/shipping/calculate', { 
-            cep: cep.value 
+            cep: cep.value,
+            weight: totalWeight,
+            dimensions: { height: maxHeight, width: maxWidth, length: maxLength }
         });
         
         console.log('✅ Frete calculado:', response.data);

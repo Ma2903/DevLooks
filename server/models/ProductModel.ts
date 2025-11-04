@@ -6,7 +6,7 @@ export interface IProduct extends Document {
     name: string;
     description: string;
     price: number;
-    promotion_price?: number; // <-- CAMPO ADICIONADO AQUI (opcional)
+    promotion_price?: number;
     category: string;
     stock: number;
     image: string;
@@ -21,6 +21,13 @@ export interface IProduct extends Document {
     brand?: string;
     sku?: string;
     tags?: string[];
+    // Campos para cálculo de frete
+    weight?: number; // Peso em kg
+    dimensions?: {
+        height: number; // Altura em cm
+        width: number;  // Largura em cm
+        length: number; // Comprimento em cm
+    };
     createdAt: Date;
     updatedAt: Date;
 }
@@ -45,6 +52,13 @@ const ProductSchema = new Schema<IProduct>({
     brand: { type: String },
     sku: { type: String, unique: true, sparse: true },
     tags: [{ type: String }],
+    // Campos para cálculo de frete
+    weight: { type: Number, default: 0.5 }, // Peso padrão: 0.5 kg
+    dimensions: {
+        height: { type: Number, default: 10 },  // Altura padrão: 10 cm
+        width: { type: Number, default: 15 },   // Largura padrão: 15 cm
+        length: { type: Number, default: 20 }   // Comprimento padrão: 20 cm
+    }
 }, { timestamps: true });
 
 const ProductModel = model<IProduct>("Product", ProductSchema);

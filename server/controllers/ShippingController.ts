@@ -148,25 +148,46 @@ class ShippingController {
             const cepPrefix = cepClean.substring(0, 2);
             
             // Busca na tabela de frete
-            const shippingInfo = SHIPPING_TABLE[cepPrefix];
+            let shippingInfo = SHIPPING_TABLE[cepPrefix];
             
             if (!shippingInfo) {
                 // CEP não encontrado na tabela - usa valor padrão
                 console.log(`⚠️  CEP prefix ${cepPrefix} não encontrado. Usando valor padrão.`);
-                res.status(200).json({
-                    service: 'SEDEX',
+                shippingInfo = {
                     cost: 35.00,
-                    deliveryTime: '7-10 dias úteis',
+                    days: '7-10 dias úteis',
                     region: 'Brasil'
-                });
-                return;
+                };
             }
 
-            console.log(`✅ Frete calculado para ${shippingInfo.region}: R$ ${shippingInfo.cost.toFixed(2)} - ${shippingInfo.days}`);
+            // Calcula ajuste baseado no peso e dimensões (se fornecidos)
+            const { weight, dimensions } = req.body;
+            let finalCost = shippingInfo.cost;
+            const totalWeight = weight || 0.5; // Peso padrão: 0.5kg
+            
+            // Adiciona R$ 2,00 para cada kg adicional acima de 1kg
+            if (totalWeight > 1) {
+                const extraWeight = totalWeight - 1;
+                const weightSurcharge = extraWeight * 2.00;
+                finalCost += weightSurcharge;
+                console.log(`📦 Peso adicional: ${extraWeight.toFixed(2)}kg - Taxa extra: R$ ${weightSurcharge.toFixed(2)}`);
+            }
+
+            // Adiciona taxa se o volume for muito grande
+            if (dimensions) {
+                const volume = (dimensions.height * dimensions.width * dimensions.length) / 1000; // dm³
+                if (volume > 30) {
+                    const volumeSurcharge = 5.00;
+                    finalCost += volumeSurcharge;
+                    console.log(`📏 Volume grande (${volume.toFixed(2)} dm³) - Taxa extra: R$ ${volumeSurcharge.toFixed(2)}`);
+                }
+            }
+
+            console.log(`✅ Frete calculado para ${shippingInfo.region}: R$ ${finalCost.toFixed(2)} - ${shippingInfo.days}`);
 
             res.status(200).json({
                 service: 'SEDEX',
-                cost: shippingInfo.cost,
+                cost: finalCost,
                 deliveryTime: shippingInfo.days,
                 region: shippingInfo.region
             });

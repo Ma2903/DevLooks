@@ -22,5 +22,6 @@ router.delete("/products/:id", verifyToken, verifyAdmin, ProductController.delet
 // 5. Rotas de reviews (requer autenticação)
 router.post("/products/:id/reviews", verifyToken, ProductController.addReview);
 router.get("/products/:id/reviews", ProductController.getProductReviews);
+router.get("/products/:id/can-review", verifyToken, ProductController.checkUserCanReview);
 
 export default router;
