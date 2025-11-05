@@ -9,31 +9,37 @@
     <div v-else-if="user" class="w-full max-w-5xl bg-gray-800 rounded-2xl shadow-2xl p-8 border-t-4 border-emerald-400">
       
       <div class="flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
-        <div class="relative mb-6 md:mb-0 md:mr-8 flex-shrink-0">
-          <img :src="user.avatarUrl || 'https://i.pravatar.cc/150?u=' + user.email" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-emerald-400 shadow-lg object-cover">
-        </div>
         
-        <div class="flex-grow">
-          <h1 class="text-3xl lg:text-4xl font-bold text-white">{{ user.name }}</h1>
-          <p class="text-gray-400 mt-2 text-lg">{{ user.email }}</p>
-          <div class="mt-4 flex justify-center md:justify-start items-center gap-4">
-            <span class="inline-block bg-emerald-500 text-white text-sm font-bold px-4 py-1 rounded-full uppercase tracking-wider">
-              {{ user.role }}
-            </span>
-            <span class="inline-block bg-sky-500 text-white text-sm font-bold px-4 py-1 rounded-full">
-              Passes de Avatar: {{ user.avatarPasses || 0 }}
-            </span>
+        <!-- Coluna de Informações do Usuário -->
+        <div class="flex-grow md:border-r md:border-gray-700 md:pr-8">
+          <div class="relative mb-6 md:mb-0 flex-shrink-0 mx-auto md:mx-0">
+            <img :src="user.avatarUrl || 'https://i.pravatar.cc/150?u=' + user.email" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-emerald-400 shadow-lg object-cover mx-auto">
+          </div>
+          
+          <div class="mt-6">
+            <h1 class="text-3xl lg:text-4xl font-bold text-white">{{ user.name }}</h1>
+            <p class="text-gray-400 mt-2 text-lg">{{ user.email }}</p>
+            <div class="mt-4 flex justify-center md:justify-start items-center gap-4">
+              <span class="inline-block bg-emerald-500 text-white text-sm font-bold px-4 py-1 rounded-full uppercase tracking-wider">
+                {{ user.role }}
+              </span>
+              <span class="inline-block bg-sky-500 text-white text-sm font-bold px-4 py-1 rounded-full">
+                Passes de Avatar: {{ user.avatarPasses || 0 }}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div class="flex flex-col items-center mt-6 md:mt-0 md:ml-4 gap-3 w-full md:w-auto">
-            <router-link :to="`/edit-user/${user._id}`" class="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+        <!-- Coluna de Ações -->
+        <div class="flex flex-col items-center mt-8 md:mt-0 md:pl-8 gap-4 w-full md:w-1/3">
+            <h2 class="text-2xl font-bold text-emerald-400 mb-2">Ações Rápidas</h2>
+            <router-link :to="`/edit-user/${user._id}`" class="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md">
               <i class="fas fa-edit"></i>Editar Perfil
             </router-link>
-            <router-link to="/my-orders" class="w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+            <router-link to="/my-orders" class="w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md">
               <i class="fas fa-receipt"></i>Meus Pedidos
             </router-link>
-            <button @click="confirmAccountDeletion" class="w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+            <button @click="confirmAccountDeletion" class="w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md">
                 <i class="fas fa-trash-alt"></i>Deletar Conta
             </button>
         </div>

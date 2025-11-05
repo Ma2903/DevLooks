@@ -74,10 +74,11 @@ class CouponController {
             
             // Busca case-insensitive usando RegExp
             const coupon = await Coupon.findOne({ 
-                code: { $regex: new RegExp('^' + code + '$', 'i') } 
+                code: { $regex: new RegExp('^' + code + '$', 'i') },
+                is_active: true
             });
 
-            if (!coupon || !coupon.is_active || new Date(coupon.expires_at) < new Date()) {
+            if (!coupon || new Date(coupon.expires_at) < new Date()) {
                 res.status(404).json({ message: "Cupom inválido, expirado ou inativo." });
                 return;
             }

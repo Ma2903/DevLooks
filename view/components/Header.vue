@@ -17,7 +17,7 @@
       <div class="hidden md:flex items-center space-x-6">
         <!-- Notificações -->
         <div v-if="user" class="relative">
-          <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors">
+          <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors" aria-label="Notificações" :aria-expanded="isNotificationsOpen">
             <i class="fas fa-bell text-xl"></i>
             <span v-if="notificationCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ notificationCount }}</span>
           </button>
@@ -50,14 +50,14 @@
           </transition>
         </div>
 
-        <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors">
+        <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors" aria-label="Carrinho de Compras">
           <i class="fas fa-shopping-cart text-xl"></i>
-          <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+          <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" aria-label="Itens no carrinho">{{ cartItemCount }}</span>
         </router-link>
         
         <div v-if="user" class="relative">
-          <button @click="toggleDropdown" class="flex items-center gap-2">
-            <img :src="user.avatarUrl || 'https://i.pravatar.cc/40'" alt="User Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
+          <button @click="toggleDropdown" class="flex items-center gap-2" aria-label="Menu do Usuário" :aria-expanded="isDropdownOpen">
+            <img :src="user.avatarUrl || 'https://i.pravatar.cc/40'" :alt="`Avatar de ${user.name}`" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
           </button>
           <transition name="fade-scale">
             <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-56 bg-gray-700 rounded-md shadow-lg py-2 z-50 border border-gray-600">
@@ -84,11 +84,11 @@
       </div>
       
       <div class="md:hidden flex items-center">
-        <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors mr-4">
+        <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors mr-4" aria-label="Carrinho de Compras">
           <i class="fas fa-shopping-cart text-xl"></i>
-            <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartItemCount }}</span>
+            <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" aria-label="Itens no carrinho">{{ cartItemCount }}</span>
         </router-link>
-        <button @click="isMobileMenuOpen = !isMobileMenuOpen">
+        <button @click="isMobileMenuOpen = !isMobileMenuOpen" aria-label="Abrir Menu Principal" :aria-expanded="isMobileMenuOpen">
           <i class="fas fa-bars text-2xl"></i>
         </button>
       </div>

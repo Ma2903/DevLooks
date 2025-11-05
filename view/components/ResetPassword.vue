@@ -70,12 +70,17 @@ export default {
         // Use await para esperar a resposta
         const response = await axios.post('/api/users/forgot-password', { email: this.email });
         
-        // Sucesso: redireciona
-        this.$router.push("/confirm-reset?hash=" + response.data.code + "&email=" + response.data.email);
+        // Sucesso: exibe a mensagem de sucesso e não redireciona imediatamente
+        this.resetSuccess = "Link de redefinição enviado para o seu email!";
+        
+        // Log para o desenvolvedor, caso precise do hash
+        if (response.data.code && response.data.email) {
+            console.log("Link de redefinição simulado: /confirm-reset?hash=" + response.data.code + "&email=" + response.data.email);
+        }
 
       } catch (error) {
-        // Erro: exibe a mensagem de erro
-        this.resetError = "Erro ao enviar o link de redefinição. Verifique seu email.";
+        // Captura erros de rede ou de API
+        this.resetError = error.response?.data?.message || "Erro ao enviar o link de redefinição. Verifique seu email.";
         console.error("Erro ao enviar o link de redefinição:", error);
       } finally {
         this.loading = false;

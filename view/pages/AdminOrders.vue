@@ -31,7 +31,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-700">
-            <tr v-for="order in orders" :key="order._id" class="hover:bg-gray-700/50">
+            <tr v-for="order in paginatedOrders" :key="order._id" class="hover:bg-gray-700/50">
               <td class="px-6 py-4 font-mono text-xs">{{ order._id }}</td>
               <td class="px-6 py-4">{{ order.user ? order.user.name : 'Utilizador Removido' }} <br> <span class="text-xs text-gray-400">{{ order.user ? order.user.email : '' }}</span></td>
               <td class="px-6 py-4">{{ new Date(order.createdAt).toLocaleDateString('pt-BR') }}</td>
@@ -49,6 +49,26 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Controles de Paginação -->
+      <div v-if="totalPages > 1" class="flex justify-center items-center space-x-4 mt-8">
+        <button 
+          @click="currentPage--" 
+          :disabled="currentPage === 1"
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 transition"
+        >
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        <span class="text-lg">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button 
+          @click="currentPage++" 
+          :disabled="currentPage === totalPages"
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 transition"
+        >
+          Próxima <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -61,22 +81,36 @@ export default {
   name: 'AdminOrders',
   data() {
     return {
-      orders: [],
+      allOrders: [], // Todos os pedidos
+      ordersPerPage: 10,
+      currentPage: 1,
       loading: true,
     };
   },
   async created() {
     await this.fetchOrders();
   },
+  computed: {
+    paginatedOrders() {
+      const start = (this.currentPage - 1) * this.ordersPerPage;
+      const end = start + this.ordersPerPage;
+      return this.allOrders.slice(start, end);
+    },
+    totalPages() {
+      return Math.ceil(this.allOrders.length / this.ordersPerPage);
+    },
+  },
   methods: {
     async fetchOrders() {
       this.loading = true;
       try {
         const token = localStorage.getItem('token');
+        // A API de backend deve ser ajustada para suportar paginação, mas como não temos acesso,
+        // vamos buscar todos e paginar no frontend.
         const response = await axios.get('/api/orders', {
           headers: { 'Authorization': `Bearer ${token}` },
         });
-        this.orders = response.data;
+        this.allOrders = response.data;
       } catch (error) {
         Swal.fire({
           title: 'Erro!',

@@ -34,25 +34,57 @@ class CsvLibrary {
     if (!jsonData || jsonData.length === 0) {
       return "";
     }
-    const sanitizedData = jsonData.map(row => {
-        const newRow: { [key: string]: any } = {};
-        for(const key in row) {
-            if(typeof row[key] === 'string') {
-                newRow[key] = `"${row[key].replace(/"/g, '""')}"`;
+    // Função auxiliar para achatar objetos e formatar valores
+    const flattenAndFormat = (data: any, prefix = ''): { [key: string]: any } => {
+        const result: { [key: string]: any } = {};
+        for (const key in data) {
+            if (!data.hasOwnProperty(key)) continue;
+
+            const newKey = prefix ? `${prefix}_${key}` : key;
+            const value = data[key];
+
+            if (typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)) {
+                // Objeto aninhado (ex: user, dimensions)
+                Object.assign(result, flattenAndFormat(value, newKey));
+            } else if (Array.isArray(value)) {
+                // Array (ex: items)
+                result[newKey] = `"${value.map(item => JSON.stringify(item)).join('; ').replace(/"/g, '""')}"`;
+            } else if (value instanceof Date) {
+                // Data
+                result[newKey] = value.toISOString();
+            } else if (typeof value === 'string') {
+                // String: sanitiza e coloca entre aspas
+                result[newKey] = `"${value.replace(/"/g, '""')}"`;
             } else {
-                newRow[key] = row[key];
+                // Outros tipos (number, boolean, null)
+                result[newKey] = value;
             }
         }
-        return newRow;
-    });
+        return result;
+    };
 
-    const headers = Object.keys(sanitizedData[0]);
+    // 1. Achata e formata todos os dados
+    const flattenedData = jsonData.map(row => flattenAndFormat(row));
+
+    if (flattenedData.length === 0) {
+        return "";
+    }
+
+    // 2. Coleta todos os cabeçalhos únicos
+    const allHeaders = new Set<string>();
+    flattenedData.forEach(row => {
+        Object.keys(row).forEach(key => allHeaders.add(key));
+    });
+    const headers = Array.from(allHeaders);
+
+    // 3. Cria as linhas CSV
     const csvRows = [
-      headers.join(','),
-      ...sanitizedData.map(row =>
-        headers.map(header => row[header]).join(',')
-      )
+        headers.join(','), // Cabeçalho
+        ...flattenedData.map(row =>
+            headers.map(header => row[header] !== undefined ? row[header] : '').join(',')
+        )
     ];
+
     return csvRows.join('\n');
   }
 }

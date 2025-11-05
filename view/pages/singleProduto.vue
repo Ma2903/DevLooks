@@ -428,6 +428,92 @@ export default {
         year: 'numeric'
       });
     },
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('pt-BR', options);
+    },
+    async fetchReviews(productId) {
+      try {
+        const response = await axios.get(`/api/products/${productId}/reviews`);
+        this.reviews = response.data.reviews || [];
+        
+        // Chamada simulada para as rotas de IA (ainda não implementadas)
+        if (this.reviews.length > 0) {
+          // Simulação do resumo de IA
+          this.aiSummary = "Análise de IA: A maioria dos clientes elogia a qualidade do material e a rapidez na entrega. Pontos negativos incluem o tamanho, que é um pouco menor que o esperado.";
+          this.sentimentStats = {
+            percentages: {
+              positivo: 75,
+              negativo: 15,
+              neutro: 10
+            }
+          };
+          // Se as rotas de IA estivessem prontas, seria:
+          // await this.generateAISummary();
+          // await this.analyzeSentiments();
+        }
+      } catch (error) {
+        console.error("Erro ao carregar avaliações:", error);
+      }
+    },
+    async checkIfUserCanReview(productId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.userCanReview = false;
+        return;
+      }
+      try {
+        // A rota de backend faz a verificação completa (compra + recebimento + não avaliou)
+        const response = await axios.get(`/api/products/${productId}/can-review`);
+        this.userCanReview = response.data.canReview;
+      } catch (error) {
+        // 401 ou 403, o usuário não está logado ou não tem permissão
+        this.userCanReview = false;
+        console.error("Erro ao verificar permissão de avaliação:", error);
+      }
+    },
+    async submitReview() {
+      const productId = this.$route.params.id;
+      if (!this.reviewForm.comment || this.reviewForm.rating < 1) {
+        Swal.fire({
+          title: 'Atenção!',
+          text: 'Por favor, preencha a nota e o comentário.',
+          icon: 'warning',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+        return;
+      }
+
+      try {
+        await axios.post(`/api/products/${productId}/review`, this.reviewForm);
+        
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Sua avaliação foi enviada com sucesso!',
+          icon: 'success',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+
+        // Limpa o formulário e recarrega as avaliações
+        this.reviewForm.comment = '';
+        this.reviewForm.rating = 5;
+        this.userCanReview = false; // Impede o reenvio
+        await this.fetchReviews(productId);
+
+      } catch (error) {
+        console.error("Erro ao enviar avaliação:", error);
+        Swal.fire({
+          title: 'Erro!',
+          text: error.response?.data?.message || 'Não foi possível enviar sua avaliação.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+      }
+    },
     openImageModal(image) {
       // Abre a imagem em uma modal ou nova aba
       window.open(this.getImageUrl(image), '_blank');

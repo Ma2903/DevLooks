@@ -44,6 +44,10 @@
               <span>Desconto ({{ checkoutData.appliedCoupon.code }})</span>
               <span>- R$ {{ checkoutData.discountAmount.toFixed(2) }}</span>
             </div>
+            <div class="flex justify-between text-gray-300">
+              <span>Frete</span>
+              <span>R$ {{ checkoutData.shippingCost.toFixed(2) }}</span>
+            </div>
             <div class="border-t border-gray-700 pt-3 mt-3 flex justify-between font-bold text-2xl text-white">
               <span>Total</span>
               <span class="text-[#04d1b0]">R$ {{ checkoutData.finalTotal.toFixed(2) }}</span>
@@ -71,7 +75,7 @@ export default {
     return {
       checkoutData: {
         cartItems: [], appliedCoupon: null, subtotal: 0,
-        discountAmount: 0, finalTotal: 0, shippingAddress: null,
+        discountAmount: 0, finalTotal: 0, shippingAddress: null, shippingCost: 0,
       },
     };
   },

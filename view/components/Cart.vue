@@ -64,19 +64,21 @@
                         </button>
                     </div>
                     <!-- Wrapper fixo que sempre existe no DOM -->
-                    <div class="min-h-[60px]">
-                        <div v-if="shippingError" class="text-red-400 text-sm mt-2 fade-in">
-                            <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
-                        </div>
-                        <div v-else-if="hasShippingInfo" class="mt-3 p-3 bg-gray-700 rounded-lg fade-in">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-300">SEDEX</span>
-                                <span class="text-[#04d1b0] font-bold">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                    <div class="min-h-[60px] mt-2">
+                        <transition name="fade" mode="out-in">
+                            <div v-if="shippingError" key="error" class="text-red-400 text-sm">
+                                <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
                             </div>
-                            <div class="text-xs text-gray-400 mt-1">
-                                <i class="fas fa-clock"></i> {{ shippingTime || 'Calculando...' }}
+                            <div v-else-if="hasShippingInfo" key="success" class="p-3 bg-gray-700 rounded-lg">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-300">SEDEX</span>
+                                    <span class="text-[#04d1b0] font-bold">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                                </div>
+                                <div class="text-xs text-gray-400 mt-1">
+                                    <i class="fas fa-clock"></i> {{ shippingTime || 'Calculando...' }}
+                                </div>
                             </div>
-                        </div>
+                        </transition>
                     </div>
                 </div>
 
@@ -94,14 +96,18 @@
                         <span>Subtotal ({{ totalItems }} itens)</span>
                         <span>R$ {{ subtotal.toFixed(2) }}</span>
                     </div>
-                    <div v-if="appliedCoupon" class="flex justify-between text-[#04d1b0]">
-                        <span>Desconto ({{ appliedCoupon.code }})</span>
-                        <span>- R$ {{ discountAmount.toFixed(2) }}</span>
-                    </div>
-                    <div v-if="hasShippingInfo" class="flex justify-between text-gray-300 fade-in">
-                        <span>Frete</span>
-                        <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
-                    </div>
+                    <transition name="fade">
+                        <div v-show="appliedCoupon" class="flex justify-between text-[#04d1b0]">
+                            <span>Desconto ({{ appliedCoupon?.code }})</span>
+                            <span>- R$ {{ discountAmount.toFixed(2) }}</span>
+                        </div>
+                    </transition>
+                    <transition name="fade">
+                        <div v-show="hasShippingInfo" class="flex justify-between text-gray-300">
+                            <span>Frete</span>
+                            <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                        </div>
+                    </transition>
                     <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl">
                         <span>Total</span>
                         <span class="text-[#04d1b0]">R$ {{ finalTotalWithShipping.toFixed(2) }}</span>
@@ -272,12 +278,13 @@ async function calculateShipping() {
         return;
     }
     
-    // Reseta estados antes de calcular
-    shippingReady.value = false;
-    loadingShipping.value = true;
-    shippingError.value = '';
-    shippingCost.value = null;
-    shippingTime.value = '';
+        // Reseta estados antes de calcular
+        shippingReady.value = false;
+        loadingShipping.value = true;
+        shippingError.value = '';
+        shippingCost.value = null;
+        shippingTime.value = '';
+        await nextTick(); // Garante que o DOM seja atualizado antes de prosseguir
     
     try {
         // Calcula peso e dimensões totais do carrinho
@@ -287,7 +294,8 @@ async function calculateShipping() {
         let maxLength = 0;
         
         for (const item of cartItems.value) {
-            // Peso padrão por produto se não especificado: 0.5kg
+            // O item do carrinho deve ter os dados de peso e dimensão do produto
+            // Se não tiver, usa os valores padrão definidos no ProductModel.ts
             const itemWeight = item.weight || 0.5;
             totalWeight += itemWeight * item.quantity;
             
@@ -300,8 +308,16 @@ async function calculateShipping() {
             if (itemDimensions.length > maxLength) maxLength = itemDimensions.length;
         }
         
+        // Regra dos Correios: dimensões mínimas
+        maxHeight = Math.max(maxHeight, 2); // Mínimo 2 cm
+        maxWidth = Math.max(maxWidth, 11);  // Mínimo 11 cm
+        maxLength = Math.max(maxLength, 16); // Mínimo 16 cm
+        
+        // Regra dos Correios: peso mínimo
+        totalWeight = Math.max(totalWeight, 0.3); // Mínimo 300g (0.3kg)
+        
         console.log('📦 Peso total do carrinho:', totalWeight.toFixed(2), 'kg');
-        console.log('📏 Dimensões máximas:', { height: maxHeight, width: maxWidth, length: maxLength });
+        console.log('📏 Dimensões máximas (ajustadas):', { height: maxHeight, width: maxWidth, length: maxLength });
         
         const response = await api.post('/api/shipping/calculate', { 
             cep: cep.value,
@@ -330,7 +346,7 @@ async function calculateShipping() {
         // Se o erro é do Vue, não tenta atualizar nada
         if (error.message && error.message.includes('insertBefore')) {
             console.error('❌ Erro de renderização Vue:', error);
-            return;
+            // Não retorna, deixa o fluxo de erro continuar para limpar o estado
         }
         
         console.error('❌ Erro ao calcular frete:', error);
@@ -428,18 +444,25 @@ onMounted(fetchCart);
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
 
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
+/* Vue transition styles */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>

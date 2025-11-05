@@ -19,8 +19,8 @@ router.get("/products/:id", ProductController.getProductById);
 router.put("/products/:id", verifyToken, verifyAdmin, ProductController.uploadImage, ProductController.updateProduct);
 router.delete("/products/:id", verifyToken, verifyAdmin, ProductController.deleteProduct);
 
-// 5. Rotas de reviews (requer autenticação)
-router.post("/products/:id/reviews", verifyToken, ProductController.addReview);
+// Rotas de Avaliação (Reviews)
+router.post("/products/:id/review", verifyToken, ProductController.addReview);
 router.get("/products/:id/reviews", ProductController.getProductReviews);
 router.get("/products/:id/can-review", verifyToken, ProductController.checkUserCanReview);
 

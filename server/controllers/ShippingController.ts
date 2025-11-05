@@ -160,28 +160,38 @@ class ShippingController {
                 };
             }
 
-            // Calcula ajuste baseado no peso e dimensões (se fornecidos)
+            // Calcula ajuste baseado no peso e dimensões (agora obrigatórios no req.body)
             const { weight, dimensions } = req.body;
             let finalCost = shippingInfo.cost;
-            const totalWeight = weight || 0.5; // Peso padrão: 0.5kg
+            const totalWeight = weight; // Peso total em kg (já calculado no frontend)
             
-            // Adiciona R$ 2,00 para cada kg adicional acima de 1kg
+            if (!totalWeight || !dimensions) {
+                res.status(400).json({ error: "Peso e dimensões do carrinho são obrigatórios para o cálculo do frete." });
+                return;
+            }
+
+            // Fator de ajuste baseado no peso (ex: R$ 2,00 por kg adicional acima de 1kg)
             if (totalWeight > 1) {
                 const extraWeight = totalWeight - 1;
-                const weightSurcharge = extraWeight * 2.00;
+                // Taxa de R$ 2,00 por kg adicional
+                const weightSurcharge = extraWeight * 2.00; 
                 finalCost += weightSurcharge;
                 console.log(`📦 Peso adicional: ${extraWeight.toFixed(2)}kg - Taxa extra: R$ ${weightSurcharge.toFixed(2)}`);
             }
 
-            // Adiciona taxa se o volume for muito grande
-            if (dimensions) {
-                const volume = (dimensions.height * dimensions.width * dimensions.length) / 1000; // dm³
-                if (volume > 30) {
-                    const volumeSurcharge = 5.00;
-                    finalCost += volumeSurcharge;
-                    console.log(`📏 Volume grande (${volume.toFixed(2)} dm³) - Taxa extra: R$ ${volumeSurcharge.toFixed(2)}`);
-                }
+            // Fator de ajuste baseado no volume (ex: R$ 5,00 se o volume for muito grande)
+            // Volume em cm³ / 1000 = dm³
+            const volume = (dimensions.height * dimensions.width * dimensions.length) / 1000; 
+            
+            // Se o volume for maior que 30 dm³ (30 litros)
+            if (volume > 30) {
+                const volumeSurcharge = 5.00;
+                finalCost += volumeSurcharge;
+                console.log(`📏 Volume grande (${volume.toFixed(2)} dm³) - Taxa extra: R$ ${volumeSurcharge.toFixed(2)}`);
             }
+            
+            // Arredonda o custo final para 2 casas decimais
+            finalCost = parseFloat(finalCost.toFixed(2));
 
             console.log(`✅ Frete calculado para ${shippingInfo.region}: R$ ${finalCost.toFixed(2)} - ${shippingInfo.days}`);
 

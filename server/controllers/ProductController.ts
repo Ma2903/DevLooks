@@ -1,7 +1,8 @@
 // Ficheiro: server/controllers/ProductController.ts
 import { Request, Response, RequestHandler } from 'express';
 import ProductModel from '../models/ProductModel';
-import Order from '../models/OrderModel';
+import OrderModel from '../models/OrderModel';
+
 import multer from 'multer';
 import path from 'path';
 
@@ -88,7 +89,7 @@ class ProductController {
     // <<-- CORREÇÃO APLICADA AQUI -->>
     static getBestSellingProducts: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-          const bestSellingProducts = await Order.aggregate([
+          const bestSellingProducts = await OrderModel.aggregate([
             { $unwind: '$items' },
             {
               $group: {
@@ -133,10 +134,11 @@ class ProductController {
     static addReview: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const productId = req.params.id;
-            const userId = (req as any).user.id;
-            const { rating, comment, images } = req.body;
+            // O ID do usuário é injetado pelo middleware de autenticação
+            const userId = (req as any).user.id; 
+            const { rating, comment, image } = req.body;
 
-            // Validação
+            // 1. Validação básica
             if (!rating || rating < 1 || rating > 5) {
                 res.status(400).json({ message: 'Nota deve ser entre 1 e 5' });
                 return;
@@ -146,15 +148,17 @@ class ProductController {
                 return;
             }
 
-            // Verifica se o produto existe
+            // 2. Verifica se o produto existe
             const product = await ProductModel.findById(productId);
             if (!product) {
                 res.status(404).json({ message: 'Produto não encontrado' });
                 return;
             }
 
-            // Verificação de segurança: usuário comprou e recebeu o produto?
-            const userOrder = await Order.findOne({
+            // 3. Verificação de segurança: usuário comprou e recebeu o produto?
+            // Procura por um pedido do usuário para este produto com status 'Entregue'
+            const OrderModel = (await import('../models/OrderModel')).default;
+            const userOrder = await OrderModel.findOne({
                 user: userId,
                 'items.productId': productId,
                 status: 'Entregue'
@@ -167,7 +171,7 @@ class ProductController {
                 return;
             }
 
-            // Verifica se o usuário já avaliou este produto
+            // 4. Verifica se o usuário já avaliou este produto
             const existingReview = product.reviews?.find(
                 review => review.user.toString() === userId
             );
@@ -177,19 +181,21 @@ class ProductController {
                 return;
             }
 
-            // Adiciona a review
-            if (!product.reviews) product.reviews = [];
-            product.reviews.push({
-                user: userId as any,
+            // 5. Adiciona a review
+            const newReview = {
+                user: userId,
                 rating: Number(rating),
                 comment: comment.trim(),
-                images: images || [],
+                image: image || '',
                 createdAt: new Date()
-            });
+            };
+
+            if (!product.reviews) product.reviews = [];
+            product.reviews.push(newReview as any); // 'as any' para evitar problemas de tipagem com ObjectId
 
             await product.save();
 
-            // Popula o usuário para retornar info completa
+            // 6. Retorna o produto atualizado com a review populada
             const updatedProduct = await ProductModel.findById(productId).populate('reviews.user', 'name');
             
             res.status(201).json({ 
@@ -205,6 +211,7 @@ class ProductController {
     static getProductReviews: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const productId = req.params.id;
+            // Popula o usuário para retornar o nome do avaliador
             const product = await ProductModel.findById(productId).populate('reviews.user', 'name');
             
             if (!product) {
@@ -223,14 +230,14 @@ class ProductController {
             const productId = req.params.id;
             const userId = (req as any).user.id;
 
-            // Verifica se o produto existe
+            // 1. Verifica se o produto existe
             const product = await ProductModel.findById(productId);
             if (!product) {
                 res.status(404).json({ message: 'Produto não encontrado' });
                 return;
             }
 
-            // Verifica se já avaliou
+            // 2. Verifica se já avaliou
             const existingReview = product.reviews?.find(
                 review => review.user.toString() === userId
             );
@@ -240,8 +247,9 @@ class ProductController {
                 return;
             }
 
-            // Verifica se comprou e recebeu
-            const userOrder = await Order.findOne({
+            // 3. Verifica se comprou e recebeu
+            const OrderModel = (await import('../models/OrderModel')).default;
+            const userOrder = await OrderModel.findOne({
                 user: userId,
                 'items.productId': productId,
                 status: 'Entregue'
@@ -261,7 +269,7 @@ class ProductController {
             res.status(500).json({ message: 'Erro ao verificar permissão', error: error.message });
         }
     };
-    
+
     static uploadImage = upload.single('imagem');
 }
 
