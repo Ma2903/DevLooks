@@ -521,7 +521,8 @@ export default {
       window.open(this.getImageUrl(image), '_blank');
     },
     async addToWishlist() {
-      if (!this.user) {
+      const token = localStorage.getItem('token');
+      if (!token) {
         Swal.fire({
           title: 'Atenção!',
           text: 'Você precisa fazer login para adicionar produtos aos favoritos.',

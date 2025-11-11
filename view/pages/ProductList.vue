@@ -173,9 +173,7 @@ export default {
       }
 
       try {
-        await axios.post('/api/wishlist/add', { productId }, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await axios.post('/api/wishlist/add', { productId });
 
         Swal.fire({
           title: "Adicionado aos Favoritos!",
@@ -189,6 +187,7 @@ export default {
         });
 
       } catch (error) {
+        console.error('Erro ao adicionar à wishlist:', error);
         const message = error.response?.data?.message || 'Não foi possível adicionar aos favoritos.';
         Swal.fire({
           title: 'Aviso',
