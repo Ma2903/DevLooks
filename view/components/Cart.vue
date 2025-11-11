@@ -352,10 +352,21 @@ function goToCheckout() {
     }
     
     // Verifica se o frete foi calculado (exceto se for frete grátis)
-    if (subtotal.value < 150 && shipping.cost === null) {
+    if (subtotal.value < 150 && !shipping.ready) {
         Swal.fire({
             title: 'Atenção',
-            text: 'Por favor, calcule o frete antes de prosseguir.',
+            text: 'Por favor, informe o CEP de entrega antes de prosseguir.',
+            icon: 'warning',
+            background: "#1F2937",
+            color: "#E5E7EB"
+        });
+        return;
+    }
+
+    if (!cep.value || cep.value.length !== 9) {
+        Swal.fire({
+            title: 'Atenção',
+            text: 'Por favor, informe um CEP válido antes de prosseguir.',
             icon: 'warning',
             background: "#1F2937",
             color: "#E5E7EB"
@@ -363,13 +374,15 @@ function goToCheckout() {
         return;
     }
     
+    const shippingCostValue = subtotal.value >= 150 ? 0 : (shipping.cost || 15);
+
     localStorage.setItem('checkoutData', JSON.stringify({
         cartItems: cartItems.value,
         appliedCoupon: appliedCoupon.value,
         subtotal: subtotal.value,
         discountAmount: discountAmount.value,
-        shippingCost: shipping.cost || 0,
-        finalTotal: finalTotalWithShipping.value,
+        shippingCost: shippingCostValue,
+        finalTotal: finalTotal.value + shippingCostValue,
         cep: cep.value
     }));
     
