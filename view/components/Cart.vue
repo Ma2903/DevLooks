@@ -313,8 +313,13 @@ async function calculateShipping() {
         return;
     }
 
+    // Reseta e inicia loading em um único ciclo
     shippingError.value = '';
     shippingReady.value = false;
+    shippingCost.value = null;
+    shippingRegion.value = '';
+
+    await nextTick();
     loadingShipping.value = true;
 
     try {
@@ -352,19 +357,28 @@ async function calculateShipping() {
 
         console.log('✅ Resposta do frete:', response.data);
 
-        loadingShipping.value = false;
-        shippingCost.value = response.data.cost || 0;
-        shippingTime.value = response.data.deliveryTime || 'Não disponível';
-        shippingRegion.value = response.data.region || '';
-        shippingReady.value = true;
+        // Atualiza todas as variáveis em um único ciclo de renderização
+        await nextTick(() => {
+            shippingCost.value = response.data.cost || 0;
+            shippingTime.value = response.data.deliveryTime || 'Não disponível';
+            shippingRegion.value = response.data.region || '';
+            loadingShipping.value = false;
+            shippingError.value = '';
+            shippingReady.value = true;
+        });
 
     } catch (error) {
         console.error('❌ Erro ao calcular frete:', error);
         console.error('Detalhes:', error.response?.data);
-        loadingShipping.value = false;
-        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
-        shippingReady.value = false;
-        shippingCost.value = null;
+
+        // Atualiza todas as variáveis em um único ciclo de renderização
+        await nextTick(() => {
+            loadingShipping.value = false;
+            shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
+            shippingReady.value = false;
+            shippingCost.value = null;
+            shippingRegion.value = '';
+        });
     }
 }
 
