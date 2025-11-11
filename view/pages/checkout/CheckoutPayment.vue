@@ -59,7 +59,7 @@ export default {
         // 1. Monta o payload com os dados do localStorage
         const payload = {
           items: this.checkoutData.cartItems.map(item => ({
-            product: item.product._id || item.product, // Garante que apenas o ID seja enviado
+            product: item.productId || item.product?._id || item.product, // Garante que apenas o ID seja enviado
             quantity: item.quantity,
           })),
           shippingAddress: this.checkoutData.shippingAddress,

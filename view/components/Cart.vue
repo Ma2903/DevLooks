@@ -279,11 +279,9 @@ async function calculateShipping() {
     }
     
         // Reseta estados antes de calcular
-        shippingReady.value = false;
-        loadingShipping.value = true;
         shippingError.value = '';
-        shippingCost.value = null;
-        shippingTime.value = '';
+        loadingShipping.value = true;
+        shippingReady.value = false;
         await nextTick(); // Garante que o DOM seja atualizado antes de prosseguir
     
     try {
@@ -326,36 +324,22 @@ async function calculateShipping() {
         });
         
         console.log('✅ Frete calculado:', response.data);
-        
-        // Salva os dados temporariamente
-        const tempCost = response.data.cost;
-        const tempTime = response.data.deliveryTime;
-        
-        // Desliga loading e aguarda
+
+        // Desliga loading primeiro
         loadingShipping.value = false;
-        
-        // Aguarda antes de atualizar qualquer dado do frete
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Agora atualiza tudo de uma vez
-        shippingCost.value = tempCost;
-        shippingTime.value = tempTime;
+        await nextTick();
+
+        // Agora atualiza os valores do frete
+        shippingCost.value = response.data.cost || 0;
+        shippingTime.value = response.data.deliveryTime || '';
         shippingReady.value = true;
         
     } catch (error) {
-        // Se o erro é do Vue, não tenta atualizar nada
-        if (error.message && error.message.includes('insertBefore')) {
-            console.error('❌ Erro de renderização Vue:', error);
-            // Não retorna, deixa o fluxo de erro continuar para limpar o estado
-        }
-        
         console.error('❌ Erro ao calcular frete:', error);
-        
+
         loadingShipping.value = false;
-        
-        // Aguarda antes de mostrar erro
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
+        await nextTick();
+
         shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete. Tente novamente.';
         shippingReady.value = false;
         
