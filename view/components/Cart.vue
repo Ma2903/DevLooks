@@ -104,7 +104,7 @@
                         </div>
                     </transition>
                     <transition name="fade">
-                        <div v-show="hasShippingInfo" class="flex justify-between text-gray-300">
+                        <div v-show="shippingReady && shippingCost !== null" class="flex justify-between text-gray-300">
                             <span>Frete</span>
                             <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
                         </div>
