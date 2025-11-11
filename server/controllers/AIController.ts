@@ -32,7 +32,7 @@ class AIController {
 
             const model = AIController.genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-            const prompt = `Analise o sentimento do seguinte comentário de cliente sobre um produto e classifique como POSITIVO, NEGATIVO ou NEUTRO. Responda APENAS com uma dessas três palavras:
+            const prompt = `Analise o sentimento do seguinte comentário de cliente sobre um produto de tecnologia/desenvolvedor (como camisetas, canecas, mousepads, teclados, periféricos) e classifique como POSITIVO, NEGATIVO ou NEUTRO. Responda APENAS com uma dessas três palavras:
 
 Comentário: "${comment}"
 
@@ -82,7 +82,17 @@ Classificação:`;
 
             const commentsList = comments.map((c, i) => `${i + 1}. "${c}"`).join('\n');
 
-            const prompt = `Você é um assistente que resume avaliações de produtos. Analise os seguintes comentários de clientes e crie um resumo conciso em português brasileiro, destacando os pontos principais (pontos positivos e negativos mais mencionados). O resumo deve ter no máximo 3 parágrafos.
+            const prompt = `Você é um assistente especializado em produtos para desenvolvedores e tecnologia. Analise os seguintes comentários de clientes sobre produtos como camisetas geek, canecas, mousepads, teclados mecânicos, periféricos e acessórios para programadores.
+
+Crie um resumo conciso em português brasileiro, destacando:
+- Qualidade do produto (material, impressão, acabamento)
+- Conforto e usabilidade
+- Design e estética
+- Relação custo-benefício
+- Pontos positivos mais mencionados
+- Pontos de melhoria (se houver)
+
+O resumo deve ter no máximo 3 parágrafos curtos e objetivos.
 
 Comentários dos clientes:
 ${commentsList}
@@ -128,10 +138,10 @@ Resumo:`;
 
             // Analisa todos os comentários em lote
             const sentimentPromises = comments.map(async (comment) => {
-                const prompt = `Classifique o sentimento deste comentário como POSITIVO, NEGATIVO ou NEUTRO. Responda APENAS com uma palavra:
+                const prompt = `Classifique o sentimento deste comentário de um cliente sobre produto de tecnologia/desenvolvedor (camisetas, canecas, periféricos, acessórios geek) como POSITIVO, NEGATIVO ou NEUTRO. Responda APENAS com uma palavra:
 
 "${comment}"`;
-                
+
                 try {
                     const result = await model.generateContent(prompt);
                     const response = await result.response;
