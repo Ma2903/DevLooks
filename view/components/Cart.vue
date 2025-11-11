@@ -54,19 +54,19 @@
                             placeholder="00000-000"
                             maxlength="9"
                         />
-                        <button 
-                            @click="calculateShipping" 
-                            :disabled="loadingShipping"
+                        <button
+                            @click="calculateShipping"
+                            :disabled="shipping.loading"
                             class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-5 rounded-r-lg disabled:opacity-50"
                         >
-                            <i v-if="!loadingShipping" class="fas fa-calculator"></i>
+                            <i v-if="!shipping.loading" class="fas fa-calculator"></i>
                             <i v-else class="fas fa-spinner fa-spin"></i>
                         </button>
                     </div>
                     <!-- Resultado do Frete -->
                     <div class="mt-3 min-h-[120px]">
                         <!-- Loading -->
-                        <div v-show="loadingShipping" class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
+                        <div v-show="shipping.loading" class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
                             <div class="flex items-center gap-2 text-gray-400 text-sm">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span>Calculando frete...</span>
@@ -74,33 +74,33 @@
                         </div>
 
                         <!-- Erro -->
-                        <div v-show="!loadingShipping && shippingError" class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
+                        <div v-show="!shipping.loading && shipping.error" class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
                             <div class="flex items-center gap-2 text-red-400 text-sm">
                                 <i class="fas fa-exclamation-circle"></i>
-                                <span>{{ shippingError }}</span>
+                                <span>{{ shipping.error }}</span>
                             </div>
                         </div>
 
                         <!-- Frete Calculado com Sucesso -->
-                        <div v-show="!loadingShipping && !shippingError && shippingReady && shippingCost !== null" class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
+                        <div v-show="!shipping.loading && !shipping.error && shipping.ready && shipping.cost !== null" class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
                             <!-- Cabeçalho -->
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
                                     <span class="text-white font-bold">SEDEX</span>
                                 </div>
-                                <span class="text-[#04d1b0] font-bold text-lg">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                                <span class="text-[#04d1b0] font-bold text-lg">R$ {{ (shipping.cost || 0).toFixed(2) }}</span>
                             </div>
 
                             <!-- Detalhes -->
                             <div class="space-y-2 text-sm">
                                 <div class="flex items-center gap-2 text-gray-300">
                                     <i class="fas fa-clock text-[#04d1b0]"></i>
-                                    <span>Prazo: <strong class="text-white">{{ shippingTime || 'N/A' }}</strong></span>
+                                    <span>Prazo: <strong class="text-white">{{ shipping.time || 'N/A' }}</strong></span>
                                 </div>
-                                <div v-show="shippingRegion" class="flex items-center gap-2 text-gray-300">
+                                <div v-show="shipping.region" class="flex items-center gap-2 text-gray-300">
                                     <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
-                                    <span>Região: <strong class="text-white">{{ shippingRegion }}</strong></span>
+                                    <span>Região: <strong class="text-white">{{ shipping.region }}</strong></span>
                                 </div>
                             </div>
 
@@ -114,7 +114,7 @@
                         </div>
 
                         <!-- Placeholder quando não calculado -->
-                        <div v-show="!loadingShipping && !shippingError && !shippingReady" class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
+                        <div v-show="!shipping.loading && !shipping.error && !shipping.ready" class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
                             <div class="text-center text-gray-500 text-sm">
                                 <i class="fas fa-info-circle"></i>
                                 Digite seu CEP e clique em calcular
@@ -141,9 +141,9 @@
                         <span>Desconto ({{ appliedCoupon?.code }})</span>
                         <span>- R$ {{ discountAmount.toFixed(2) }}</span>
                     </div>
-                    <div v-if="shippingReady && shippingCost !== null" class="flex justify-between text-gray-300">
+                    <div v-if="shipping.ready && shipping.cost !== null" class="flex justify-between text-gray-300">
                         <span>Frete</span>
-                        <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                        <span>R$ {{ (shipping.cost || 0).toFixed(2) }}</span>
                     </div>
                     <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl">
                         <span>Total</span>
@@ -157,14 +157,14 @@
                 
                 <button
                     @click="goToCheckout"
-                    :disabled="shippingCost === null && subtotal < 150"
+                    :disabled="shipping.cost === null && subtotal < 150"
                     class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg mt-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:scale-[1.02]"
                 >
                     <i class="fas fa-credit-card mr-2"></i> Finalizar Compra
                 </button>
 
                 <!-- Aviso quando frete não está calculado -->
-                <div v-if="shippingCost === null && subtotal < 150" class="mt-3 p-3 bg-yellow-900/20 border border-yellow-500/50 rounded-lg">
+                <div v-if="shipping.cost === null && subtotal < 150" class="mt-3 p-3 bg-yellow-900/20 border border-yellow-500/50 rounded-lg">
                     <div class="flex items-center gap-2 text-yellow-400 text-sm">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>Calcule o frete acima para continuar</span>
@@ -172,7 +172,7 @@
                 </div>
 
                 <!-- Mensagem quando está pronto para checkout -->
-                <div v-else-if="shippingCost !== null || subtotal >= 150" class="mt-3 p-3 bg-green-900/20 border border-green-500/50 rounded-lg">
+                <div v-else-if="shipping.cost !== null || subtotal >= 150" class="mt-3 p-3 bg-green-900/20 border border-green-500/50 rounded-lg">
                     <div class="flex items-center gap-2 text-green-400 text-sm">
                         <i class="fas fa-check-circle"></i>
                         <span>Pronto para finalizar a compra!</span>
@@ -192,7 +192,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import CouponService from '@/services/CouponService';
 import api from '@/services/main.js';
@@ -203,12 +203,16 @@ const cartItems = ref([]);
 const couponCodeInput = ref('');
 const appliedCoupon = ref(null);
 const cep = ref('');
-const shippingCost = ref(null);
-const shippingTime = ref('');
-const shippingRegion = ref('');
-const loadingShipping = ref(false);
-const shippingError = ref('');
-const shippingReady = ref(false);
+
+// Usando objeto reativo ao invés de múltiplas refs
+const shipping = reactive({
+    cost: null,
+    time: '',
+    region: '',
+    loading: false,
+    error: '',
+    ready: false
+});
 
 async function fetchCart() {
     const token = localStorage.getItem('token');
@@ -297,11 +301,14 @@ async function calculateShipping() {
     }
 
     if (subtotal.value >= 150) {
-        shippingReady.value = false;
-        shippingError.value = '';
-        shippingCost.value = 0;
-        shippingTime.value = 'Frete Grátis!';
-        shippingReady.value = true;
+        Object.assign(shipping, {
+            cost: 0,
+            time: 'Frete Grátis!',
+            region: '',
+            error: '',
+            ready: true,
+            loading: false
+        });
 
         Swal.fire({
             icon: 'success',
@@ -313,14 +320,9 @@ async function calculateShipping() {
         return;
     }
 
-    // Reseta e inicia loading em um único ciclo
-    shippingError.value = '';
-    shippingReady.value = false;
-    shippingCost.value = null;
-    shippingRegion.value = '';
-
-    await nextTick();
-    loadingShipping.value = true;
+    shipping.loading = true;
+    shipping.error = '';
+    shipping.ready = false;
 
     try {
         let totalWeight = 0;
@@ -357,30 +359,27 @@ async function calculateShipping() {
 
         console.log('✅ Resposta do frete:', response.data);
 
-        // Atualiza loading primeiro
-        loadingShipping.value = false;
-        await nextTick();
-
-        // Atualiza os dados do frete
-        shippingCost.value = response.data.cost || 0;
-        shippingTime.value = response.data.deliveryTime || 'Não disponível';
-        shippingRegion.value = response.data.region || '';
-        shippingError.value = '';
-        shippingReady.value = true;
+        Object.assign(shipping, {
+            cost: response.data.cost || 0,
+            time: response.data.deliveryTime || 'Não disponível',
+            region: response.data.region || '',
+            error: '',
+            ready: true,
+            loading: false
+        });
 
     } catch (error) {
         console.error('❌ Erro ao calcular frete:', error);
         console.error('Detalhes:', error.response?.data);
 
-        // Atualiza loading primeiro
-        loadingShipping.value = false;
-        await nextTick();
-
-        // Atualiza estado de erro
-        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
-        shippingReady.value = false;
-        shippingCost.value = null;
-        shippingRegion.value = '';
+        Object.assign(shipping, {
+            cost: null,
+            time: '',
+            region: '',
+            error: error.response?.data?.error || 'Não foi possível calcular o frete.',
+            ready: false,
+            loading: false
+        });
     }
 }
 
@@ -415,7 +414,7 @@ function goToCheckout() {
     }
     
     // Verifica se o frete foi calculado (exceto se for frete grátis)
-    if (subtotal.value < 150 && shippingCost.value === null) {
+    if (subtotal.value < 150 && shipping.cost === null) {
         Swal.fire({
             title: 'Atenção',
             text: 'Por favor, calcule o frete antes de prosseguir.',
@@ -431,7 +430,7 @@ function goToCheckout() {
         appliedCoupon: appliedCoupon.value,
         subtotal: subtotal.value,
         discountAmount: discountAmount.value,
-        shippingCost: shippingCost.value || 0,
+        shippingCost: shipping.cost || 0,
         finalTotal: finalTotalWithShipping.value,
         cep: cep.value
     }));
@@ -449,8 +448,8 @@ const discountAmount = computed(() => {
 });
 const finalTotal = computed(() => Math.max(0, subtotal.value - discountAmount.value));
 const finalTotalWithShipping = computed(() => {
-    const shipping = shippingCost.value || 0;
-    return finalTotal.value + shipping;
+    const shippingValue = shipping.cost || 0;
+    return finalTotal.value + shippingValue;
 });
 
 onMounted(fetchCart);
