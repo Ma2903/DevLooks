@@ -50,7 +50,16 @@
         Nenhum produto para exibir no momento.
       </div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div v-for="produto in produtos" :key="produto._id" class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 flex flex-col">
+        <div v-for="produto in produtos" :key="produto._id" class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 flex flex-col relative">
+            <button
+              v-if="isLoggedIn && userType !== 'admin'"
+              @click.stop="addToWishlist(produto._id)"
+              class="absolute top-3 right-3 z-20 bg-gray-900/80 hover:bg-red-500 text-red-400 hover:text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm"
+              title="Adicionar aos favoritos"
+            >
+              <i class="fas fa-heart"></i>
+            </button>
+
             <router-link :to="`/products/${produto._id}`" class="block mb-4">
               <img :src="getImageUrl(produto.image)" :alt="produto.name" class="w-full h-48 object-cover rounded-lg"/>
             </router-link>
@@ -170,6 +179,11 @@ export default {
       userType: "user",
     };
   },
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('token');
+    }
+  },
   methods: {
     getImageUrl(imagePath) {
       if (!imagePath) {
@@ -249,6 +263,46 @@ export default {
           title: 'Erro',
           text: 'Não foi possível adicionar o item ao carrinho.',
           icon: 'error',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        });
+      }
+    },
+    async addToWishlist(productId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire({
+          title: 'Login Necessário',
+          text: 'Você precisa fazer login para adicionar aos favoritos.',
+          icon: 'info',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        }).then(() => this.$router.push('/login'));
+        return;
+      }
+
+      try {
+        await api.post('/api/wishlist/add', { productId }, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        Swal.fire({
+          title: "Adicionado aos Favoritos!",
+          icon: "success",
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+
+      } catch (error) {
+        const message = error.response?.data?.message || 'Não foi possível adicionar aos favoritos.';
+        Swal.fire({
+          title: 'Aviso',
+          text: message,
+          icon: message.includes('já está') ? 'info' : 'error',
           background: "#1F2937",
           color: "#E5E7EB"
         });

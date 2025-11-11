@@ -38,93 +38,66 @@
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-[#04d1b0] sticky top-8">
                 <h2 class="text-2xl font-bold text-white mb-6"><i class="fas fa-receipt"></i> Resumo do Pedido</h2>
                 
-                <!-- Sistema de CEP e Cálculo de Frete -->
+                <!-- Sistema de CEP e Frete Fixo -->
                 <div class="mb-4">
                     <label for="cep" class="block text-gray-300 mb-2 font-semibold">
-                        <i class="fas fa-truck mr-1"></i> Calcular Frete
+                        <i class="fas fa-truck mr-1"></i> Informar CEP de Entrega
                     </label>
                     <div class="flex">
-                        <input 
-                            type="text" 
-                            id="cep" 
-                            v-model="cep" 
+                        <input
+                            type="text"
+                            id="cep"
+                            v-model="cep"
                             @input="applyCepMask"
-                            @keyup.enter="calculateShipping" 
-                            class="flex-1 px-4 py-2 rounded-l-lg bg-gray-900 border border-gray-700" 
+                            @keyup.enter="setFixedShipping"
+                            class="flex-1 px-4 py-2 rounded-l-lg bg-gray-900 border border-gray-700"
                             placeholder="00000-000"
                             maxlength="9"
                         />
                         <button
-                            @click="calculateShipping"
-                            :disabled="shipping.loading"
-                            class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-5 rounded-r-lg disabled:opacity-50"
+                            @click="setFixedShipping"
+                            class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-2 px-5 rounded-r-lg"
                         >
-                            <i v-if="!shipping.loading" class="fas fa-calculator"></i>
-                            <i v-else class="fas fa-spinner fa-spin"></i>
+                            <i class="fas fa-check"></i>
                         </button>
                     </div>
                     <!-- Resultado do Frete -->
-                    <div class="mt-3 min-h-[120px]">
-                        <!-- Loading -->
-                        <template v-if="shipping.loading">
-                            <div class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
-                                <div class="flex items-center gap-2 text-gray-400 text-sm">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>Calculando frete...</span>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Erro -->
-                        <template v-else-if="shipping.error">
-                            <div class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
-                                <div class="flex items-center gap-2 text-red-400 text-sm">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <span>{{ shipping.error }}</span>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Frete Calculado com Sucesso -->
-                        <template v-else-if="shipping.ready && shipping.cost !== null">
+                    <div class="mt-3">
+                        <!-- Frete Fixo -->
+                        <template v-if="shipping.ready && shipping.cost !== null">
                             <div class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
-                                <!-- Cabeçalho -->
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
                                         <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
-                                        <span class="text-white font-bold">SEDEX</span>
+                                        <span class="text-white font-bold">Frete Padrão</span>
                                     </div>
-                                    <span class="text-[#04d1b0] font-bold text-lg">R$ {{ (shipping.cost || 0).toFixed(2) }}</span>
+                                    <span class="text-[#04d1b0] font-bold text-lg">R$ 15,00</span>
                                 </div>
-
-                                <!-- Detalhes -->
                                 <div class="space-y-2 text-sm">
                                     <div class="flex items-center gap-2 text-gray-300">
                                         <i class="fas fa-clock text-[#04d1b0]"></i>
-                                        <span>Prazo: <strong class="text-white">{{ shipping.time || 'N/A' }}</strong></span>
+                                        <span>Prazo: <strong class="text-white">3 a 7 dias úteis</strong></span>
                                     </div>
-                                    <div v-if="shipping.region" class="flex items-center gap-2 text-gray-300">
+                                    <div class="flex items-center gap-2 text-gray-300">
                                         <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
-                                        <span>Região: <strong class="text-white">{{ shipping.region }}</strong></span>
+                                        <span>CEP: <strong class="text-white">{{ cep }}</strong></span>
                                     </div>
                                 </div>
-
-                                <!-- Badge de Sucesso -->
                                 <div class="mt-3 pt-3 border-t border-gray-600">
                                     <div class="flex items-center gap-2 text-xs text-green-400">
                                         <i class="fas fa-check-circle"></i>
-                                        <span>Frete calculado com sucesso!</span>
+                                        <span>Frete calculado para todo Brasil!</span>
                                     </div>
                                 </div>
                             </div>
                         </template>
 
-                        <!-- Placeholder quando não calculado -->
+                        <!-- Placeholder -->
                         <template v-else>
                             <div class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
                                 <div class="text-center text-gray-500 text-sm">
                                     <i class="fas fa-info-circle"></i>
-                                    Digite seu CEP e clique em calcular
+                                    Digite seu CEP para confirmar o frete (R$ 15,00 fixo - 3 a 7 dias úteis)
                                 </div>
                             </div>
                         </template>
@@ -296,7 +269,7 @@ function applyCepMask(event) {
     cep.value = value;
 }
 
-async function calculateShipping() {
+function setFixedShipping() {
     if (!cep.value || cep.value.length !== 9) {
         Swal.fire({
             icon: 'error',
@@ -311,7 +284,7 @@ async function calculateShipping() {
     if (subtotal.value >= 150) {
         Object.assign(shipping, {
             cost: 0,
-            time: 'Frete Grátis!',
+            time: '3 a 7 dias úteis',
             region: '',
             error: '',
             ready: true,
@@ -321,74 +294,31 @@ async function calculateShipping() {
         Swal.fire({
             icon: 'success',
             title: 'Frete Grátis!',
-            text: 'Parabéns! Sua compra tem frete grátis.',
+            text: 'Parabéns! Sua compra tem frete grátis (compras acima de R$ 150,00).',
             background: '#1F2937',
             color: '#E5E7EB'
         });
         return;
     }
 
-    shipping.loading = true;
-    shipping.error = '';
-    shipping.ready = false;
-
-    try {
-        let totalWeight = 0;
-        let maxHeight = 0;
-        let maxWidth = 0;
-        let maxLength = 0;
-
-        for (const item of cartItems.value) {
-            const itemWeight = item.weight || 0.5;
-            totalWeight += itemWeight * item.quantity;
-
-            const itemDimensions = item.dimensions || { height: 10, width: 15, length: 20 };
-            if (itemDimensions.height > maxHeight) maxHeight = itemDimensions.height;
-            if (itemDimensions.width > maxWidth) maxWidth = itemDimensions.width;
-            if (itemDimensions.length > maxLength) maxLength = itemDimensions.length;
-        }
-
-        maxHeight = Math.max(maxHeight, 2);
-        maxWidth = Math.max(maxWidth, 11);
-        maxLength = Math.max(maxLength, 16);
-        totalWeight = Math.max(totalWeight, 0.3);
-
-        console.log('📦 Calculando frete para:', {
-            cep: cep.value,
-            weight: totalWeight,
-            dimensions: { height: maxHeight, width: maxWidth, length: maxLength }
+    Object.assign(shipping, {
+        cost: 15,
+        time: '3 a 7 dias úteis',
+        region: '',
+        error: '',
+        ready: true,
+        loading: false
         });
 
-        const response = await api.post('/api/shipping/calculate', {
-            cep: cep.value,
-            weight: totalWeight,
-            dimensions: { height: maxHeight, width: maxWidth, length: maxLength }
-        });
-
-        console.log('✅ Resposta do frete:', response.data);
-
-        Object.assign(shipping, {
-            cost: response.data.cost || 0,
-            time: response.data.deliveryTime || 'Não disponível',
-            region: response.data.region || '',
-            error: '',
-            ready: true,
-            loading: false
-        });
-
-    } catch (error) {
-        console.error('❌ Erro ao calcular frete:', error);
-        console.error('Detalhes:', error.response?.data);
-
-        Object.assign(shipping, {
-            cost: null,
-            time: '',
-            region: '',
-            error: error.response?.data?.error || 'Não foi possível calcular o frete.',
-            ready: false,
-            loading: false
-        });
-    }
+    Swal.fire({
+        icon: 'success',
+        title: 'Frete Confirmado!',
+        text: 'Frete padrão: R$ 15,00 - Entrega em 3 a 7 dias úteis',
+        background: '#1F2937',
+        color: '#E5E7EB',
+        timer: 2000,
+        showConfirmButton: false
+    });
 }
 
 function getImageUrl(imagePath) {

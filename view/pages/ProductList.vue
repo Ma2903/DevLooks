@@ -19,7 +19,16 @@
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        <div v-for="product in produtosFiltrados" :key="product._id" class="bg-gray-900 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 flex flex-col">
+        <div v-for="product in produtosFiltrados" :key="product._id" class="bg-gray-900 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 flex flex-col relative">
+          <button
+            v-if="isLoggedIn"
+            @click.stop="addToWishlist(product._id)"
+            class="absolute top-3 right-3 z-20 bg-gray-800/80 hover:bg-red-500 text-red-400 hover:text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm"
+            title="Adicionar aos favoritos"
+          >
+            <i class="fas fa-heart"></i>
+          </button>
+
           <router-link :to="'/products/' + product._id" class="flex flex-col flex-grow">
             <img class="w-full h-56 object-cover" :src="getImageUrl(product.image)" :alt="product.name" />
             <div class="p-6 flex flex-col flex-grow">
@@ -57,22 +66,24 @@ export default {
     return {
       products: [],
       loading: true,
-      search: "", // Adiciona a propriedade para a busca
-      category: "", // Adiciona a propriedade para a categoria
+      search: "",
+      category: "",
     };
   },
   computed: {
-    // Lógica de filtro reintroduzida
     produtosFiltrados() {
       if (!this.search && !this.category) {
         return this.products;
       }
       return this.products.filter(product => {
-        const matchSearch = product.name.toLowerCase().includes(this.search.toLowerCase()) || 
+        const matchSearch = product.name.toLowerCase().includes(this.search.toLowerCase()) ||
                             product.description.toLowerCase().includes(this.search.toLowerCase());
         const matchCategory = this.category ? product.category === this.category : true;
         return matchSearch && matchCategory;
       });
+    },
+    isLoggedIn() {
+      return !!localStorage.getItem('token');
     }
   },
   async created() {
@@ -143,6 +154,46 @@ export default {
           title: 'Erro',
           text: 'Não foi possível adicionar o item ao carrinho.',
           icon: 'error',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        });
+      }
+    },
+    async addToWishlist(productId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire({
+          title: 'Login Necessário',
+          text: 'Você precisa fazer login para adicionar aos favoritos.',
+          icon: 'info',
+          background: "#1F2937",
+          color: "#E5E7EB"
+        }).then(() => this.$router.push('/login'));
+        return;
+      }
+
+      try {
+        await axios.post('/api/wishlist/add', { productId }, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        Swal.fire({
+          title: "Adicionado aos Favoritos!",
+          icon: "success",
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          background: "#1F2937",
+          color: "#E5E7EB",
+        });
+
+      } catch (error) {
+        const message = error.response?.data?.message || 'Não foi possível adicionar aos favoritos.';
+        Swal.fire({
+          title: 'Aviso',
+          text: message,
+          icon: message.includes('já está') ? 'info' : 'error',
           background: "#1F2937",
           color: "#E5E7EB"
         });
