@@ -63,21 +63,61 @@
                             <i v-else class="fas fa-spinner fa-spin"></i>
                         </button>
                     </div>
-                    <!-- Wrapper fixo que sempre existe no DOM -->
-                    <div class="min-h-[60px] mt-2">
-                        <div v-if="loadingShipping" class="text-gray-400 text-sm">
-                            <i class="fas fa-spinner fa-spin"></i> Calculando frete...
-                        </div>
-                        <div v-else-if="shippingError" class="text-red-400 text-sm">
-                            <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
-                        </div>
-                        <div v-else-if="shippingReady && shippingCost !== null" class="p-3 bg-gray-700 rounded-lg">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-300">SEDEX</span>
-                                <span class="text-[#04d1b0] font-bold">R$ {{ shippingCost.toFixed(2) }}</span>
+                    <!-- Resultado do Frete -->
+                    <div class="mt-3">
+                        <!-- Loading -->
+                        <div v-if="loadingShipping" class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
+                            <div class="flex items-center gap-2 text-gray-400 text-sm">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Calculando frete...</span>
                             </div>
-                            <div class="text-xs text-gray-400 mt-1">
-                                <i class="fas fa-clock"></i> {{ shippingTime }}
+                        </div>
+
+                        <!-- Erro -->
+                        <div v-else-if="shippingError" class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
+                            <div class="flex items-center gap-2 text-red-400 text-sm">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>{{ shippingError }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Frete Calculado com Sucesso -->
+                        <div v-else-if="shippingReady && shippingCost !== null" class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
+                            <!-- Cabeçalho -->
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
+                                    <span class="text-white font-bold">SEDEX</span>
+                                </div>
+                                <span class="text-[#04d1b0] font-bold text-lg">R$ {{ shippingCost.toFixed(2) }}</span>
+                            </div>
+
+                            <!-- Detalhes -->
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-gray-300">
+                                    <i class="fas fa-clock text-[#04d1b0]"></i>
+                                    <span>Prazo: <strong class="text-white">{{ shippingTime }}</strong></span>
+                                </div>
+                                <div v-if="shippingRegion" class="flex items-center gap-2 text-gray-300">
+                                    <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
+                                    <span>Região: <strong class="text-white">{{ shippingRegion }}</strong></span>
+                                </div>
+                            </div>
+
+                            <!-- Badge de Sucesso -->
+                            <div class="mt-3 pt-3 border-t border-gray-600">
+                                <div class="flex items-center gap-2 text-xs text-green-400">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Frete calculado com sucesso!</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Placeholder quando não calculado -->
+                        <div v-else class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
+                            <div class="text-center text-gray-500 text-sm">
+                                <i class="fas fa-info-circle"></i>
+                                Digite seu CEP e clique em calcular
                             </div>
                         </div>
                     </div>
@@ -115,16 +155,28 @@
                     <i class="fas fa-gift"></i> Parabéns! Você ganhou frete grátis!
                 </div>
                 
-                <button 
-                    @click="goToCheckout" 
+                <button
+                    @click="goToCheckout"
                     :disabled="shippingCost === null && subtotal < 150"
-                    class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg mt-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg mt-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:scale-[1.02]"
                 >
-                    <i class="fas fa-credit-card"></i> Finalizar Compra
+                    <i class="fas fa-credit-card mr-2"></i> Finalizar Compra
                 </button>
-                
-                <div v-if="shippingCost === null && subtotal < 150" class="text-xs text-gray-400 text-center mt-2">
-                    Calcule o frete para continuar
+
+                <!-- Aviso quando frete não está calculado -->
+                <div v-if="shippingCost === null && subtotal < 150" class="mt-3 p-3 bg-yellow-900/20 border border-yellow-500/50 rounded-lg">
+                    <div class="flex items-center gap-2 text-yellow-400 text-sm">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Calcule o frete acima para continuar</span>
+                    </div>
+                </div>
+
+                <!-- Mensagem quando está pronto para checkout -->
+                <div v-else-if="shippingCost !== null || subtotal >= 150" class="mt-3 p-3 bg-green-900/20 border border-green-500/50 rounded-lg">
+                    <div class="flex items-center gap-2 text-green-400 text-sm">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Pronto para finalizar a compra!</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -153,6 +205,7 @@ const appliedCoupon = ref(null);
 const cep = ref('');
 const shippingCost = ref(null);
 const shippingTime = ref('');
+const shippingRegion = ref('');
 const loadingShipping = ref(false);
 const shippingError = ref('');
 const shippingReady = ref(false);
@@ -302,35 +355,16 @@ async function calculateShipping() {
         loadingShipping.value = false;
         shippingCost.value = response.data.cost || 0;
         shippingTime.value = response.data.deliveryTime || 'Não disponível';
+        shippingRegion.value = response.data.region || '';
         shippingReady.value = true;
-
-        // Mostra mensagem de sucesso
-        Swal.fire({
-            icon: 'success',
-            title: 'Frete Calculado!',
-            html: `<div class="text-left">
-                <p><strong>Região:</strong> ${response.data.region || 'N/A'}</p>
-                <p><strong>Valor:</strong> R$ ${response.data.cost.toFixed(2)}</p>
-                <p><strong>Prazo:</strong> ${response.data.deliveryTime}</p>
-            </div>`,
-            background: '#1F2937',
-            color: '#E5E7EB',
-            confirmButtonColor: '#04d1b0'
-        });
 
     } catch (error) {
         console.error('❌ Erro ao calcular frete:', error);
         console.error('Detalhes:', error.response?.data);
         loadingShipping.value = false;
         shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: shippingError.value,
-            background: '#1F2937',
-            color: '#E5E7EB'
-        });
+        shippingReady.value = false;
+        shippingCost.value = null;
     }
 }
 
