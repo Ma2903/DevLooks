@@ -35,6 +35,57 @@ class CsvLibrary {
       return "";
     }
 
+    // Função para limpar e preparar dados antes do processamento
+    const cleanData = (obj: any): any => {
+        if (obj === null || obj === undefined) return obj;
+
+        // Se for ObjectId do MongoDB, converte para string
+        if (obj._id && typeof obj._id === 'object' && obj._id.toString) {
+            obj._id = obj._id.toString();
+        }
+
+        // Se for array, limpa cada item
+        if (Array.isArray(obj)) {
+            return obj.map(item => cleanData(item));
+        }
+
+        // Se for objeto, limpa cada propriedade
+        if (typeof obj === 'object' && !(obj instanceof Date)) {
+            const cleaned: any = {};
+            for (const key in obj) {
+                if (!obj.hasOwnProperty(key)) continue;
+
+                // Ignora campos internos do MongoDB
+                if (key === '__v') continue;
+
+                const value = obj[key];
+
+                // Converte ObjectId para string
+                if (value && typeof value === 'object' && value.toString && value.constructor.name === 'ObjectId') {
+                    cleaned[key] = value.toString();
+                }
+                // Processa objetos aninhados
+                else if (value && typeof value === 'object' && !(value instanceof Date)) {
+                    // Se for um objeto com _id, converte o _id
+                    if (value._id && typeof value._id === 'object') {
+                        cleaned[key] = { ...value, _id: value._id.toString() };
+                    } else {
+                        cleaned[key] = cleanData(value);
+                    }
+                }
+                else {
+                    cleaned[key] = value;
+                }
+            }
+            return cleaned;
+        }
+
+        return obj;
+    };
+
+    // Limpa todos os dados primeiro
+    const cleanedData = jsonData.map(item => cleanData(item));
+
     // Função para formatar valores corretamente para CSV
     const formatValue = (value: any, forDisplay: boolean = false): string => {
         if (value === null || value === undefined) {
@@ -74,17 +125,26 @@ class CsvLibrary {
         return String(value);
     };
 
-    // Função auxiliar para achatar objetos
+    // Função auxiliar para achatar objetos (simplificada)
     const flattenObject = (data: any, prefix = ''): { [key: string]: any } => {
         const result: { [key: string]: any } = {};
         for (const key in data) {
             if (!data.hasOwnProperty(key)) continue;
 
+            // Ignora campos internos
+            if (key === '__v') continue;
+
             const newKey = prefix ? `${prefix}_${key}` : key;
             const value = data[key];
 
+            // Não achata objetos que são _id ou que contém apenas campos simples
             if (typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)) {
-                Object.assign(result, flattenObject(value, newKey));
+                // Se o objeto tem _id, apenas extrai campos importantes
+                if (value._id) {
+                    result[newKey] = value.name || value.email || value.title || value._id;
+                } else {
+                    Object.assign(result, flattenObject(value, newKey));
+                }
             } else {
                 result[newKey] = value;
             }
@@ -92,17 +152,27 @@ class CsvLibrary {
         return result;
     };
 
-    // 1. Achata todos os dados
-    const flattenedData = jsonData.map(row => flattenObject(row));
+    // 1. Achata todos os dados limpos
+    const flattenedData = cleanedData.map(row => flattenObject(row));
 
     if (flattenedData.length === 0) {
         return "";
     }
 
-    // 2. Coleta todos os cabeçalhos únicos e ordena
+    // 2. Coleta todos os cabeçalhos únicos e filtra indesejados
     const allHeaders = new Set<string>();
     flattenedData.forEach(row => {
-        Object.keys(row).forEach(key => allHeaders.add(key));
+        Object.keys(row).forEach(key => {
+            // Ignora campos que contêm "buffer", "_id_" múltiplos, ou campos internos
+            const keyLower = key.toLowerCase();
+            if (!keyLower.includes('buffer') &&
+                !keyLower.includes('_bsontype') &&
+                !keyLower.includes('_id_id') &&
+                !keyLower.includes('_id_bsontype') &&
+                key !== '__v') {
+                allHeaders.add(key);
+            }
+        });
     });
 
     // Ordena para campos importantes virem primeiro
@@ -143,6 +213,17 @@ class CsvLibrary {
             'price': 'Preço',
             'total': 'Total',
             'status': 'Status',
+            'quantity': 'Quantidade',
+            'description': 'Descrição',
+            'category': 'Categoria',
+            'stock': 'Estoque',
+            'isActive': 'Ativo',
+            'isAdmin': 'Admin',
+            'phone': 'Telefone',
+            'address': 'Endereço',
+            'user': 'Usuário',
+            'product': 'Produto',
+            'items': 'Itens',
             '__v': 'Versão'
         };
 
