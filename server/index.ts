@@ -23,6 +23,7 @@ import avatarRoutes from './routes/AvatarRoutes';
 import shippingRoutes from './routes/ShippingRoutes';
 import aiRoutes from './routes/AIRoutes';
 import notificationRoutes from './routes/NotificationRoutes';
+import wishlistRoutes from './routes/WishlistRoutes';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/api', adminRoutes);
 app.use('/api', shippingRoutes);
 app.use('/api', aiRoutes);
 app.use('/api', notificationRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 app.listen(port, () => {
     console.log(`✅ API Rodando em http://localhost:${port}`);

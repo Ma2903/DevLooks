@@ -28,6 +28,7 @@ import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
 import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
 import CheckoutReview from './pages/checkout/CheckoutReview.vue';
 import CheckoutPayment from './pages/checkout/CheckoutPayment.vue';
+import Wishlist from './pages/Wishlist.vue';
 
 // Sua estrutura de rotas está ótima e foi mantida
 const routes = [
@@ -46,6 +47,7 @@ const routes = [
   { path: '/create-avatar', component: CreateAvatar, meta: { requiresAuth: true } },
   { path: '/profile', component: Profile, meta: { requiresAuth: true } },
   { path: '/cart', component: Cart, meta: { requiresAuth: true } },
+  { path: '/wishlist', component: Wishlist, meta: { requiresAuth: true } },
   { path: '/my-orders', component: OrderHistory, meta: { requiresAuth: true } },
   { path: '/edit-user/:id', component: EditUser, meta: { requiresAuth: true } },
 

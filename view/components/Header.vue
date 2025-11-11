@@ -50,6 +50,10 @@
           </transition>
         </div>
 
+        <router-link v-if="user" to="/wishlist" class="relative hover:text-red-400 transition-colors" aria-label="Lista de Desejos">
+          <i class="fas fa-heart text-xl"></i>
+        </router-link>
+
         <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors" aria-label="Carrinho de Compras">
           <i class="fas fa-shopping-cart text-xl"></i>
           <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" aria-label="Itens no carrinho">{{ cartItemCount }}</span>

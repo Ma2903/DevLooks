@@ -65,6 +65,9 @@
           <router-link to="/products" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
             <i class="fas fa-arrow-left"></i> Voltar
           </router-link>
+          <button v-if="userType !== 'admin'" @click="addToWishlist" class="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
+            <i class="fas fa-heart"></i> Adicionar aos Favoritos
+          </button>
           <button v-if="userType !== 'admin'" @click="addToCart" class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center gap-2">
             <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
           </button>
@@ -515,8 +518,44 @@ export default {
       }
     },
     openImageModal(image) {
-      // Abre a imagem em uma modal ou nova aba
       window.open(this.getImageUrl(image), '_blank');
+    },
+    async addToWishlist() {
+      if (!this.user) {
+        Swal.fire({
+          title: 'Atenção!',
+          text: 'Você precisa fazer login para adicionar produtos aos favoritos.',
+          icon: 'warning',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+        return;
+      }
+
+      try {
+        await api.post('/api/wishlist/add', {
+          productId: this.$route.params.id
+        });
+
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Produto adicionado à lista de desejos!',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+      } catch (error) {
+        console.error("Erro ao adicionar à wishlist:", error);
+        Swal.fire({
+          title: 'Erro!',
+          text: error.response?.data?.message || 'Não foi possível adicionar aos favoritos.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+      }
     }
   },
 };
