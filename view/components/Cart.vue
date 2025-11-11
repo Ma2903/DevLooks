@@ -65,20 +65,21 @@
                     </div>
                     <!-- Wrapper fixo que sempre existe no DOM -->
                     <div class="min-h-[60px] mt-2">
-                        <transition name="fade" mode="out-in">
-                            <div v-if="shippingError" key="error" class="text-red-400 text-sm">
-                                <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
+                        <div v-if="loadingShipping" class="text-gray-400 text-sm">
+                            <i class="fas fa-spinner fa-spin"></i> Calculando frete...
+                        </div>
+                        <div v-else-if="shippingError" class="text-red-400 text-sm">
+                            <i class="fas fa-exclamation-triangle"></i> {{ shippingError }}
+                        </div>
+                        <div v-else-if="shippingReady && shippingCost !== null" class="p-3 bg-gray-700 rounded-lg">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-300">SEDEX</span>
+                                <span class="text-[#04d1b0] font-bold">R$ {{ shippingCost.toFixed(2) }}</span>
                             </div>
-                            <div v-else-if="hasShippingInfo" key="success" class="p-3 bg-gray-700 rounded-lg">
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-gray-300">SEDEX</span>
-                                    <span class="text-[#04d1b0] font-bold">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
-                                </div>
-                                <div class="text-xs text-gray-400 mt-1">
-                                    <i class="fas fa-clock"></i> {{ shippingTime || 'Calculando...' }}
-                                </div>
+                            <div class="text-xs text-gray-400 mt-1">
+                                <i class="fas fa-clock"></i> {{ shippingTime }}
                             </div>
-                        </transition>
+                        </div>
                     </div>
                 </div>
 
@@ -158,12 +159,7 @@ const shippingCost = ref(null);
 const shippingTime = ref('');
 const loadingShipping = ref(false);
 const shippingError = ref('');
-const shippingReady = ref(false); // Nova flag para controlar quando mostrar o resultado
-
-// Computed property para controlar visibilidade do shipping
-const hasShippingInfo = computed(() => {
-    return shippingReady.value && shippingCost.value !== null && shippingCost.value !== undefined && !shippingError.value;
-});
+const shippingReady = ref(false);
 
 async function fetchCart() {
     const token = localStorage.getItem('token');
@@ -240,7 +236,6 @@ function applyCepMask(event) {
 }
 
 async function calculateShipping() {
-    // Validação básica
     if (!cep.value || cep.value.length !== 9) {
         Swal.fire({
             icon: 'error',
@@ -251,102 +246,69 @@ async function calculateShipping() {
         });
         return;
     }
-    
-    // Frete grátis para compras acima de R$ 150
+
     if (subtotal.value >= 150) {
-        // Esconde resultados anteriores primeiro
         shippingReady.value = false;
-        loadingShipping.value = false;
-        
-        // Aguarda antes de mostrar resultado
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Atualiza com frete grátis
         shippingError.value = '';
         shippingCost.value = 0;
         shippingTime.value = 'Frete Grátis!';
         shippingReady.value = true;
-        
+
         Swal.fire({
             icon: 'success',
             title: 'Frete Grátis!',
             text: 'Parabéns! Sua compra tem frete grátis.',
             background: '#1F2937',
-            color: '#E5E7EB',
-            confirmButtonColor: '#04d1b0'
+            color: '#E5E7EB'
         });
         return;
     }
-    
-        // Reseta estados antes de calcular
-        shippingError.value = '';
-        loadingShipping.value = true;
-        shippingReady.value = false;
-        await nextTick(); // Garante que o DOM seja atualizado antes de prosseguir
-    
+
+    shippingError.value = '';
+    shippingReady.value = false;
+    loadingShipping.value = true;
+
     try {
-        // Calcula peso e dimensões totais do carrinho
         let totalWeight = 0;
         let maxHeight = 0;
         let maxWidth = 0;
         let maxLength = 0;
-        
+
         for (const item of cartItems.value) {
-            // O item do carrinho deve ter os dados de peso e dimensão do produto
-            // Se não tiver, usa os valores padrão definidos no ProductModel.ts
             const itemWeight = item.weight || 0.5;
             totalWeight += itemWeight * item.quantity;
-            
-            // Dimensões padrão se não especificadas
+
             const itemDimensions = item.dimensions || { height: 10, width: 15, length: 20 };
-            
-            // Usa as maiores dimensões encontradas (empilhamento)
             if (itemDimensions.height > maxHeight) maxHeight = itemDimensions.height;
             if (itemDimensions.width > maxWidth) maxWidth = itemDimensions.width;
             if (itemDimensions.length > maxLength) maxLength = itemDimensions.length;
         }
-        
-        // Regra dos Correios: dimensões mínimas
-        maxHeight = Math.max(maxHeight, 2); // Mínimo 2 cm
-        maxWidth = Math.max(maxWidth, 11);  // Mínimo 11 cm
-        maxLength = Math.max(maxLength, 16); // Mínimo 16 cm
-        
-        // Regra dos Correios: peso mínimo
-        totalWeight = Math.max(totalWeight, 0.3); // Mínimo 300g (0.3kg)
-        
-        console.log('📦 Peso total do carrinho:', totalWeight.toFixed(2), 'kg');
-        console.log('📏 Dimensões máximas (ajustadas):', { height: maxHeight, width: maxWidth, length: maxLength });
-        
-        const response = await api.post('/api/shipping/calculate', { 
+
+        maxHeight = Math.max(maxHeight, 2);
+        maxWidth = Math.max(maxWidth, 11);
+        maxLength = Math.max(maxLength, 16);
+        totalWeight = Math.max(totalWeight, 0.3);
+
+        const response = await api.post('/api/shipping/calculate', {
             cep: cep.value,
             weight: totalWeight,
             dimensions: { height: maxHeight, width: maxWidth, length: maxLength }
         });
-        
-        console.log('✅ Frete calculado:', response.data);
 
-        // Desliga loading primeiro
         loadingShipping.value = false;
-        await nextTick();
-
-        // Agora atualiza os valores do frete
         shippingCost.value = response.data.cost || 0;
-        shippingTime.value = response.data.deliveryTime || '';
+        shippingTime.value = response.data.deliveryTime || 'Não disponível';
         shippingReady.value = true;
-        
+
     } catch (error) {
-        console.error('❌ Erro ao calcular frete:', error);
-
+        console.error('Erro ao calcular frete:', error);
         loadingShipping.value = false;
-        await nextTick();
+        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
 
-        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete. Tente novamente.';
-        shippingReady.value = false;
-        
         Swal.fire({
             icon: 'error',
-            title: 'Erro ao calcular frete',
-            text: error.response?.data?.error || 'Não foi possível calcular o frete. Tente novamente.',
+            title: 'Erro',
+            text: shippingError.value,
             background: '#1F2937',
             color: '#E5E7EB'
         });
