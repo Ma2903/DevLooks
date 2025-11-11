@@ -97,18 +97,14 @@
                         <span>Subtotal ({{ totalItems }} itens)</span>
                         <span>R$ {{ subtotal.toFixed(2) }}</span>
                     </div>
-                    <transition name="fade">
-                        <div v-show="appliedCoupon" class="flex justify-between text-[#04d1b0]">
-                            <span>Desconto ({{ appliedCoupon?.code }})</span>
-                            <span>- R$ {{ discountAmount.toFixed(2) }}</span>
-                        </div>
-                    </transition>
-                    <transition name="fade">
-                        <div v-show="shippingReady && shippingCost !== null" class="flex justify-between text-gray-300">
-                            <span>Frete</span>
-                            <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
-                        </div>
-                    </transition>
+                    <div v-if="appliedCoupon" class="flex justify-between text-[#04d1b0]">
+                        <span>Desconto ({{ appliedCoupon?.code }})</span>
+                        <span>- R$ {{ discountAmount.toFixed(2) }}</span>
+                    </div>
+                    <div v-if="shippingReady && shippingCost !== null" class="flex justify-between text-gray-300">
+                        <span>Frete</span>
+                        <span>R$ {{ (shippingCost || 0).toFixed(2) }}</span>
+                    </div>
                     <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl">
                         <span>Total</span>
                         <span class="text-[#04d1b0]">R$ {{ finalTotalWithShipping.toFixed(2) }}</span>
@@ -289,19 +285,42 @@ async function calculateShipping() {
         maxLength = Math.max(maxLength, 16);
         totalWeight = Math.max(totalWeight, 0.3);
 
+        console.log('📦 Calculando frete para:', {
+            cep: cep.value,
+            weight: totalWeight,
+            dimensions: { height: maxHeight, width: maxWidth, length: maxLength }
+        });
+
         const response = await api.post('/api/shipping/calculate', {
             cep: cep.value,
             weight: totalWeight,
             dimensions: { height: maxHeight, width: maxWidth, length: maxLength }
         });
 
+        console.log('✅ Resposta do frete:', response.data);
+
         loadingShipping.value = false;
         shippingCost.value = response.data.cost || 0;
         shippingTime.value = response.data.deliveryTime || 'Não disponível';
         shippingReady.value = true;
 
+        // Mostra mensagem de sucesso
+        Swal.fire({
+            icon: 'success',
+            title: 'Frete Calculado!',
+            html: `<div class="text-left">
+                <p><strong>Região:</strong> ${response.data.region || 'N/A'}</p>
+                <p><strong>Valor:</strong> R$ ${response.data.cost.toFixed(2)}</p>
+                <p><strong>Prazo:</strong> ${response.data.deliveryTime}</p>
+            </div>`,
+            background: '#1F2937',
+            color: '#E5E7EB',
+            confirmButtonColor: '#04d1b0'
+        });
+
     } catch (error) {
-        console.error('Erro ao calcular frete:', error);
+        console.error('❌ Erro ao calcular frete:', error);
+        console.error('Detalhes:', error.response?.data);
         loadingShipping.value = false;
         shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
 

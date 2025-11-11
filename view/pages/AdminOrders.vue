@@ -15,7 +15,7 @@
         <i class="fas fa-spinner fa-spin text-3xl text-[#04d1b0]"></i>
         <p>A carregar pedidos...</p>
       </div>
-      <div v-else-if="orders.length === 0" class="text-center bg-gray-800 p-8 rounded-lg">
+      <div v-else-if="allOrders.length === 0" class="text-center bg-gray-800 p-8 rounded-lg">
         <p class="text-xl"><i class="fas fa-ghost mr-2"></i>Nenhuma venda encontrada.</p>
       </div>
       <div v-else class="bg-gray-800 rounded-lg shadow-lg overflow-x-auto">
