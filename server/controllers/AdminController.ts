@@ -36,27 +36,40 @@ class CsvLibrary {
     }
 
     // Função para formatar valores corretamente para CSV
-    const formatValue = (value: any): string => {
+    const formatValue = (value: any, forDisplay: boolean = false): string => {
         if (value === null || value === undefined) {
-            return '';
+            return forDisplay ? '-' : '';
         }
         if (value instanceof Date) {
-            return value.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+            const date = value.toISOString().split('T')[0];
+            const [year, month, day] = date.split('-');
+            return `${day}/${month}/${year}`; // Formato brasileiro: DD/MM/YYYY
         }
         if (Array.isArray(value)) {
-            return `"${value.map(item =>
+            if (value.length === 0) return forDisplay ? '-' : '';
+            const formatted = value.map(item =>
                 typeof item === 'object' ? JSON.stringify(item) : String(item)
-            ).join('; ').replace(/"/g, '""')}"`;
+            ).join('; ');
+            return `"${formatted.replace(/"/g, '""')}"`;
         }
         if (typeof value === 'object') {
-            return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
+            return `"${JSON.stringify(value, null, 0).replace(/"/g, '""')}"`;
+        }
+        if (typeof value === 'boolean') {
+            return value ? 'Sim' : 'Não';
+        }
+        if (typeof value === 'number') {
+            // Formata números com 2 casas decimais se for decimal
+            return Number.isInteger(value) ? String(value) : value.toFixed(2);
         }
         if (typeof value === 'string') {
+            const trimmed = value.trim();
+            if (trimmed === '') return forDisplay ? '-' : '';
             // Escapa aspas duplas e envolve em aspas se contiver vírgula, quebra de linha ou aspas
-            if (value.includes(',') || value.includes('\n') || value.includes('"')) {
-                return `"${value.replace(/"/g, '""')}"`;
+            if (trimmed.includes(',') || trimmed.includes('\n') || trimmed.includes('"') || trimmed.includes(';')) {
+                return `"${trimmed.replace(/"/g, '""')}"`;
             }
-            return value;
+            return trimmed;
         }
         return String(value);
     };
@@ -86,23 +99,68 @@ class CsvLibrary {
         return "";
     }
 
-    // 2. Coleta todos os cabeçalhos únicos
+    // 2. Coleta todos os cabeçalhos únicos e ordena
     const allHeaders = new Set<string>();
     flattenedData.forEach(row => {
         Object.keys(row).forEach(key => allHeaders.add(key));
     });
-    const headers = Array.from(allHeaders);
+
+    // Ordena para campos importantes virem primeiro
+    const headers = Array.from(allHeaders).sort((a, b) => {
+        const priority: { [key: string]: number } = {
+            '_id': 1,
+            'name': 2,
+            'email': 3,
+            'title': 4,
+            'price': 5,
+            'status': 6,
+            'total': 7,
+            'createdAt': 98,
+            'updatedAt': 99,
+            '__v': 100
+        };
+
+        const priorityA = priority[a] || 50;
+        const priorityB = priority[b] || 50;
+
+        if (priorityA !== priorityB) return priorityA - priorityB;
+        return a.localeCompare(b);
+    });
 
     // 3. Formata os cabeçalhos (capitaliza e remove underscores)
-    const formattedHeaders = headers.map(h =>
-        h.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-    );
+    const formattedHeaders = headers.map(h => {
+        // Remove underscores no início
+        const cleaned = h.replace(/^_+/, '');
 
-    // 4. Cria as linhas CSV com formatação adequada
+        // Mapeamento de nomes específicos
+        const nameMap: { [key: string]: string } = {
+            '_id': 'ID',
+            'id': 'ID',
+            'createdAt': 'Data Criação',
+            'updatedAt': 'Data Atualização',
+            'email': 'E-mail',
+            'name': 'Nome',
+            'price': 'Preço',
+            'total': 'Total',
+            'status': 'Status',
+            '__v': 'Versão'
+        };
+
+        if (nameMap[h]) return nameMap[h];
+
+        // Formatação padrão
+        return cleaned
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    });
+
+    // 4. Cria as linhas CSV com separador de ponto e vírgula (melhor para Excel brasileiro)
+    const separator = ';';
     const csvRows = [
-        formattedHeaders.join(','), // Cabeçalho formatado
+        formattedHeaders.join(separator), // Cabeçalho formatado
         ...flattenedData.map(row =>
-            headers.map(header => formatValue(row[header])).join(',')
+            headers.map(header => formatValue(row[header], true)).join(separator)
         )
     ];
 
