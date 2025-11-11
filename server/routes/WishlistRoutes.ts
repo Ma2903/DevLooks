@@ -1,19 +1,19 @@
 import express from 'express';
 import WishlistController from '../controllers/WishlistController';
-import { authenticate } from '../middlewares/authMiddleware';
+import { verifyToken } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
-router.get('/', authenticate, WishlistController.getWishlist);
+router.get('/', verifyToken, WishlistController.getWishlist);
 
-router.post('/add', authenticate, WishlistController.addToWishlist);
+router.post('/add', verifyToken, WishlistController.addToWishlist);
 
-router.delete('/remove/:productId', authenticate, WishlistController.removeFromWishlist);
+router.delete('/remove/:productId', verifyToken, WishlistController.removeFromWishlist);
 
-router.delete('/clear', authenticate, WishlistController.clearWishlist);
+router.delete('/clear', verifyToken, WishlistController.clearWishlist);
 
-router.get('/check/:productId', authenticate, WishlistController.checkInWishlist);
+router.get('/check/:productId', verifyToken, WishlistController.checkInWishlist);
 
-router.post('/move-to-cart', authenticate, WishlistController.moveToCart);
+router.post('/move-to-cart', verifyToken, WishlistController.moveToCart);
 
 export default router;

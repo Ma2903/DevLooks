@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     gotoPage() {
-      this.$router.push({ path: `/product/${this.product._id}` });
+      this.$router.push({ path: `/products/${this.product._id}` });
     }
   }
 };
