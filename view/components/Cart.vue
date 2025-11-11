@@ -64,9 +64,9 @@
                         </button>
                     </div>
                     <!-- Resultado do Frete -->
-                    <div class="mt-3">
+                    <div class="mt-3 min-h-[120px]">
                         <!-- Loading -->
-                        <div v-if="loadingShipping" class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
+                        <div v-show="loadingShipping" class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
                             <div class="flex items-center gap-2 text-gray-400 text-sm">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span>Calculando frete...</span>
@@ -74,7 +74,7 @@
                         </div>
 
                         <!-- Erro -->
-                        <div v-else-if="shippingError" class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
+                        <div v-show="!loadingShipping && shippingError" class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
                             <div class="flex items-center gap-2 text-red-400 text-sm">
                                 <i class="fas fa-exclamation-circle"></i>
                                 <span>{{ shippingError }}</span>
@@ -82,23 +82,23 @@
                         </div>
 
                         <!-- Frete Calculado com Sucesso -->
-                        <div v-else-if="shippingReady && shippingCost !== null" class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
+                        <div v-show="!loadingShipping && !shippingError && shippingReady && shippingCost !== null" class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
                             <!-- Cabeçalho -->
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
                                     <span class="text-white font-bold">SEDEX</span>
                                 </div>
-                                <span class="text-[#04d1b0] font-bold text-lg">R$ {{ shippingCost.toFixed(2) }}</span>
+                                <span class="text-[#04d1b0] font-bold text-lg">R$ {{ (shippingCost || 0).toFixed(2) }}</span>
                             </div>
 
                             <!-- Detalhes -->
                             <div class="space-y-2 text-sm">
                                 <div class="flex items-center gap-2 text-gray-300">
                                     <i class="fas fa-clock text-[#04d1b0]"></i>
-                                    <span>Prazo: <strong class="text-white">{{ shippingTime }}</strong></span>
+                                    <span>Prazo: <strong class="text-white">{{ shippingTime || 'N/A' }}</strong></span>
                                 </div>
-                                <div v-if="shippingRegion" class="flex items-center gap-2 text-gray-300">
+                                <div v-show="shippingRegion" class="flex items-center gap-2 text-gray-300">
                                     <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
                                     <span>Região: <strong class="text-white">{{ shippingRegion }}</strong></span>
                                 </div>
@@ -114,7 +114,7 @@
                         </div>
 
                         <!-- Placeholder quando não calculado -->
-                        <div v-else class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
+                        <div v-show="!loadingShipping && !shippingError && !shippingReady" class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
                             <div class="text-center text-gray-500 text-sm">
                                 <i class="fas fa-info-circle"></i>
                                 Digite seu CEP e clique em calcular
@@ -357,28 +357,30 @@ async function calculateShipping() {
 
         console.log('✅ Resposta do frete:', response.data);
 
-        // Atualiza todas as variáveis em um único ciclo de renderização
-        await nextTick(() => {
-            shippingCost.value = response.data.cost || 0;
-            shippingTime.value = response.data.deliveryTime || 'Não disponível';
-            shippingRegion.value = response.data.region || '';
-            loadingShipping.value = false;
-            shippingError.value = '';
-            shippingReady.value = true;
-        });
+        // Atualiza loading primeiro
+        loadingShipping.value = false;
+        await nextTick();
+
+        // Atualiza os dados do frete
+        shippingCost.value = response.data.cost || 0;
+        shippingTime.value = response.data.deliveryTime || 'Não disponível';
+        shippingRegion.value = response.data.region || '';
+        shippingError.value = '';
+        shippingReady.value = true;
 
     } catch (error) {
         console.error('❌ Erro ao calcular frete:', error);
         console.error('Detalhes:', error.response?.data);
 
-        // Atualiza todas as variáveis em um único ciclo de renderização
-        await nextTick(() => {
-            loadingShipping.value = false;
-            shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
-            shippingReady.value = false;
-            shippingCost.value = null;
-            shippingRegion.value = '';
-        });
+        // Atualiza loading primeiro
+        loadingShipping.value = false;
+        await nextTick();
+
+        // Atualiza estado de erro
+        shippingError.value = error.response?.data?.error || 'Não foi possível calcular o frete.';
+        shippingReady.value = false;
+        shippingCost.value = null;
+        shippingRegion.value = '';
     }
 }
 
