@@ -66,60 +66,68 @@
                     <!-- Resultado do Frete -->
                     <div class="mt-3 min-h-[120px]">
                         <!-- Loading -->
-                        <div v-show="shipping.loading" class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
-                            <div class="flex items-center gap-2 text-gray-400 text-sm">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <span>Calculando frete...</span>
+                        <template v-if="shipping.loading">
+                            <div class="p-3 bg-gray-700/50 rounded-lg border border-gray-600 animate-pulse">
+                                <div class="flex items-center gap-2 text-gray-400 text-sm">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Calculando frete...</span>
+                                </div>
                             </div>
-                        </div>
+                        </template>
 
                         <!-- Erro -->
-                        <div v-show="!shipping.loading && shipping.error" class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
-                            <div class="flex items-center gap-2 text-red-400 text-sm">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <span>{{ shipping.error }}</span>
+                        <template v-else-if="shipping.error">
+                            <div class="p-3 bg-red-900/20 border border-red-500/50 rounded-lg">
+                                <div class="flex items-center gap-2 text-red-400 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ shipping.error }}</span>
+                                </div>
                             </div>
-                        </div>
+                        </template>
 
                         <!-- Frete Calculado com Sucesso -->
-                        <div v-show="!shipping.loading && !shipping.error && shipping.ready && shipping.cost !== null" class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
-                            <!-- Cabeçalho -->
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
-                                    <span class="text-white font-bold">SEDEX</span>
+                        <template v-else-if="shipping.ready && shipping.cost !== null">
+                            <div class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
+                                <!-- Cabeçalho -->
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
+                                        <span class="text-white font-bold">SEDEX</span>
+                                    </div>
+                                    <span class="text-[#04d1b0] font-bold text-lg">R$ {{ (shipping.cost || 0).toFixed(2) }}</span>
                                 </div>
-                                <span class="text-[#04d1b0] font-bold text-lg">R$ {{ (shipping.cost || 0).toFixed(2) }}</span>
-                            </div>
 
-                            <!-- Detalhes -->
-                            <div class="space-y-2 text-sm">
-                                <div class="flex items-center gap-2 text-gray-300">
-                                    <i class="fas fa-clock text-[#04d1b0]"></i>
-                                    <span>Prazo: <strong class="text-white">{{ shipping.time || 'N/A' }}</strong></span>
+                                <!-- Detalhes -->
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center gap-2 text-gray-300">
+                                        <i class="fas fa-clock text-[#04d1b0]"></i>
+                                        <span>Prazo: <strong class="text-white">{{ shipping.time || 'N/A' }}</strong></span>
+                                    </div>
+                                    <div v-if="shipping.region" class="flex items-center gap-2 text-gray-300">
+                                        <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
+                                        <span>Região: <strong class="text-white">{{ shipping.region }}</strong></span>
+                                    </div>
                                 </div>
-                                <div v-show="shipping.region" class="flex items-center gap-2 text-gray-300">
-                                    <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
-                                    <span>Região: <strong class="text-white">{{ shipping.region }}</strong></span>
-                                </div>
-                            </div>
 
-                            <!-- Badge de Sucesso -->
-                            <div class="mt-3 pt-3 border-t border-gray-600">
-                                <div class="flex items-center gap-2 text-xs text-green-400">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>Frete calculado com sucesso!</span>
+                                <!-- Badge de Sucesso -->
+                                <div class="mt-3 pt-3 border-t border-gray-600">
+                                    <div class="flex items-center gap-2 text-xs text-green-400">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Frete calculado com sucesso!</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </template>
 
                         <!-- Placeholder quando não calculado -->
-                        <div v-show="!shipping.loading && !shipping.error && !shipping.ready" class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
-                            <div class="text-center text-gray-500 text-sm">
-                                <i class="fas fa-info-circle"></i>
-                                Digite seu CEP e clique em calcular
+                        <template v-else>
+                            <div class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
+                                <div class="text-center text-gray-500 text-sm">
+                                    <i class="fas fa-info-circle"></i>
+                                    Digite seu CEP e clique em calcular
+                                </div>
                             </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
 
