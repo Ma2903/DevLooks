@@ -49,12 +49,12 @@
           >
             <div class="relative aspect-square overflow-hidden">
               <img
-                :src="product.image_url || '/images/placeholder.png'"
+                :src="getImageUrl(product.image)"
                 :alt="product.name"
                 class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
               />
               <button
-                @click="removeFromWishlist(product._id)"
+                @click="confirmRemoveFromWishlist(product)"
                 class="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center transition shadow-lg"
               >
                 <i class="fas fa-times"></i>
@@ -125,6 +125,11 @@ export default {
     this.loadWishlist();
   },
   methods: {
+    getImageUrl(imagePath) {
+      if (!imagePath) return '/images/placeholder.png';
+      const cleanPath = imagePath.replace(/^public[\\/]/, '');
+      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
+    },
     async loadWishlist() {
       this.loading = true;
       try {
@@ -145,18 +150,40 @@ export default {
       }
     },
 
-    async removeFromWishlist(productId) {
+    async confirmRemoveFromWishlist(product) {
+      const result = await Swal.fire({
+        title: 'Remover dos Favoritos?',
+        html: `Tem certeza que deseja remover<br><strong>"${product.name}"</strong><br>da sua lista de desejos?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-trash mr-2"></i> Sim, remover!',
+        cancelButtonText: '<i class="fas fa-times mr-2"></i> Cancelar',
+        background: '#1F2937',
+        color: '#E5E7EB',
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        reverseButtons: true
+      });
+
+      if (result.isConfirmed) {
+        this.removeFromWishlist(product._id, product.name);
+      }
+    },
+
+    async removeFromWishlist(productId, productName) {
       try {
         await api.delete(`/api/wishlist/remove/${productId}`);
 
         await Swal.fire({
           icon: 'success',
           title: 'Removido!',
-          text: 'Produto removido da lista de desejos',
+          text: `"${productName}" foi removido da lista de desejos`,
           timer: 2000,
           showConfirmButton: false,
           background: '#1F2937',
-          color: '#E5E7EB'
+          color: '#E5E7EB',
+          toast: true,
+          position: 'top-end'
         });
 
         this.loadWishlist();
@@ -254,6 +281,7 @@ export default {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

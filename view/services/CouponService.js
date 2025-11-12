@@ -53,7 +53,9 @@ export default {
 
   // Validar cupom (para o carrinho)
   async validateCoupon(code) {
-    const response = await axios.post(`${API_URL}/validate`, { code });
+    const token = getToken();
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const response = await axios.post(`${API_URL}/validate`, { code }, { headers });
     return response.data;
   }
 };

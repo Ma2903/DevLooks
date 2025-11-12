@@ -140,11 +140,16 @@ async function changeProfilePicture(avatarUrl) {
     user.value = response.data.user;
     localStorage.setItem('userData', JSON.stringify(user.value));
     window.dispatchEvent(new Event('auth-change'));
+    
+    // Força o re-render do componente atualizando a referência
+    user.value = { ...user.value };
+    
     Swal.fire({
       icon: 'success', title: 'Sucesso!', text: 'Sua foto de perfil foi alterada.',
       background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false
     });
   } catch (error) {
+    console.error('Erro ao alterar foto de perfil:', error);
     const errorMessage = error.response?.data?.message || 'Não foi possível alterar a foto de perfil.';
     Swal.fire({ icon: 'error', title: 'Erro', text: errorMessage, background: "#1F2937", color: "#E5E7EB" });
   }

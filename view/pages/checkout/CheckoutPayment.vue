@@ -59,7 +59,7 @@ export default {
         // 1. Monta o payload com os dados do localStorage
         const payload = {
           items: this.checkoutData.cartItems.map(item => ({
-            product: item.productId, // O campo correto é productId, não product
+            product: item.productId || item._id, // Tenta productId primeiro, depois _id
             quantity: item.quantity,
           })),
           shippingAddress: this.checkoutData.shippingAddress,
@@ -67,18 +67,24 @@ export default {
           couponCode: this.checkoutData.appliedCoupon ? this.checkoutData.appliedCoupon.code : null,
         };
 
+        console.log('[CheckoutPayment] Payload sendo enviado:', payload);
+
         // 2. Chama a API de checkout do nosso back-end
         const response = await api.post('/api/orders/checkout', payload);
 
+        console.log('[CheckoutPayment] Resposta recebida:', response.data);
+
         // 3. Pega o link de pagamento retornado pelo back-end e redireciona o utilizador
         if (response.data && response.data.payment_url) {
+          // Limpa o checkoutData do localStorage após sucesso
+          localStorage.removeItem('checkoutData');
           window.location.href = response.data.payment_url;
         } else {
           throw new Error('URL de pagamento não recebida do servidor.');
         }
 
       } catch (error) {
-        console.error('Erro ao iniciar pagamento:', error);
+        console.error('[CheckoutPayment] Erro ao iniciar pagamento:', error);
         Swal.fire({
           icon: 'error',
           title: 'Erro ao Iniciar Pagamento',

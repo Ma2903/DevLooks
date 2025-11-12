@@ -22,11 +22,14 @@
         <div v-for="product in produtosFiltrados" :key="product._id" class="bg-gray-900 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 flex flex-col relative">
           <button
             v-if="isLoggedIn"
-            @click.stop="addToWishlist(product._id)"
-            class="absolute top-3 right-3 z-20 bg-gray-800/80 hover:bg-red-500 text-red-400 hover:text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm"
-            title="Adicionar aos favoritos"
+            @click.stop="toggleWishlist(product._id)"
+            class="absolute top-3 right-3 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm"
+            :class="isInWishlist(product._id) 
+              ? 'bg-red-500 text-white hover:bg-red-600' 
+              : 'bg-gray-800/80 text-red-400 hover:bg-red-500 hover:text-white'"
+            :title="isInWishlist(product._id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
           >
-            <i class="fas fa-heart"></i>
+            <i :class="isInWishlist(product._id) ? 'fas fa-heart' : 'far fa-heart'"></i>
           </button>
 
           <router-link :to="'/products/' + product._id" class="flex flex-col flex-grow">
@@ -68,6 +71,7 @@ export default {
       loading: true,
       search: "",
       category: "",
+      wishlistIds: [], // Array para armazenar IDs dos produtos favoritados
     };
   },
   computed: {
@@ -88,6 +92,7 @@ export default {
   },
   async created() {
     await this.fetchProducts();
+    await this.fetchWishlist();
   },
   methods: {
     async fetchProducts() {
@@ -101,6 +106,22 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async fetchWishlist() {
+      if (!this.isLoggedIn) {
+        this.wishlistIds = [];
+        return;
+      }
+      try {
+        const response = await axios.get('/api/wishlist');
+        this.wishlistIds = response.data.products.map(p => p._id);
+      } catch (error) {
+        console.error('Erro ao buscar wishlist:', error);
+        this.wishlistIds = [];
+      }
+    },
+    isInWishlist(productId) {
+      return this.wishlistIds.includes(productId);
     },
     getImageUrl(imagePath) {
       if (!imagePath) return '';
@@ -159,7 +180,7 @@ export default {
         });
       }
     },
-    async addToWishlist(productId) {
+    async toggleWishlist(productId) {
       const token = localStorage.getItem('token');
       if (!token) {
         Swal.fire({
@@ -172,27 +193,47 @@ export default {
         return;
       }
 
+      const isCurrentlyInWishlist = this.isInWishlist(productId);
+
       try {
-        await axios.post('/api/wishlist/add', { productId });
+        if (isCurrentlyInWishlist) {
+          // Remove dos favoritos
+          await axios.delete(`/api/wishlist/remove/${productId}`);
+          this.wishlistIds = this.wishlistIds.filter(id => id !== productId);
+          
+          Swal.fire({
+            title: "Removido dos Favoritos!",
+            icon: "info",
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
+        } else {
+          // Adiciona aos favoritos
+          await axios.post('/api/wishlist/add', { productId });
+          this.wishlistIds.push(productId);
 
-        Swal.fire({
-          title: "Adicionado aos Favoritos!",
-          icon: "success",
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 2000,
-          background: "#1F2937",
-          color: "#E5E7EB",
-        });
-
+          Swal.fire({
+            title: "Adicionado aos Favoritos!",
+            icon: "success",
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            background: "#1F2937",
+            color: "#E5E7EB",
+          });
+        }
       } catch (error) {
-        console.error('Erro ao adicionar à wishlist:', error);
-        const message = error.response?.data?.message || 'Não foi possível adicionar aos favoritos.';
+        console.error('Erro ao atualizar wishlist:', error);
+        const message = error.response?.data?.message || 'Não foi possível atualizar os favoritos.';
         Swal.fire({
-          title: 'Aviso',
+          title: 'Erro',
           text: message,
-          icon: message.includes('já está') ? 'info' : 'error',
+          icon: 'error',
           background: "#1F2937",
           color: "#E5E7EB"
         });
