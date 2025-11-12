@@ -1,61 +1,78 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-gray-200 p-8">
     <div class="container mx-auto">
-      <h1 class="text-4xl font-bold text-[#04d1b0] mb-8 flex items-center gap-3">
-        <i class="fas fa-dollar-sign"></i>
-        Gerenciamento de Vendas
-      </h1>
-      <button @click="exportData('json')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
-        <i class="fas fa-file-code"></i> Exportar JSON
-      </button>
-      <button @click="exportData('csv')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
-        <i class="fas fa-file-csv"></i> Exportar CSV
-      </button>
+      <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-emerald-400 flex items-center gap-3">
+          <i class="fas fa-dollar-sign"></i>
+          Gerenciamento de Vendas
+        </h1>
+        <div class="flex items-center gap-4 mt-4 md:mt-0">
+          <button @click="exportData('json')"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
+            <i class="fas fa-file-code"></i> Exportar JSON
+          </button>
+          <button @click="exportData('csv')"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform transform hover:scale-105">
+            <i class="fas fa-file-csv"></i> Exportar CSV
+          </button>
+        </div>
+      </div>
+
       <div v-if="loading" class="text-center p-10">
-        <i class="fas fa-spinner fa-spin text-3xl text-[#04d1b0]"></i>
-        <p>A carregar pedidos...</p>
+        <i class="fas fa-spinner fa-spin text-3xl text-emerald-400"></i>
+        <p class="mt-4">Carregando pedidos...</p>
       </div>
+
       <div v-else-if="allOrders.length === 0" class="text-center bg-gray-800 p-8 rounded-lg">
-        <p class="text-xl"><i class="fas fa-ghost mr-2"></i>Nenhuma venda encontrada.</p>
+        <i class="fas fa-ghost text-4xl text-gray-500 mb-3"></i>
+        <p class="text-xl">Nenhuma venda encontrada.</p>
       </div>
-      <div v-else class="bg-gray-800 rounded-lg shadow-lg overflow-x-auto">
-        <table class="min-w-full">
-          <thead class="bg-gray-700/50">
+
+      <div v-else class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+        <table class="w-full text-left">
+          <thead class="bg-gradient-to-r from-emerald-600 to-cyan-600">
             <tr>
-              <th class="px-6 py-3 text-left uppercase tracking-wider">ID do Pedido</th>
-              <th class="px-6 py-3 text-left uppercase tracking-wider">Cliente</th>
-              <th class="px-6 py-3 text-left uppercase tracking-wider">Data</th>
-              <th class="px-6 py-3 text-left uppercase tracking-wider">Total</th>
-              <th class="px-6 py-3 text-left uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-center uppercase tracking-wider">Ações</th>
+              <th class="p-4 uppercase text-sm font-semibold">ID do Pedido</th>
+              <th class="p-4 uppercase text-sm font-semibold">Cliente</th>
+              <th class="p-4 uppercase text-sm font-semibold">Data</th>
+              <th class="p-4 uppercase text-sm font-semibold">Total</th>
+              <th class="p-4 uppercase text-sm font-semibold">Status</th>
+              <th class="p-4 uppercase text-sm font-semibold text-center">Ações</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-700">
-            <tr v-for="order in paginatedOrders" :key="order._id" class="hover:bg-gray-700/50">
-              <td class="px-6 py-4 font-mono text-xs">{{ order._id }}</td>
-              <td class="px-6 py-4">{{ order.user ? order.user.name : 'Utilizador Removido' }} <br> <span class="text-xs text-gray-400">{{ order.user ? order.user.email : '' }}</span></td>
-              <td class="px-6 py-4">{{ new Date(order.createdAt).toLocaleDateString('pt-BR') }}</td>
-              <td class="px-6 py-4 font-bold text-green-400">R$ {{ order.total.toFixed(2) }}</td>
-              <td class="px-6 py-4">
+          <tbody>
+            <tr v-for="order in paginatedOrders" :key="order._id" class="border-b border-gray-700 hover:bg-gray-700/50 transition-all">
+              <td class="p-4 font-mono text-xs text-gray-400">{{ order._id }}</td>
+              <td class="p-4">
+                <div class="font-medium">{{ order.user ? order.user.name : 'Usuário Removido' }}</div>
+                <div class="text-xs text-gray-400">{{ order.user ? order.user.email : '' }}</div>
+              </td>
+              <td class="p-4">{{ new Date(order.createdAt).toLocaleDateString('pt-BR') }}</td>
+              <td class="p-4 font-bold text-green-400">R$ {{ order.total.toFixed(2) }}</td>
+              <td class="p-4">
                 <span :class="getStatusClass(order.status)" class="px-3 py-1 rounded-full text-xs font-bold">
                   {{ order.status }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-center space-x-4">
-                <button @click="updateStatus(order)" class="text-blue-400 hover:text-blue-300 transition" title="Mudar Status"><i class="fas fa-edit"></i> Mudar Status</button>
-                <button @click="confirmDelete(order)" class="text-red-500 hover:text-red-400 transition" title="Excluir Pedido"><i class="fas fa-trash-alt"></i> Excluir</button>
+              <td class="p-4 flex justify-center items-center gap-3">
+                <button @click="updateStatus(order)" class="text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+                  <i class="fas fa-edit"></i> Mudar Status
+                </button>
+                <button @click="confirmDelete(order)" class="text-red-500 hover:text-red-400 transition-colors flex items-center gap-1">
+                  <i class="fas fa-trash-alt"></i> Excluir
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      
+
       <!-- Controles de Paginação -->
-      <div v-if="totalPages > 1" class="flex justify-center items-center space-x-4 mt-8">
+      <div v-if="totalPages > 1" class="flex justify-center items-center gap-4 mt-8">
         <button 
           @click="currentPage--" 
           :disabled="currentPage === 1"
-          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 transition"
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           <i class="fas fa-arrow-left"></i> Anterior
         </button>
@@ -63,12 +80,11 @@
         <button 
           @click="currentPage++" 
           :disabled="currentPage === totalPages"
-          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 transition"
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Próxima <i class="fas fa-arrow-right"></i>
         </button>
       </div>
-
     </div>
   </div>
 </template>
