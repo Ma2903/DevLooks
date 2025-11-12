@@ -342,8 +342,12 @@ export default {
     },
     async analyzeSentiments() {
       try {
-        const comments = this.reviews.map(r => r.comment);
-        const response = await axios.post('/api/ai/sentiment-stats', { comments });
+        // Envia comentários com suas respectivas estrelas
+        const reviewsData = this.reviews.map(r => ({
+          comment: r.comment,
+          rating: r.rating
+        }));
+        const response = await axios.post('/api/ai/sentiment-stats', { reviews: reviewsData });
         this.sentimentStats = response.data;
       } catch (error) {
         console.error('Erro ao analisar sentimentos:', error);
@@ -447,20 +451,10 @@ export default {
         const response = await axios.get(`/api/products/${productId}/reviews`);
         this.reviews = response.data.reviews || [];
         
-        // Chamada simulada para as rotas de IA (ainda não implementadas)
+        // Gera resumo e análise de sentimento REAL com IA Gemini
         if (this.reviews.length > 0) {
-          // Simulação do resumo de IA
-          this.aiSummary = "Análise de IA: A maioria dos clientes elogia a qualidade do material e a rapidez na entrega. Pontos negativos incluem o tamanho, que é um pouco menor que o esperado.";
-          this.sentimentStats = {
-            percentages: {
-              positivo: 75,
-              negativo: 15,
-              neutro: 10
-            }
-          };
-          // Se as rotas de IA estivessem prontas, seria:
-          // await this.generateAISummary();
-          // await this.analyzeSentiments();
+          await this.generateAISummary();
+          await this.analyzeSentiments();
         }
       } catch (error) {
         console.error("Erro ao carregar avaliações:", error);
