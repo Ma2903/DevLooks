@@ -14,6 +14,15 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Configuração específica para reviews (permite múltiplas imagens)
+const reviewStorage = multer.diskStorage({
+    destination: './public/images/reviews',
+    filename: (_req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const reviewUpload = multer({ storage: reviewStorage });
+
 class ProductController {
     static addProduct: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -134,9 +143,16 @@ class ProductController {
     static addReview: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const productId = req.params.id;
-            // O ID do usuário é injetado pelo middleware de autenticação
             const userId = (req as any).user.id; 
-            const { rating, comment, image } = req.body;
+            const { rating, comment } = req.body;
+
+            // Pega as imagens enviadas (req.files se for array de imagens)
+            const images: string[] = [];
+            if (req.files && Array.isArray(req.files)) {
+                images.push(...req.files.map(file => path.join('public/images/reviews', file.filename)));
+            } else if (req.file) {
+                images.push(path.join('public/images/reviews', req.file.filename));
+            }
 
             // 1. Validação básica
             if (!rating || rating < 1 || rating > 5) {
@@ -156,7 +172,6 @@ class ProductController {
             }
 
             // 3. Verificação de segurança: usuário comprou e recebeu o produto?
-            // Procura por um pedido do usuário para este produto com status 'Entregue'
             const OrderModel = (await import('../models/OrderModel')).default;
             const userOrder = await OrderModel.findOne({
                 user: userId,
@@ -186,12 +201,12 @@ class ProductController {
                 user: userId,
                 rating: Number(rating),
                 comment: comment.trim(),
-                image: image || '',
+                images: images,
                 createdAt: new Date()
             };
 
             if (!product.reviews) product.reviews = [];
-            product.reviews.push(newReview as any); // 'as any' para evitar problemas de tipagem com ObjectId
+            product.reviews.push(newReview as any);
 
             await product.save();
 
@@ -271,6 +286,162 @@ class ProductController {
     };
 
     static uploadImage = upload.single('imagem');
+    static uploadReviewImages = reviewUpload.array('images', 5); // Permite até 5 imagens
+    
+    static deleteReview: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productId = req.params.id;
+            const userId = (req as any).user.id;
+
+            console.log('deleteReview - productId:', productId);
+            console.log('deleteReview - userId:', userId);
+
+            const product = await ProductModel.findById(productId);
+            if (!product) {
+                console.log('deleteReview - Produto não encontrado');
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+
+            console.log('deleteReview - Product reviews:', product.reviews?.map(r => ({ user: r.user.toString(), rating: r.rating })));
+
+            // Encontra o índice da review do usuário
+            const reviewIndex = product.reviews?.findIndex(
+                review => review.user.toString() === userId
+            );
+
+            console.log('deleteReview - reviewIndex:', reviewIndex);
+
+            if (reviewIndex === undefined || reviewIndex === -1) {
+                console.log('deleteReview - Usuário não possui avaliação');
+                res.status(404).json({ message: 'Você não possui uma avaliação para este produto' });
+                return;
+            }
+
+            // Remove a review
+            product.reviews!.splice(reviewIndex, 1);
+            await product.save();
+
+            console.log('deleteReview - Avaliação removida com sucesso');
+
+            const updatedProduct = await ProductModel.findById(productId).populate('reviews.user', 'name');
+            
+            res.status(200).json({ 
+                message: 'Avaliação removida com sucesso',
+                product: updatedProduct
+            });
+        } catch (error: any) {
+            console.error('Erro ao remover avaliação:', error);
+            res.status(500).json({ message: 'Erro ao remover avaliação', error: error.message });
+        }
+    };
+    
+    static updateReview: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productId = req.params.id;
+            const userId = (req as any).user.id;
+            const { rating, comment } = req.body;
+
+            // Pega as imagens enviadas
+            const newImages: string[] = [];
+            if (req.files && Array.isArray(req.files)) {
+                newImages.push(...req.files.map(file => path.join('public/images/reviews', file.filename)));
+            } else if (req.file) {
+                newImages.push(path.join('public/images/reviews', req.file.filename));
+            }
+
+            // Validação básica
+            if (rating && (rating < 1 || rating > 5)) {
+                res.status(400).json({ message: 'Nota deve ser entre 1 e 5' });
+                return;
+            }
+
+            const product = await ProductModel.findById(productId);
+            if (!product) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+
+            // Encontra a review do usuário
+            const reviewIndex = product.reviews?.findIndex(
+                review => review.user.toString() === userId
+            );
+
+            if (reviewIndex === undefined || reviewIndex === -1) {
+                res.status(404).json({ message: 'Você não possui uma avaliação para este produto' });
+                return;
+            }
+
+            // Atualiza os campos fornecidos
+            if (rating) product.reviews![reviewIndex].rating = Number(rating);
+            if (comment) product.reviews![reviewIndex].comment = comment.trim();
+            
+            // Se novas imagens foram enviadas, adiciona às existentes
+            if (newImages.length > 0) {
+                const currentImages = product.reviews![reviewIndex].images || [];
+                product.reviews![reviewIndex].images = [...currentImages, ...newImages];
+            }
+
+            await product.save();
+
+            const updatedProduct = await ProductModel.findById(productId).populate('reviews.user', 'name');
+            
+            res.status(200).json({ 
+                message: 'Avaliação atualizada com sucesso',
+                product: updatedProduct
+            });
+        } catch (error: any) {
+            console.error('Erro ao atualizar avaliação:', error);
+            res.status(500).json({ message: 'Erro ao atualizar avaliação', error: error.message });
+        }
+    };
+
+    static deleteReviewImage: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productId = req.params.id;
+            const userId = (req as any).user.id;
+            const { imageUrl } = req.body;
+
+            if (!imageUrl) {
+                res.status(400).json({ message: 'URL da imagem não fornecida' });
+                return;
+            }
+
+            const product = await ProductModel.findById(productId);
+            if (!product) {
+                res.status(404).json({ message: 'Produto não encontrado' });
+                return;
+            }
+
+            const reviewIndex = product.reviews?.findIndex(
+                review => review.user.toString() === userId
+            );
+
+            if (reviewIndex === undefined || reviewIndex === -1) {
+                res.status(404).json({ message: 'Você não possui uma avaliação para este produto' });
+                return;
+            }
+
+            // Remove a imagem do array
+            if (product.reviews![reviewIndex].images) {
+                product.reviews![reviewIndex].images = product.reviews![reviewIndex].images!.filter(
+                    img => img !== imageUrl
+                );
+            }
+
+            await product.save();
+
+            const updatedProduct = await ProductModel.findById(productId).populate('reviews.user', 'name');
+            
+            res.status(200).json({ 
+                message: 'Imagem removida com sucesso',
+                product: updatedProduct
+            });
+        } catch (error: any) {
+            console.error('Erro ao remover imagem da avaliação:', error);
+            res.status(500).json({ message: 'Erro ao remover imagem', error: error.message });
+        }
+    };
 }
 
 export default ProductController;

@@ -145,7 +145,8 @@ async function changeProfilePicture(avatarUrl) {
     user.value = { ...user.value };
     
     Swal.fire({
-      icon: 'success', title: 'Sucesso!', text: 'Sua foto de perfil foi alterada.',
+      icon: 'success',
+      title: 'Avatar atualizado!',
       background: "#1F2937", color: "#E5E7EB", timer: 2000, showConfirmButton: false
     });
   } catch (error) {

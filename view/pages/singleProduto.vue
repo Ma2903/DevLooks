@@ -85,10 +85,13 @@
         <i class="fas fa-star"></i> Avaliações do Produto
       </h2>
 
-      <!-- Formulário de Avaliação (apenas se usuário comprou) -->
-      <div v-if="userCanReview" class="bg-gray-800 p-6 rounded-lg mb-8">
-        <h3 class="text-xl font-semibold mb-4 text-white">Deixe sua avaliação</h3>
-        <form @submit.prevent="submitReview">
+      <!-- Formulário de Avaliação (apenas se usuário comprou OU está editando) -->
+      <div v-if="userCanReview || isEditingReview" class="bg-gray-800 p-6 rounded-lg mb-8">
+        <h3 class="text-xl font-semibold mb-4 text-white flex items-center gap-2">
+          <i :class="isEditingReview ? 'fas fa-edit' : 'fas fa-plus-circle'"></i>
+          {{ isEditingReview ? 'Editar sua avaliação' : 'Deixe sua avaliação' }}
+        </h3>
+        <form @submit.prevent="submitReview" enctype="multipart/form-data">
           <div class="mb-4">
             <label class="block text-gray-300 mb-2">Nota:</label>
             <div class="flex gap-2">
@@ -114,12 +117,79 @@
               required
             ></textarea>
           </div>
-          <button
-            type="submit"
-            class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
-          >
-            <i class="fas fa-paper-plane"></i> Enviar Avaliação
-          </button>
+          
+          <!-- Upload de Imagens -->
+          <div class="mb-4">
+            <label class="flex items-center gap-2 text-gray-300 mb-2">
+              <i class="fas fa-image"></i> Adicionar imagens (opcional, até 5 imagens):
+            </label>
+            <input
+              type="file"
+              @change="handleImageUpload"
+              accept="image/*"
+              multiple
+              class="w-full p-3 bg-gray-700 text-white rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#04d1b0] file:text-white file:cursor-pointer hover:file:bg-[#03b89a]"
+            />
+            
+            <!-- Preview das imagens existentes (se estiver editando) -->
+            <div v-if="reviewForm.existingImages && reviewForm.existingImages.length > 0" class="mt-4">
+              <p class="text-gray-400 text-sm mb-2">Imagens atuais:</p>
+              <div class="flex gap-2 flex-wrap">
+                <div v-for="(image, idx) in reviewForm.existingImages" :key="idx" class="relative">
+                  <img
+                    :src="getImageUrl(image)"
+                    class="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    @click="removeExistingImage(image)"
+                    class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                  >
+                    <i class="fas fa-times text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Preview das novas imagens -->
+            <div v-if="reviewForm.imagePreviews && reviewForm.imagePreviews.length > 0" class="mt-4">
+              <p class="text-gray-400 text-sm mb-2">Novas imagens:</p>
+              <div class="flex gap-2 flex-wrap">
+                <div v-for="(preview, idx) in reviewForm.imagePreviews" :key="idx" class="relative">
+                  <img
+                    :src="preview"
+                    class="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    @click="removeNewImage(idx)"
+                    class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                  >
+                    <i class="fas fa-times text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="submit"
+              class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+            >
+              <i :class="isEditingReview ? 'fas fa-save' : 'fas fa-paper-plane'"></i> 
+              {{ isEditingReview ? 'Atualizar Avaliação' : 'Enviar Avaliação' }}
+            </button>
+            
+            <button
+              v-if="isEditingReview"
+              type="button"
+              @click="cancelEdit"
+              class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition flex items-center gap-2"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
         </form>
       </div>
 
@@ -164,17 +234,36 @@
                 ></i>
               </div>
             </div>
-            <span class="text-gray-400 text-sm">
-              {{ formatDate(review.createdAt) }}
-            </span>
+            <div class="flex items-center gap-3">
+              <span class="text-gray-400 text-sm">
+                {{ formatDate(review.createdAt) }}
+              </span>
+              <!-- Botões de ação (apenas para o próprio usuário) -->
+              <div v-if="isUserReview(review)" class="flex items-center gap-2">
+                <button
+                  @click="editReview(review)"
+                  class="text-[#04d1b0] hover:text-[#03b89a] transition"
+                  title="Editar avaliação"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  @click="confirmDeleteReview(review)"
+                  class="text-red-500 hover:text-red-400 transition"
+                  title="Excluir avaliação"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
           </div>
           <p class="text-gray-300">{{ review.comment }}</p>
-          <div v-if="review.images && review.images.length > 0" class="flex gap-2 mt-4">
+          <div v-if="review.images && review.images.length > 0" class="flex gap-2 mt-4 flex-wrap">
             <img
               v-for="(image, idx) in review.images"
               :key="idx"
               :src="getImageUrl(image)"
-              class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80"
+              class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition"
               @click="openImageModal(image)"
             />
           </div>
@@ -206,8 +295,11 @@ export default {
       reviewForm: {
         rating: 5,
         comment: '',
-        images: []
+        imageFiles: [],
+        imagePreviews: [],
+        existingImages: []
       },
+      isEditingReview: false,
       aiSummary: '',
       sentimentStats: null,
       isInWishlist: false, // Adiciona controle de favorito
@@ -490,21 +582,46 @@ export default {
       }
 
       try {
-        await axios.post(`/api/products/${productId}/review`, this.reviewForm);
+        const formData = new FormData();
+        formData.append('rating', this.reviewForm.rating);
+        formData.append('comment', this.reviewForm.comment);
         
-        Swal.fire({
-          title: 'Sucesso!',
-          text: 'Sua avaliação foi enviada com sucesso!',
-          icon: 'success',
-          background: '#1f2937',
-          color: '#e5e7eb'
-        });
+        // Adiciona as imagens ao FormData
+        if (this.reviewForm.imageFiles && this.reviewForm.imageFiles.length > 0) {
+          this.reviewForm.imageFiles.forEach(file => {
+            formData.append('images', file);
+          });
+        }
 
-        // Limpa o formulário e recarrega as avaliações
-        this.reviewForm.comment = '';
-        this.reviewForm.rating = 5;
-        this.userCanReview = false; // Impede o reenvio
+        if (this.isEditingReview) {
+          await axios.put(`/api/products/${productId}/review`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          Swal.fire({
+            title: 'Atualizado!',
+            text: 'Sua avaliação foi atualizada com sucesso!',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#e5e7eb'
+          });
+        } else {
+          await axios.post(`/api/products/${productId}/review`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          Swal.fire({
+            title: 'Sucesso!',
+            text: 'Sua avaliação foi enviada com sucesso!',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#e5e7eb'
+          });
+        }
+
+        // Recarrega e reseta
+        this.reviewForm = { rating: 5, comment: '', imageFiles: [], imagePreviews: [], existingImages: [] };
+        this.isEditingReview = false;
         await this.fetchReviews(productId);
+        await this.checkIfUserCanReview(productId);
 
       } catch (error) {
         console.error("Erro ao enviar avaliação:", error);
@@ -517,8 +634,145 @@ export default {
         });
       }
     },
+    handleImageUpload(event) {
+      const files = Array.from(event.target.files);
+      const maxFiles = 5;
+      const currentTotal = (this.reviewForm.existingImages?.length || 0) + (this.reviewForm.imagePreviews?.length || 0) + files.length;
+      if (currentTotal > maxFiles) {
+        Swal.fire({ title: 'Limite excedido', text: `Você pode adicionar no máximo ${maxFiles} imagens.`, icon: 'warning', background: '#1f2937', color: '#e5e7eb' });
+        return;
+      }
+      this.reviewForm.imageFiles.push(...files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => { this.reviewForm.imagePreviews.push(e.target.result); };
+        reader.readAsDataURL(file);
+      });
+      event.target.value = '';
+    },
+    removeNewImage(index) {
+      this.reviewForm.imageFiles.splice(index, 1);
+      this.reviewForm.imagePreviews.splice(index, 1);
+    },
+    async removeExistingImage(imageUrl) {
+      try {
+        await axios.delete(`/api/products/${this.$route.params.id}/review/image`, { data: { imageUrl } });
+        const index = this.reviewForm.existingImages.indexOf(imageUrl);
+        if (index > -1) this.reviewForm.existingImages.splice(index, 1);
+        Swal.fire({ title: 'Removida!', text: 'Imagem removida com sucesso.', icon: 'success', timer: 1500, showConfirmButton: false, background: '#1f2937', color: '#e5e7eb' });
+        await this.fetchReviews(this.$route.params.id);
+      } catch (error) {
+        Swal.fire({ title: 'Erro', text: 'Não foi possível remover a imagem.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });
+      }
+    },
+    editReview(review) {
+      console.log('editReview chamado com:', review);
+      // Preenche o formulário com os dados da review
+      this.reviewForm = {
+        rating: review.rating,
+        comment: review.comment,
+        imageFiles: [],
+        imagePreviews: [],
+        existingImages: review.images || []
+      };
+      this.isEditingReview = true;
+      console.log('reviewForm atualizado:', this.reviewForm);
+      console.log('isEditingReview:', this.isEditingReview);
+      
+      // Scrolla até o formulário
+      this.$nextTick(() => {
+        const form = document.querySelector('.bg-gray-800');
+        if (form) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    },
+    cancelEdit() {
+      this.reviewForm = { rating: 5, comment: '', imageFiles: [], imagePreviews: [], existingImages: [] };
+      this.isEditingReview = false;
+    },
+    async confirmDeleteReview(review) {
+      const result = await Swal.fire({
+        title: 'Excluir avaliação?',
+        html: `Tem certeza que deseja remover sua avaliação deste produto?<br><br><strong>Esta ação não pode ser desfeita.</strong>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-trash mr-2"></i> Sim, excluir!',
+        cancelButtonText: '<i class="fas fa-times mr-2"></i> Cancelar',
+        background: '#1f2937',
+        color: '#e5e7eb',
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        reverseButtons: true
+      });
+
+      if (result.isConfirmed) {
+        await this.deleteReview();
+      }
+    },
+    async deleteReview() {
+      try {
+        console.log('Tentando excluir review do produto:', this.$route.params.id);
+        const response = await axios.delete(`/api/products/${this.$route.params.id}/review`);
+        console.log('Resposta do servidor:', response.data);
+        
+        Swal.fire({
+          title: 'Excluída!',
+          text: 'Sua avaliação foi removida com sucesso.',
+          icon: 'success',
+          background: '#1f2937',
+          color: '#e5e7eb',
+          timer: 2000,
+          showConfirmButton: false
+        });
+
+        // Recarrega as avaliações e verifica se pode avaliar novamente
+        await this.fetchReviews(this.$route.params.id);
+        await this.checkIfUserCanReview(this.$route.params.id);
+        
+        // Se estava editando, cancela a edição
+        if (this.isEditingReview) {
+          this.cancelEdit();
+        }
+      } catch (error) {
+        console.error('Erro detalhado ao excluir avaliação:', error);
+        console.error('Response error:', error.response);
+        Swal.fire({
+          title: 'Erro',
+          text: error.response?.data?.message || 'Não foi possível excluir sua avaliação.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#e5e7eb'
+        });
+      }
+    },
+    isUserReview(review) {
+      const userDataRaw = localStorage.getItem("userData");
+      if (!userDataRaw || userDataRaw === "undefined") {
+        console.log('isUserReview: Sem dados de usuário no localStorage');
+        return false;
+      }
+      
+      const userData = JSON.parse(userDataRaw);
+      const userId = userData.id || userData._id;
+      const reviewUserId = typeof review.user === 'object' ? (review.user._id || review.user.id) : review.user;
+      
+      console.log('isUserReview - userId:', userId);
+      console.log('isUserReview - reviewUserId:', reviewUserId);
+      console.log('isUserReview - são iguais?:', String(userId) === String(reviewUserId));
+      
+      return String(userId) === String(reviewUserId);
+    },
     openImageModal(image) {
-      window.open(this.getImageUrl(image), '_blank');
+      const imageUrl = this.getImageUrl(image);
+      Swal.fire({
+        imageUrl: imageUrl,
+        imageAlt: 'Imagem da avaliação',
+        showCloseButton: true,
+        showConfirmButton: false,
+        background: '#1f2937',
+        customClass: { image: 'max-h-96 object-contain' }
+      });
     },
     async checkWishlistStatus(productId) {
       const token = localStorage.getItem('token');

@@ -393,11 +393,6 @@ const totalItems = computed(() => cartItems.value.reduce((t, i) => t + i.quantit
 const subtotal = computed(() => cartItems.value.reduce((t, i) => t + (i.price * i.quantity), 0));
 const discountAmount = computed(() => {
   if (!appliedCoupon.value) return 0;
-  // Verifica se o cupom tem discount_percentage (formato do backend)
-  if (appliedCoupon.value.discount_percentage) {
-    return subtotal.value * (appliedCoupon.value.discount_percentage / 100);
-  }
-  // Mantém compatibilidade com formato antigo se existir
   if (appliedCoupon.value.discountType === 'fixed') return appliedCoupon.value.discountValue;
   if (appliedCoupon.value.discountType === 'percentage') return subtotal.value * (appliedCoupon.value.discountValue / 100);
   return 0;

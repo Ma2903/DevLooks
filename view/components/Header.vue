@@ -147,8 +147,8 @@ const isAdmin = computed(() => {
 
 // --- LÓGICA CORRIGIDA ---
 const updateUserState = () => {
-  // 1. Lendo da chave correta: 'user'
-  const storedUser = localStorage.getItem('user');
+  // 1. Lendo da chave correta: 'userData'
+  const storedUser = localStorage.getItem('userData');
   const userObj = storedUser && storedUser !== 'undefined' ? JSON.parse(storedUser) : null;
   user.value = userObj;
   
@@ -259,8 +259,8 @@ const logout = () => {
   }).then((result) => {
     if (result.isConfirmed) {
       localStorage.removeItem('token');
-      // 2. Removendo a chave correta: 'user'
-      localStorage.removeItem('user');
+      // 2. Removendo a chave correta: 'userData'
+      localStorage.removeItem('userData');
       localStorage.removeItem('cart');
 
       window.dispatchEvent(new Event('auth-change'));
