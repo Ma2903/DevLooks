@@ -35,7 +35,7 @@
           </span>
         </div>
 
-        <div v-if="product.category === 'camisetas' && product.sizes && product.sizes.length > 0" class="mb-6">
+        <div v-if="hasSizes && product.sizes && product.sizes.length > 0" class="mb-6">
             <label class="block text-gray-300 text-sm font-medium mb-2">Selecione o Tamanho:</label>
             <div class="flex flex-wrap gap-2">
                 <button
@@ -305,6 +305,13 @@ export default {
       isInWishlist: false, // Adiciona controle de favorito
     };
   },
+  computed: {
+    hasSizes() {
+      // Retorna true para categorias que precisam de seleção de tamanho
+      const category = this.product.category?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return ['camisetas', 'moletons', 'calcas'].includes(category);
+    }
+  },
   async created() {
     const productId = this.$route.params.id;
     await this.fetchProduct(productId);
@@ -357,9 +364,9 @@ export default {
           return;
       }
 
-      if (this.product.category === 'camisetas' && !this.selectedSize) {
+      if (this.hasSizes && !this.selectedSize) {
           // --- DEBUG 3: Verificação de Tamanho ---
-          console.log('DEBUG: Categoria é camiseta, mas nenhum tamanho foi selecionado.');
+          console.log('DEBUG: Produto requer tamanho, mas nenhum foi selecionado.');
           Swal.fire({ icon: 'warning', title: 'Tamanho não selecionado', text: 'Por favor, selecione um tamanho.', background: "#1F2937", color: "#E5E7EB" });
           return;
       }

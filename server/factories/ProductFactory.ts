@@ -1,24 +1,23 @@
 import Product, { IProduct } from '../models/ProductModel';
 
-// --- Interfaces para os Objetos de Negócio ---
+// --- Interfaces ---
 
-// Interface base que todos os produtos devem seguir
 interface IProductObject {
     id: string;
     name: string;
     price: number;
     category: string;
-    displayInfo(): string; // Um método de exemplo
+    displayInfo(): string;
 }
 
-// Interface específica para Camiseta, que tem tamanhos
-interface ICamisetaObject extends IProductObject {
+// Interface para produtos que possuem grade de tamanhos
+interface ISizedProduct extends IProductObject {
     availableSizes: string[];
 }
 
-// --- Classes Concretas dos Produtos ---
+// --- Classes Concretas (4 Tipos Diferentes) ---
 
-// Classe base para um produto genérico
+// Classe Base
 class BaseProduct implements IProductObject {
     id: string;
     name: string;
@@ -26,7 +25,7 @@ class BaseProduct implements IProductObject {
     category: string;
 
     constructor(data: IProduct) {
-        this.id = data._id.toString(); // Converte o ID do Mongoose para string
+        this.id = data._id.toString();
         this.name = data.name;
         this.price = data.price;
         this.category = data.category;
@@ -37,57 +36,89 @@ class BaseProduct implements IProductObject {
     }
 }
 
-// Classe concreta para Camisetas
-class CamisetaObject extends BaseProduct implements ICamisetaObject {
+// 1. Camisetas: Grade de Letras (P, M, G...)
+class CamisetaObject extends BaseProduct implements ISizedProduct {
     availableSizes: string[];
 
     constructor(data: IProduct) {
-        super(data); // Chama o construtor da classe pai
-        this.availableSizes = data.sizes || []; // Pega os tamanhos do banco
+        super(data);
+        this.availableSizes = data.sizes || ['P', 'M', 'G', 'GG'];
     }
 
-    // Sobrescreve o método para mostrar informações adicionais
     override displayInfo(): string {
-        const baseInfo = super.displayInfo();
-        return `${baseInfo} (Tamanhos: ${this.availableSizes.join(', ')})`;
+        return `${super.displayInfo()} (T-Shirt Dev)`;
     }
 }
 
-// Classe concreta para Canecas (ou qualquer outro produto sem tamanho)
-class CanecaObject extends BaseProduct {
+// 2. Moletons: Grade de Letras + Atributo de conforto
+class MoletomObject extends BaseProduct implements ISizedProduct {
+    availableSizes: string[];
+
+    constructor(data: IProduct) {
+        super(data);
+        this.availableSizes = data.sizes || ['P', 'M', 'G', 'GG'];
+    }
+
+    override displayInfo(): string {
+        return `${super.displayInfo()} (Inverno - Conforto Máximo)`;
+    }
+}
+
+// 3. Calças: Grade Numérica (38, 40, 42...)
+class CalcaObject extends BaseProduct implements ISizedProduct {
+    availableSizes: string[];
+
+    constructor(data: IProduct) {
+        super(data);
+        // Se não vier do banco, define padrão numérico
+        this.availableSizes = data.sizes && data.sizes.length > 0 ? data.sizes : ['38', '40', '42', '44', '46'];
+    }
+
+    override displayInfo(): string {
+        return `${super.displayInfo()} (Numeração: ${this.availableSizes.join(', ')})`;
+    }
+}
+
+// 4. Acessórios: Tamanho Único
+class AcessorioObject extends BaseProduct {
     constructor(data: IProduct) {
         super(data);
     }
-    // Não precisa de lógica adicional por enquanto
+
+    override displayInfo(): string {
+        return `${super.displayInfo()} (Tamanho Único)`;
+    }
 }
 
-
-// --- A Fábrica (Factory Method) ---
+// --- Factory ---
 
 export class ProductFactory {
     /**
-     * Este é o Factory Method. Ele decide qual classe de objeto instanciar
-     * com base na categoria do produto.
+     * Factory Method: Fabrica o objeto correto baseado na categoria.
+     * Atende ao requisito de "Mínimo 4 produtos diferentes".
      */
     public static createProduct(productData: IProduct): IProductObject {
-        switch (productData.category.toLowerCase()) {
-            case 'camisetas':
-            case 'camiseta dev': // Adicione variações se necessário
-                return new CamisetaObject(productData);
+        // Normaliza para minúsculas e remove acentos para evitar erros
+        const category = productData.category.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-            case 'canecas':
-            case 'caneca dev':
-                return new CanecaObject(productData);
+        switch (category) {
+            case 'camisetas':
+                return new CamisetaObject(productData);
             
-            // Para qualquer outra categoria, retorna um produto base
+            case 'moletons':
+                return new MoletomObject(productData);
+            
+            case 'calcas': 
+                return new CalcaObject(productData);
+            
+            case 'acessorios':
+                return new AcessorioObject(productData);
+
             default:
                 return new BaseProduct(productData);
         }
     }
 
-    /**
-     * Retorna o Model do Mongoose para operações de banco de dados.
-     */
     public static getModel() {
         return Product;
     }

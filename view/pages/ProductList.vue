@@ -76,15 +76,20 @@ export default {
   },
   computed: {
     produtosFiltrados() {
-      if (!this.search && !this.category) {
-        return this.products;
+      let filtered = this.products;
+      
+      // Aplica filtros de busca e categoria
+      if (this.search || this.category) {
+        filtered = this.products.filter(product => {
+          const matchSearch = product.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                              product.description.toLowerCase().includes(this.search.toLowerCase());
+          const matchCategory = this.category ? product.category === this.category : true;
+          return matchSearch && matchCategory;
+        });
       }
-      return this.products.filter(product => {
-        const matchSearch = product.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                            product.description.toLowerCase().includes(this.search.toLowerCase());
-        const matchCategory = this.category ? product.category === this.category : true;
-        return matchSearch && matchCategory;
-      });
+      
+      // Ordena alfabeticamente por nome
+      return filtered.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }));
     },
     isLoggedIn() {
       return !!localStorage.getItem('token');

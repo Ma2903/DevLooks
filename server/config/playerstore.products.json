@@ -1,20 +1,182 @@
-[{
-  "_id": {
-    "$oid": "67c7500d9afe8eac47d99cb4"
+[
+  {
+    "name": "Camiseta Hello World",
+    "description": "A clássica. Se você não tem essa, você realmente coda?",
+    "price": 59.90,
+    "category": "camisetas",
+    "stock": 50,
+    "image": "public/images/products/camiseta_hello_world.png",
+    "sizes": ["P", "M", "G", "GG", "XG"]
   },
-  "id": 1,
-  "name": "Produto 1",
-  "image": "camisa.jpg",
-  "price": 99.99,
-  "category": "Camisetas"
-},
-{
-  "_id": {
-    "$oid": "67c7500d9afe8eac47d99cb5"
+  {
+    "name": "Camiseta Works on My Machine",
+    "description": "O selo de garantia de qualidade de todo desenvolvedor sênior.",
+    "price": 64.90,
+    "category": "camisetas",
+    "stock": 35,
+    "image": "public/images/products/camiseta_works.png",
+    "sizes": ["P", "M", "G", "GG"]
   },
-  "id": 2,
-  "name": "Produto 2",
-  "image": "camisa.jpg",
-  "price": 199.99,
-  "category": "Camisetas"
-}]
+  {
+    "name": "Camiseta Full Stack",
+    "description": "Para quem faz o backend, o frontend e ainda arruma a impressora.",
+    "price": 69.90,
+    "category": "camisetas",
+    "stock": 40,
+    "image": "public/images/products/camiseta_fullstack.png",
+    "sizes": ["M", "G", "GG"]
+  },
+  {
+    "name": "Moletom Debugger",
+    "description": "Quentinho para as longas noites caçando bugs. Capuz duplo.",
+    "price": 189.90,
+    "category": "moletons",
+    "stock": 20,
+    "image": "public/images/products/moletom_debug.png",
+    "sizes": ["P", "M", "G", "GG"]
+  },
+  {
+    "name": "Moletom Git Commit",
+    "description": "Estampa com seus commits verdes. Mostre que você trabalha (ou finge bem).",
+    "price": 199.90,
+    "category": "moletons",
+    "stock": 15,
+    "image": "public/images/products/moletom_git.png",
+    "sizes": ["M", "G", "GG"]
+  },
+  {
+    "name": "Moletom 404",
+    "description": "Moletom não encontrado... brincadeira, ele é super confortável.",
+    "price": 179.90,
+    "category": "moletons",
+    "stock": 25,
+    "image": "public/images/products/moletom_404.png",
+    "sizes": ["P", "M", "G"]
+  },
+  {
+    "name": "Calça Jogger Tech",
+    "description": "Conforto de pijama, estilo de dev rico. Vários bolsos para pendrives.",
+    "price": 129.90,
+    "category": "calcas",
+    "stock": 30,
+    "image": "public/images/products/calca_jogger.png",
+    "sizes": ["38", "40", "42", "44", "46"]
+  },
+  {
+    "name": "Calça Cargo Preta",
+    "description": "Para carregar cabos, adaptadores e suas esperanças.",
+    "price": 149.90,
+    "category": "calcas",
+    "stock": 25,
+    "image": "public/images/products/calca_cargo.png",
+    "sizes": ["40", "42", "44"]
+  },
+  {
+    "name": "Calça Moletom Home Office",
+    "description": "A farda oficial do trabalho remoto. Ninguém vê pela webcam.",
+    "price": 99.90,
+    "category": "calcas",
+    "stock": 50,
+    "image": "public/images/products/calca_moletom.png",
+    "sizes": ["38", "40", "42", "44"]
+  },
+  {
+    "name": "Boné Docker",
+    "description": "Estilo conteinerizado. Leve sua cabeça para qualquer ambiente.",
+    "price": 49.90,
+    "category": "acessorios",
+    "stock": 100,
+    "image": "public/images/products/bone_docker.png",
+    "sizes": ["ÚNICO"]
+  },
+  {
+    "name": "Gorro Linux Penguin",
+    "description": "Mantenha as ideias quentes e livres (open source).",
+    "price": 39.90,
+    "category": "acessorios",
+    "stock": 60,
+    "image": "public/images/products/gorro_linux.png",
+    "sizes": ["ÚNICO"]
+  },
+  {
+    "name": "Meias Rubber Duck",
+    "description": "Se travar, converse com suas meias. Elas vão entender.",
+    "price": 29.90,
+    "category": "acessorios",
+    "stock": 80,
+    "image": "public/images/products/meia_duck.png",
+    "sizes": ["34-38", "39-44"]
+  },
+  {
+    "name": "Camiseta Try/Catch",
+    "description": "Para os dias em que você se sente otimista, mas precisa de um plano B.",
+    "price": 62.90,
+    "category": "camisetas",
+    "stock": 45,
+    "image": "public/images/products/camiseta_try_catch.png",
+    "sizes": ["P", "M", "G", "GG"]
+  },
+  {
+    "name": "Camiseta 99 Bugs",
+    "description": "99 bugs no código, 99 bugs. Pega um, corrige... 127 bugs no código.",
+    "price": 64.90,
+    "category": "camisetas",
+    "stock": 40,
+    "image": "public/images/products/camiseta_99bugs.png",
+    "sizes": ["P", "M", "G", "GG", "XG"]
+  },
+  {
+    "name": "Moletom Dark Mode",
+    "description": "Meu modo padrão. Confortável, estiloso e fácil para os olhos. Zíper frontal.",
+    "price": 209.90,
+    "category": "moletons",
+    "stock": 20,
+    "image": "public/images/products/moletom_dark_mode.png",
+    "sizes": ["M", "G", "GG"]
+  },
+  {
+    "name": "Moletom 'sudo'",
+    "description": "Com grandes poderes, vêm grandes responsabilidades. Estilo canguru.",
+    "price": 189.90,
+    "category": "moletons",
+    "stock": 22,
+    "image": "public/images/products/moletom_sudo.png",
+    "sizes": ["P", "M", "G", "GG"]
+  },
+  {
+    "name": "Calça Jeans Black Dev",
+    "description": "Jeans preto clássico com elastano. Confortável para maratonas de código.",
+    "price": 169.90,
+    "category": "calcas",
+    "stock": 30,
+    "image": "public/images/products/calca_jeans_black.png",
+    "sizes": ["38", "40", "42", "44", "46"]
+  },
+  {
+    "name": "Bermuda Moletom 'Commit'",
+    "description": "Perfeita para o home office. Conforto na parte de baixo, profissional na webcam.",
+    "price": 89.90,
+    "category": "calcas",
+    "stock": 35,
+    "image": "public/images/products/bermuda_moletom.png",
+    "sizes": ["P", "M", "G", "GG"]
+  },
+  {
+    "name": "Boné Python",
+    "description": "Mostre seu amor pela melhor linguagem. (Não conte para os fãs de JS).",
+    "price": 54.90,
+    "category": "acessorios",
+    "stock": 60,
+    "image": "public/images/products/bone_python.png",
+    "sizes": ["ÚNICO"]
+  },
+  {
+    "name": "Meias SQL Join",
+    "description": "O par perfeito. Um pé 'INNER', o outro 'JOIN'. Para os DBAs de plantão.",
+    "price": 32.90,
+    "category": "acessorios",
+    "stock": 70,
+    "image": "public/images/products/meia_sql.png",
+    "sizes": ["34-38", "39-44"]
+  }
+]
