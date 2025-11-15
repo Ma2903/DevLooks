@@ -1,14 +1,13 @@
-import axios from "axios";
+import api from "./main.js";
 
-// Define a URL base completa para a API de produtos.
-// Isso torna o código mais claro e fácil de manter.
-const API_URL = 'http://localhost:3000/api/products';
+// ProductService agora usa a instância configurada do axios (api)
+// que automaticamente usa a URL correta baseada em VITE_API_URL
 
 export default {
   // Buscar todos os produtos
   async getAllProducts() {
     try {
-      const response = await axios.get(API_URL);
+      const response = await api.get('/api/products');
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
@@ -19,7 +18,7 @@ export default {
   // Buscar um produto pelo ID
   async getProductById(id) {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await api.get(`/api/products/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Erro ao buscar o produto ${id}:`, error);
@@ -31,7 +30,7 @@ export default {
   // (Este método recebe um FormData por causa do upload de imagem)
   async createProduct(productData) {
     try {
-      const response = await axios.post(API_URL, productData, {
+      const response = await api.post('/api/products', productData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -47,7 +46,7 @@ export default {
   // (Também pode receber FormData se a imagem for atualizada)
   async updateProduct(id, productData) {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, productData, {
+      const response = await api.put(`/api/products/${id}`, productData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -62,7 +61,7 @@ export default {
   // Deletar um produto
   async deleteProduct(id) {
     try {
-      const response = await axios.delete(`${API_URL}/${id}`);
+      const response = await api.delete(`/api/products/${id}`);
       return response.data; // Retorna a mensagem de sucesso do backend
     } catch (error) {
       console.error(`Erro ao deletar o produto ${id}:`, error);
@@ -73,7 +72,7 @@ export default {
   // Buscar os produtos mais vendidos
   async getBestSellingProducts() {
     try {
-      const response = await axios.get(`${API_URL}/best-selling`);
+      const response = await api.get('/api/products/best-selling');
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar produtos mais vendidos:', error);
@@ -84,7 +83,7 @@ export default {
   // Buscar os produtos mais recentes
   async getLatestProducts() {
     try {
-      const response = await axios.get(`${API_URL}/latest`);
+      const response = await api.get('/api/products/latest');
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar produtos recentes:', error);

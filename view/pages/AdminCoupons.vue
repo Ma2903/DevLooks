@@ -179,7 +179,7 @@ async function confirmarExclusao(coupon) {
 async function exportData(format) {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`http://localhost:3000/api/admin/export?type=coupons&format=${format}`, {
+    const response = await axios.get(`/api/admin/export?type=coupons&format=${format}`, {
       headers: { 'Authorization': `Bearer ${token}` },
       responseType: 'blob',
     });

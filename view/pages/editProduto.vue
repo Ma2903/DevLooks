@@ -111,7 +111,7 @@ export default {
     async fetchProduct(productId) {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:3000/api/products/${productId}`, {
+        const response = await axios.get(`/api/products/${productId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         // Garante que 'sizes' seja sempre um array
@@ -155,7 +155,7 @@ export default {
           formData.append('imagem', this.newImageFile);
         }
 
-        await axios.put(`http://localhost:3000/api/products/${this.$route.params.id}`, formData, {
+        await axios.put(`/api/products/${this.$route.params.id}`, formData, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

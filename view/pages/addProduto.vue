@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import api from '../services/main.js';
 import Swal from 'sweetalert2';
 
 export default {
@@ -177,7 +177,7 @@ export default {
         // Pega o token do localStorage para autenticar a requisição
         const token = localStorage.getItem('token');
 
-        await axios.post('http://localhost:3000/api/products', formData, {
+        await api.post('/api/products', formData, {
           headers: {
             // ADICIONA O HEADER DE AUTENTICAÇÃO
             'Authorization': `Bearer ${token}`,

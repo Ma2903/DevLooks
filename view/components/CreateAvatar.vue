@@ -156,7 +156,7 @@
 </template>
 
 <script>
-import axios from "axios"; // Importa o axios diretamente
+import axios from "../services/main.js"; // Importa a instância configurada
 import Swal from "sweetalert2";
 
 export default {
@@ -214,7 +214,7 @@ export default {
       return;
     }
     try {
-      const res = await axios.get("http://localhost:3000/api/users/me", {
+      const res = await axios.get("/api/users/me", {
         headers: { Authorization: `Bearer ${this.token}` },
       });
       this.user = res.data;
@@ -266,7 +266,7 @@ export default {
         // --- CORREÇÃO APLICADA AQUI ---
         // Usando o método PUT e a rota correta do AvatarRoutes.ts
         const response = await axios.put(
-          'http://localhost:3000/api/users/avatar', // Rota correta
+          '/api/users/avatar', // Rota correta
           { avatarUrl: this.avatarUrl }, 
           { 
             headers: { 
@@ -302,7 +302,7 @@ export default {
     async downloadSVG() {
       this.isDownloading = true;
       try {
-        const response = await axios.get(`http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'blob' });
+        const response = await axios.get(`/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/svg+xml' }));
         const link = document.createElement('a');
         link.href = url;
@@ -322,7 +322,7 @@ export default {
     async downloadPNG() {
       this.isDownloading = true;
       try {
-        const response = await axios.get(`http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'text' });
+        const response = await axios.get(`/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'text' });
         const svgText = response.data;
         
         // Criar um canvas com fundo branco

@@ -82,7 +82,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import api from '@/services/main.js';
-import axios from 'axios';
+import axios from '../services/main.js';
 
 const router = useRouter();
 const user = ref(null);
@@ -202,7 +202,7 @@ async function deleteAvatar(avatarUrl) {
 
 async function exportAvatar(avatarUrl, format) {
   try {
-    const proxyUrl = `http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(avatarUrl)}`;
+    const proxyUrl = `/api/avatar/proxy?url=${encodeURIComponent(avatarUrl)}`;
     
     if (format === 'svg') {
       // Download direto do SVG
