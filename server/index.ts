@@ -40,9 +40,26 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = PORT;
 
-// --- CORREÇÃO APLICADA AQUI ---
-// O caminho correto para a pasta 'public' é um nível acima ('../')
-app.use(express.static(path.join(__dirnameResolved, '../public')));
+// --- CONFIGURAÇÃO DE ARQUIVOS ESTÁTICOS ---
+// Tenta múltiplos caminhos para garantir compatibilidade local e Render
+const publicPath1 = path.join(__dirnameResolved, '../public'); // Para build local (dist/index.js → public)
+const publicPath2 = path.join(__dirnameResolved, '../../public'); // Para estrutura alternativa
+const publicPath3 = path.join(process.cwd(), 'public'); // Caminho absoluto da raiz do projeto
+
+console.log('📁 Tentando servir arquivos estáticos de:');
+console.log('   Path 1:', publicPath1);
+console.log('   Path 2:', publicPath2);
+console.log('   Path 3:', publicPath3);
+
+// Serve arquivos estáticos de todos os caminhos possíveis
+app.use(express.static(publicPath1));
+app.use(express.static(publicPath2));
+app.use(express.static(publicPath3));
+
+// Rota adicional para servir imagens explicitamente
+app.use('/images', express.static(path.join(publicPath1, 'images')));
+app.use('/images', express.static(path.join(publicPath2, 'images')));
+app.use('/images', express.static(path.join(publicPath3, 'images')));
 
 // A rota do Avatar (mais específica) deve vir ANTES da rota de Usuários (mais geral)
 app.use('/api', avatarRoutes);
