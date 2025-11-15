@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import api from '../services/main.js';
 
 export default {
   name: "ResetPassword",
@@ -68,19 +68,34 @@ export default {
       this.resetError = "";
       try {
         // Use await para esperar a resposta
-        const response = await axios.post('/api/users/forgot-password', { email: this.email });
+        const response = await api.post('/api/users/forgot-password', { email: this.email });
         
-        // Sucesso: exibe a mensagem de sucesso e não redireciona imediatamente
-        this.resetSuccess = "Link de redefinição enviado para o seu email!";
-        
-        // Log para o desenvolvedor, caso precise do hash
+        // Sucesso: redireciona para a página de confirmação
         if (response.data.code && response.data.email) {
-            console.log("Link de redefinição simulado: /confirm-reset?hash=" + response.data.code + "&email=" + response.data.email);
+          // Redireciona com os parâmetros necessários
+          this.$router.push({
+            path: '/reset/confirm',
+            query: {
+              hash: response.data.code,
+              email: response.data.email
+            }
+          });
+        } else {
+          this.resetSuccess = response.data.message || "Link de redefinição enviado para o seu email!";
         }
 
       } catch (error) {
         // Captura erros de rede ou de API
-        this.resetError = error.response?.data?.message || "Erro ao enviar o link de redefinição. Verifique seu email.";
+        if (error.response) {
+          // Servidor respondeu com status de erro
+          this.resetError = error.response.data?.error || error.response.data?.message || "Erro ao enviar o link de redefinição.";
+        } else if (error.request) {
+          // Requisição foi feita mas sem resposta
+          this.resetError = "Não foi possível conectar ao servidor. Verifique sua conexão.";
+        } else {
+          // Erro na configuração da requisição
+          this.resetError = "Erro ao enviar a solicitação. Tente novamente.";
+        }
         console.error("Erro ao enviar o link de redefinição:", error);
       } finally {
         this.loading = false;

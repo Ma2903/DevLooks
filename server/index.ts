@@ -57,6 +57,46 @@ app.use('/api', aiRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`✅ API Rodando em http://localhost:${port}`);
+});
+
+// Mantém o processo vivo
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
+
+server.on('error', (error: any) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Porta ${port} já está em uso`);
+    } else {
+        console.error('❌ Erro no servidor:', error);
+    }
+    process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('❌ Exceção não capturada:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promise rejeitada não tratada:', reason);
+    process.exit(1);
+});
+
+// Impede que o processo termine imediatamente
+process.on('SIGTERM', () => {
+    console.log('🔴 Recebido SIGTERM, encerrando servidor...');
+    server.close(() => {
+        console.log('✅ Servidor encerrado graciosamente');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('\n🔴 Recebido SIGINT (Ctrl+C), encerrando servidor...');
+    server.close(() => {
+        console.log('✅ Servidor encerrado graciosamente');
+        process.exit(0);
+    });
 });

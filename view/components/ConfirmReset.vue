@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from '../services/main.js';
 import Swal from "sweetalert2";
 
 export default {
@@ -99,11 +99,10 @@ export default {
       }
       this.loading = true;
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const hash = urlParams.get("hash");
-      const email = urlParams.get("email");
+      const hash = this.$route.query.hash;
+      const email = this.$route.query.email;
 
-      axios.post("/api/users/reset-password", {
+      api.post("/api/users/reset-password", {
         code: this.code,
         newPassword: this.newPassword,
         hash,

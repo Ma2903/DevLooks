@@ -38,8 +38,8 @@ const routes = [
   { path: '/register', name: 'Register', component: Register },
   { path: '/products', name: 'ProductList', component: ProductList },
   { path: '/products/:id', name: 'SingleProduct', component: SingleProduct, props: true },
-  { path: '/reset-password', component: ResetPassword },
-  { path: '/reset/:token', component: ConfirmReset },
+  { path: '/reset-password', name: 'ResetPassword', component: ResetPassword },
+  { path: '/reset/confirm', name: 'ConfirmReset', component: ConfirmReset },
   { path: '/about', name: 'AboutUs', component: AboutUs },
   { path: '/faq', name: 'FAQ', component: FAQ },
   

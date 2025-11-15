@@ -22,7 +22,7 @@ const WishlistSchema: Schema = new Schema({
     timestamps: true
 });
 
-WishlistSchema.index({ user: 1 });
+// Índice já criado pelo 'unique: true' no campo user
 
 const WishlistModel = mongoose.model<IWishlist>('Wishlist', WishlistSchema);
 
