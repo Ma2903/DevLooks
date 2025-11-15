@@ -34,7 +34,7 @@ api.interceptors.response.use(
       
       // Limpa o localStorage
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('userData');
       localStorage.removeItem('cart');
       
       // Dispara evento para atualizar o estado da aplicação

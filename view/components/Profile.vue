@@ -13,7 +13,10 @@
         <!-- Coluna de Informações do Usuário -->
         <div class="flex-grow md:border-r md:border-gray-700 md:pr-8">
           <div class="relative mb-6 md:mb-0 flex-shrink-0 mx-auto md:mx-0">
-            <img :src="user.avatarUrl || 'https://i.pravatar.cc/150?u=' + user.email" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-emerald-400 shadow-lg object-cover mx-auto">
+            <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-emerald-400 shadow-lg object-cover mx-auto">
+            <div v-else class="w-36 h-36 rounded-full border-4 border-gray-600 bg-gray-700 flex items-center justify-center mx-auto">
+              <i class="fas fa-user text-gray-400 text-5xl"></i>
+            </div>
           </div>
           
           <div class="mt-6">

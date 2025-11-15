@@ -61,7 +61,10 @@
         
         <div v-if="user" class="relative">
           <button @click="toggleDropdown" class="flex items-center gap-2" aria-label="Menu do Usuário" :aria-expanded="isDropdownOpen">
-            <img :src="user.avatarUrl || 'https://i.pravatar.cc/40'" :alt="`Avatar de ${user.name}`" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
+            <img v-if="user.avatarUrl" :src="user.avatarUrl" :alt="`Avatar de ${user.name}`" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
+            <div v-else class="w-8 h-8 rounded-full bg-gray-600 border-2 border-gray-500 flex items-center justify-center">
+              <i class="fas fa-user text-gray-400 text-sm"></i>
+            </div>
           </button>
           <transition name="fade-scale">
             <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-56 bg-gray-700 rounded-md shadow-lg py-2 z-50 border border-gray-600">

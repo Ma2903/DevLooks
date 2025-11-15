@@ -88,7 +88,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 1. Pega as informações do localStorage de forma segura
   const token = localStorage.getItem('token');
-  const userString = localStorage.getItem('user'); // Padronizado para 'user'
+  const userString = localStorage.getItem('userData'); // Padronizado para 'userData'
   let user = null;
 
   // 2. Tenta fazer o parse do usuário APENAS se ele existir e for válido

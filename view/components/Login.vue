@@ -122,11 +122,16 @@
               password: this.password,
             });
 
+            console.log("Resposta do login:", response.data);
+            
             localStorage.setItem("token", response.data.token);
 
-            // --- AQUI ESTÁ A CORREÇÃO CRÍTICA ---
-            // Padronizamos a chave para 'user', que é o que o router.js espera encontrar.
-            localStorage.setItem("user", JSON.stringify(response.data.user));
+            // --- CORREÇÃO CRÍTICA ---
+            // Padronizamos a chave para 'userData', que é usado em toda a aplicação.
+            localStorage.setItem("userData", JSON.stringify(response.data.user));
+            
+            console.log("Token salvo:", localStorage.getItem("token"));
+            console.log("User salvo:", localStorage.getItem("userData"));
             
             // Avisa todo o app que o usuário mudou
             window.dispatchEvent(new Event("auth-change")); 
@@ -140,6 +145,7 @@
               color: "#E5E7EB",
             });
 
+            console.log("Redirecionando para /profile");
             // Agora o redirecionamento vai funcionar!
             this.$router.push("/profile");
 
