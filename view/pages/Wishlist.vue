@@ -201,12 +201,23 @@ export default {
 
     async moveToCart(productId) {
       try {
+        const product = this.products.find(p => p._id === productId);
+
+        if (!product) {
+          throw new Error('Produto não encontrado');
+        }
+
+        // Primeiro move o produto da wishlist (backend já remove da lista)
         await api.post('/api/wishlist/move-to-cart', { productId });
 
-        const product = this.products.find(p => p._id === productId);
+        // Depois adiciona ao carrinho com todos os dados necessários
         await api.post('/api/cart/add', {
           productId: productId,
-          quantity: 1
+          quantity: 1,
+          selectedSize: product.sizes?.[0] || null, // Pega o primeiro tamanho disponível
+          name: product.name,
+          price: product.promotion_price || product.price,
+          image: product.image
         });
 
         await Swal.fire({
@@ -216,9 +227,12 @@ export default {
           timer: 2000,
           showConfirmButton: false,
           background: '#1F2937',
-          color: '#E5E7EB'
+          color: '#E5E7EB',
+          toast: true,
+          position: 'top-end'
         });
 
+        // Recarrega a wishlist para refletir a remoção
         this.loadWishlist();
       } catch (error) {
         console.error('Erro ao mover para carrinho:', error);
