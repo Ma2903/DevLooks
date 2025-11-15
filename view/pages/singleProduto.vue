@@ -882,6 +882,8 @@ export default {
           background: '#1f2937',
           color: '#e5e7eb'
         });
+        
+        window.dispatchEvent(new Event('wishlist-updated'));
       } catch (error) {
         console.error("Erro ao adicionar à wishlist:", error);
         Swal.fire({

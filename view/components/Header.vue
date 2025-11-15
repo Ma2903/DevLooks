@@ -52,6 +52,7 @@
 
         <router-link v-if="user" to="/wishlist" class="relative hover:text-red-400 transition-colors" aria-label="Lista de Desejos">
           <i class="fas fa-heart text-xl"></i>
+          <span v-if="wishlistItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ wishlistItemCount }}</span>
         </router-link>
 
         <router-link to="/cart" class="relative hover:text-emerald-400 transition-colors" aria-label="Carrinho de Compras">
@@ -137,6 +138,7 @@ import api from '@/services/main.js';
 const router = useRouter();
 const user = ref(null);
 const cartItemCount = ref(0);
+const wishlistItemCount = ref(0);
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 const isNotificationsOpen = ref(false);
@@ -149,15 +151,28 @@ const isAdmin = computed(() => {
 });
 
 // --- LÓGICA CORRIGIDA ---
-const updateUserState = () => {
+const updateUserState = async () => {
   // 1. Lendo da chave correta: 'userData'
   const storedUser = localStorage.getItem('userData');
   const userObj = storedUser && storedUser !== 'undefined' ? JSON.parse(storedUser) : null;
   user.value = userObj;
   
-  if (userObj && Array.isArray(userObj.cart)) {
-    cartItemCount.value = userObj.cart.reduce((total, item) => total + item.quantity, 0);
+  // 2. Buscar carrinho do servidor se usuário estiver logado
+  if (userObj) {
+    await fetchCartCount();
   } else {
+    cartItemCount.value = 0;
+  }
+};
+
+const fetchCartCount = async () => {
+  try {
+    const response = await api.get('/api/cart');
+    const cart = Array.isArray(response.data) ? response.data : [];
+    cartItemCount.value = cart.reduce((total, item) => total + item.quantity, 0);
+    console.log('🛒 Carrinho atualizado:', cartItemCount.value, 'itens');
+  } catch (error) {
+    console.error('Erro ao buscar carrinho:', error);
     cartItemCount.value = 0;
   }
 };
@@ -165,18 +180,21 @@ const updateUserState = () => {
 onMounted(() => {
   updateUserState();
   window.addEventListener('auth-change', updateUserState);
-  window.addEventListener('cart-updated', updateUserState);
+  window.addEventListener('cart-updated', fetchCartCount);
+  window.addEventListener('wishlist-updated', fetchWishlistCount);
   
   // Inicia o polling de notificações se o usuário estiver logado
   if (user.value) {
     fetchNotifications();
+    fetchWishlistCount();
     notificationInterval = setInterval(fetchNotifications, 30000); // A cada 30 segundos
   }
 });
 
 onUnmounted(() => {
   window.removeEventListener('auth-change', updateUserState);
-  window.removeEventListener('cart-updated', updateUserState);
+  window.removeEventListener('cart-updated', fetchCartCount);
+  window.removeEventListener('wishlist-updated', fetchWishlistCount);
   if (notificationInterval) {
     clearInterval(notificationInterval);
   }
@@ -203,8 +221,21 @@ const fetchNotifications = async () => {
     const response = await api.get('/api/notifications/unread');
     notifications.value = response.data.notifications || [];
     notificationCount.value = response.data.count || 0;
+    console.log('📬 Notificações carregadas:', notificationCount.value);
   } catch (error) {
     console.error('Erro ao buscar notificações:', error);
+  }
+};
+
+const fetchWishlistCount = async () => {
+  if (!user.value) return;
+  
+  try {
+    const response = await api.get('/api/wishlist');
+    wishlistItemCount.value = response.data.totalItems || 0;
+    console.log('❤️ Wishlist atualizada:', wishlistItemCount.value, 'itens');
+  } catch (error) {
+    console.error('Erro ao buscar wishlist:', error);
   }
 };
 
@@ -287,12 +318,14 @@ watch(() => router.currentRoute.value, () => {
 watch(user, (newUser) => {
   if (newUser && !notificationInterval) {
     fetchNotifications();
+    fetchWishlistCount();
     notificationInterval = setInterval(fetchNotifications, 30000);
   } else if (!newUser && notificationInterval) {
     clearInterval(notificationInterval);
     notificationInterval = null;
     notifications.value = [];
     notificationCount.value = 0;
+    wishlistItemCount.value = 0;
   }
 });
 </script>

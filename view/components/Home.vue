@@ -319,6 +319,8 @@ export default {
             background: "#1F2937",
             color: "#E5E7EB",
           });
+          
+          window.dispatchEvent(new Event('wishlist-updated'));
         } else {
           // Adiciona aos favoritos
           await api.post('/api/wishlist/add', { productId });
@@ -334,6 +336,8 @@ export default {
             background: "#1F2937",
             color: "#E5E7EB",
           });
+          
+          window.dispatchEvent(new Event('wishlist-updated'));
         }
       } catch (error) {
         console.error('Erro ao atualizar wishlist:', error);

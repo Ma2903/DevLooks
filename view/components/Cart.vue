@@ -243,6 +243,7 @@ async function updateCartOnServer(newCart) {
     try {
         const response = await api.put('/api/cart/update', { cartItems: newCart });
         cartItems.value = response.data;
+        window.dispatchEvent(new Event('cart-updated'));
     } catch (error) {
         Swal.fire({ title: 'Erro', text: 'Não foi possível atualizar o carrinho.', icon: 'error', background: '#1f2937', color: '#e5e7eb' });
     }

@@ -187,6 +187,7 @@ export default {
         });
 
         this.loadWishlist();
+        window.dispatchEvent(new Event('wishlist-updated'));
       } catch (error) {
         console.error('Erro ao remover produto:', error);
         Swal.fire({
@@ -234,6 +235,7 @@ export default {
 
         // Recarrega a wishlist para refletir a remoção
         this.loadWishlist();
+        window.dispatchEvent(new Event('wishlist-updated'));
       } catch (error) {
         console.error('Erro ao mover para carrinho:', error);
         Swal.fire({
@@ -275,6 +277,7 @@ export default {
           });
 
           this.loadWishlist();
+          window.dispatchEvent(new Event('wishlist-updated'));
         } catch (error) {
           console.error('Erro ao limpar wishlist:', error);
           Swal.fire({
