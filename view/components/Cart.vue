@@ -100,12 +100,12 @@
                                         <i class="fas fa-truck text-[#04d1b0] text-lg"></i>
                                         <span class="text-white font-bold">Frete Padrão</span>
                                     </div>
-                                    <span class="text-[#04d1b0] font-bold text-lg">R$ 15,00</span>
+                                    <span class="text-[#04d1b0] font-bold text-lg">R$ {{ shipping.cost.toFixed(2) }}</span>
                                 </div>
                                 <div class="space-y-2 text-sm">
                                     <div class="flex items-center gap-2 text-gray-300">
                                         <i class="fas fa-clock text-[#04d1b0]"></i>
-                                        <span>Prazo: <strong class="text-white">3 a 7 dias úteis</strong></span>
+                                        <span>Prazo: <strong class="text-white">{{ shipping.time }}</strong></span>
                                     </div>
                                     <div class="flex items-center gap-2 text-gray-300">
                                         <i class="fas fa-map-marker-alt text-[#04d1b0]"></i>
@@ -113,9 +113,9 @@
                                     </div>
                                 </div>
                                 <div class="mt-3 pt-3 border-t border-gray-600">
-                                    <div class="flex items-center gap-2 text-xs text-green-400">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Frete calculado para todo Brasil!</span>
+                                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        <span>Região: <strong class="text-white">{{ shipping.region }}</strong></span>
                                     </div>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
                             <div class="p-3 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
                                 <div class="text-center text-gray-500 text-sm">
                                     <i class="fas fa-info-circle"></i>
-                                    Digite seu CEP para confirmar o frete (R$ 15,00 fixo - 3 a 7 dias úteis)
+                                    Digite seu CEP para calcular o valor e prazo do frete
                                 </div>
                             </div>
                         </template>
@@ -298,7 +298,7 @@ function applyCepMask(event) {
     cep.value = value;
 }
 
-function setFixedShipping() {
+async function setFixedShipping() {
     if (!cep.value || cep.value.length !== 9) {
         Swal.fire({
             icon: 'error',
@@ -310,11 +310,33 @@ function setFixedShipping() {
         return;
     }
 
-    if (subtotal.value >= 150) {
+    shipping.loading = true;
+
+    try {
+        // Calcular peso total e dimensões estimadas
+        const totalWeight = cartItems.value.reduce((sum, item) => {
+            return sum + (item.quantity * 0.5); // 0.5kg por item
+        }, 0);
+
+        const dimensions = {
+            height: 20,
+            width: 30,
+            length: 40
+        };
+
+        const response = await api.post('/api/shipping/calculate', {
+            cep: cep.value.replace('-', ''),
+            weight: totalWeight,
+            dimensions: dimensions,
+            cartTotal: subtotal.value - (discountAmount.value || 0)
+        });
+
+        const { cost, deliveryTime, region, freeShipping } = response.data;
+
         Object.assign(shipping, {
-            cost: 0,
-            time: '3 a 7 dias úteis',
-            region: '',
+            cost: cost,
+            time: deliveryTime,
+            region: region,
             error: '',
             ready: true,
             loading: false
@@ -322,32 +344,34 @@ function setFixedShipping() {
 
         Swal.fire({
             icon: 'success',
-            title: 'Frete Grátis!',
-            text: 'Parabéns! Sua compra tem frete grátis (compras acima de R$ 150,00).',
+            title: freeShipping ? 'Frete Grátis!' : 'Frete Calculado!',
+            text: freeShipping 
+                ? 'Parabéns! Sua compra tem frete grátis (compras acima de R$ 150,00).'
+                : `Frete: R$ ${cost.toFixed(2)} - Entrega: ${deliveryTime}`,
+            background: '#1F2937',
+            color: '#E5E7EB',
+            timer: 2500,
+            showConfirmButton: false
+        });
+    } catch (error) {
+        console.error('Erro ao calcular frete:', error);
+        Object.assign(shipping, {
+            cost: null,
+            time: '',
+            region: '',
+            error: 'Não foi possível calcular o frete',
+            ready: false,
+            loading: false
+        });
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro ao Calcular Frete',
+            text: 'Não foi possível calcular o frete. Tente novamente.',
             background: '#1F2937',
             color: '#E5E7EB'
         });
-        return;
     }
-
-    Object.assign(shipping, {
-        cost: 15,
-        time: '3 a 7 dias úteis',
-        region: '',
-        error: '',
-        ready: true,
-        loading: false
-        });
-
-    Swal.fire({
-        icon: 'success',
-        title: 'Frete Confirmado!',
-        text: 'Frete padrão: R$ 15,00 - Entrega em 3 a 7 dias úteis',
-        background: '#1F2937',
-        color: '#E5E7EB',
-        timer: 2000,
-        showConfirmButton: false
-    });
 }
 
 function getImageUrl(imagePath) {

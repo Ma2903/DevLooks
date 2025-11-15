@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <div v-if="!loading" class="mt-8">
+    <div v-if="!loading" class="mt-8 space-y-4">
       <!-- Exibição do frete calculado -->
       <div v-if="shippingCalculated" class="bg-gray-800 p-4 rounded-lg border-l-4 mb-6"
            :class="shippingInfo.freeShipping ? 'border-green-500' : 'border-[#04d1b0]'">
@@ -96,18 +96,27 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center">
-        <button v-if="!shippingCalculated" @click="calculateShipping" 
+      <!-- Botão de calcular frete (centralizado quando não calculado) -->
+      <div v-else class="text-center">
+        <button @click="calculateShipping" 
                 :disabled="calculatingShipping"
-                class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-3 px-6 rounded-lg transition">
+                class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-4 px-8 rounded-lg transition text-lg shadow-lg">
           <i v-if="calculatingShipping" class="fas fa-spinner fa-spin mr-2"></i>
           <i v-else class="fas fa-calculator mr-2"></i>
           {{ calculatingShipping ? 'Calculando...' : 'Calcular Frete' }}
         </button>
+        <p class="text-gray-400 text-sm mt-2">É necessário calcular o frete para continuar</p>
+      </div>
+
+      <!-- Botões de navegação (sempre visíveis) -->
+      <div class="flex justify-between items-center pt-4">
+        <router-link to="/cart" class="text-gray-400 hover:text-white transition font-semibold">
+          <i class="fas fa-arrow-left mr-2"></i> Voltar ao Carrinho
+        </router-link>
         
         <button @click="goToReview" 
                 :disabled="!shippingCalculated"
-                class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-8 rounded-lg text-lg hover:shadow-xl transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-4 px-8 rounded-lg text-lg hover:shadow-xl transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
           Continuar para Revisão <i class="fas fa-arrow-right ml-2"></i>
         </button>
       </div>
