@@ -11,6 +11,7 @@ export interface IProduct extends Document {
     stock: number;
     image: string;
     images?: string[];
+    sizes?: string[]; // Tamanhos disponíveis (P, M, G, GG para camisetas)
     reviews?: {
         user: Schema.Types.ObjectId;
         rating: number;
@@ -42,6 +43,7 @@ const ProductSchema = new Schema<IProduct>({
     stock: { type: Number, required: true, default: 0 },
     image: { type: String, required: true },
     images: [{ type: String }],
+    sizes: [{ type: String }], // Tamanhos disponíveis
     reviews: [{
         user: { type: Schema.Types.ObjectId, ref: 'User' },
         rating: { type: Number, required: true, min: 1, max: 5 },

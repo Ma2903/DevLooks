@@ -1,7 +1,7 @@
-import User from '../models/UserModel';
+import UserModel, { IUser } from '../models/UserModel';
 
 export class UserFactory {
-    static getModel(): User {
-        return User;
+    static getModel(): typeof UserModel {
+        return UserModel;
     }
 }
