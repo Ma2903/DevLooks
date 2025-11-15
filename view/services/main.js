@@ -2,9 +2,12 @@
 
 import axios from 'axios';
 
+// Define a URL da API baseado no ambiente
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 // Cria uma instância do axios que usaremos em todo o app
 const api = axios.create({
-  baseURL: 'http://localhost:3000/',
+  baseURL: API_URL,
 });
 
 // Interceptor de REQUISIÇÃO - Adiciona o token antes de enviar

@@ -24,6 +24,7 @@ import shippingRoutes from './routes/ShippingRoutes';
 import aiRoutes from './routes/AIRoutes';
 import notificationRoutes from './routes/NotificationRoutes';
 import wishlistRoutes from './routes/WishlistRoutes';
+import paymentRoutes from './routes/PaymentRoutes';
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use('/api', shippingRoutes);
 app.use('/api', aiRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/payment', paymentRoutes);
 
 const server = app.listen(port, () => {
     console.log(`✅ API Rodando em http://localhost:${port}`);

@@ -29,6 +29,9 @@ import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
 import CheckoutReview from './pages/checkout/CheckoutReview.vue';
 import CheckoutPayment from './pages/checkout/CheckoutPayment.vue';
 import Wishlist from './pages/Wishlist.vue';
+import PaymentSuccess from './pages/PaymentSuccess.vue';
+import PaymentFailure from './pages/PaymentFailure.vue';
+import PaymentPending from './pages/PaymentPending.vue';
 
 // Sua estrutura de rotas está ótima e foi mantida
 const routes = [
@@ -74,6 +77,11 @@ const routes = [
   { path: '/admin/coupons', component: AdminCoupons, meta: { requiresAdmin: true } },
   { path: '/admin/coupons/new', component: CouponForm, meta: { requiresAdmin: true } },
   { path: '/admin/coupons/edit/:id', component: CouponForm, meta: { requiresAdmin: true } },
+  
+  // Rotas de retorno do pagamento (públicas)
+  { path: '/order/success', name: 'PaymentSuccess', component: PaymentSuccess },
+  { path: '/order/failure', name: 'PaymentFailure', component: PaymentFailure },
+  { path: '/order/pending', name: 'PaymentPending', component: PaymentPending },
 ];
 
 const router = createRouter({

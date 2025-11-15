@@ -13,6 +13,10 @@ const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
 
 class OrderController {
     static async checkout(req: Request, res: Response) {
+        console.log('🛒 [Checkout] Requisição recebida!');
+        console.log('📦 [Checkout] Body:', JSON.stringify(req.body, null, 2));
+        console.log('👤 [Checkout] User ID:', (req as any).user?.id);
+        
         try {
             const userId = (req as any).user.id;
             const { items, shippingAddress, shippingCost, couponCode } = req.body;
@@ -76,22 +80,28 @@ class OrderController {
             }
 
              if (couponCode) {
-                // Cria uma RegExp que ignora o case (opção 'i')
                 const coupon = await CouponModel.findOne({ 
-                    code: { $regex: new RegExp('^' + couponCode + '$', 'i') }, 
-                    is_active: true 
+                    code: couponCode.toUpperCase(), 
+                    isActive: true 
                 });
+                
                 if (coupon) {
-                    if (new Date() > coupon.expires_at) {
+                    if (new Date() > coupon.expirationDate) {
                          console.warn(`[Checkout Warn] Tentativa de usar cupão expirado: ${couponCode}`);
                         return res.status(400).json({ message: "Cupom expirado." });
                     }
-                    const discount = (total * coupon.discount_percentage) / 100;
+                    
+                    let discount = 0;
+                    if (coupon.discountType === 'percentage') {
+                        discount = (total * coupon.discountValue) / 100;
+                    } else if (coupon.discountType === 'fixed') {
+                        discount = coupon.discountValue;
+                    }
+                    
                     total -= discount;
-                     console.log(`[Checkout Log] Cupão ${couponCode} aplicado. Desconto: ${discount.toFixed(2)}`);
+                    console.log(`[Checkout Log] Cupão ${couponCode} aplicado. Tipo: ${coupon.discountType}, Valor: ${coupon.discountValue}, Desconto: R$ ${discount.toFixed(2)}`);
                 } else {
-                     console.warn(`[Checkout Warn] Tentativa de usar cupão inválido: ${couponCode}`);
-                    return res.status(404).json({ message: "Cupom inválido." });
+                     console.warn(`[Checkout Warn] Cupão não encontrado ou inativo: ${couponCode}. Prosseguindo sem desconto.`);
                 }
             }
             
@@ -121,9 +131,8 @@ class OrderController {
                     failure: `http://localhost:8080/order/failure`,
                     pending: `http://localhost:8080/order/pending`,
                 },
-                auto_return: "approved" as "approved",
                 external_reference: tempOrderId,
-                notification_url: `https://SEU_DOMINIO_PUBLICO/api/orders/webhook`, // Lembre-se de configurar isto depois
+                statement_descriptor: "DevLooks",
             };
             
              console.log('[Checkout Log] A criar preferência de pagamento com os dados:', JSON.stringify(preferenceData, null, 2));
