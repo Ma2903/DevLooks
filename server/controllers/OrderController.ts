@@ -127,9 +127,9 @@ class OrderController {
                     email: user.email,
                 },
                 back_urls: {
-                    success: `http://localhost:8080/order/success`,
-                    failure: `http://localhost:8080/order/failure`,
-                    pending: `http://localhost:8080/order/pending`,
+                    success: `https://devlooks.vercel.app/order/success`,
+                    failure: `https://devlooks.vercel.app/order/failure`,
+                    pending: `https://devlooks.vercel.app/order/pending`,
                 },
                 external_reference: tempOrderId,
                 statement_descriptor: "DevLooks",
