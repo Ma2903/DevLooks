@@ -4,7 +4,7 @@
 
 ### Build Command:
 ```bash
-npm install && npm run server:build
+npm install
 ```
 
 ### Start Command:

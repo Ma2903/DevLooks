@@ -7,8 +7,7 @@
     "dev": "vite",
     "server": "nodemon --exec tsx server/index.ts",
     "server:dev": "tsx watch --tsconfig ./tsconfig.json server/index.ts",
-    "server:build": "tsc --project tsconfig.json",
-    "server:start": "node dist/index.js",
+    "server:start": "tsx server/index.ts",
     "build": "vite build",
     "preview": "vite preview"
   },
