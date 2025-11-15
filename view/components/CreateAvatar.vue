@@ -324,34 +324,80 @@ export default {
       try {
         const response = await axios.get(`http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(this.avatarUrl)}`, { responseType: 'text' });
         const svgText = response.data;
+        
+        // Criar um canvas com fundo branco
+        const canvas = document.createElement('canvas');
+        canvas.width = this.pngSize;
+        canvas.height = this.pngSize;
+        const ctx = canvas.getContext('2d');
+        
+        // Preencher fundo branco
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Criar imagem a partir do SVG
         const img = new Image();
         img.crossOrigin = "anonymous";
+        
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = this.pngSize;
-          canvas.height = this.pngSize;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, this.pngSize, this.pngSize);
-          canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'avatar.png';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
+          try {
+            ctx.drawImage(img, 0, 0, this.pngSize, this.pngSize);
+            
+            // Converter para PNG
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                Swal.fire('Erro', 'Não foi possível gerar a imagem PNG.', 'error');
+                this.isDownloading = false;
+                return;
+              }
+              
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = 'avatar.png';
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              URL.revokeObjectURL(url);
+              this.isDownloading = false;
+              
+              Swal.fire({
+                icon: 'success',
+                title: 'Download concluído!',
+                text: 'Seu avatar foi baixado em PNG.',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            }, 'image/png', 1.0);
+          } catch (error) {
+            console.error('Erro ao desenhar no canvas:', error);
+            Swal.fire('Erro', 'Não foi possível renderizar a imagem.', 'error');
             this.isDownloading = false;
-          }, 'image/png');
+          }
         };
-        img.onerror = () => {
+        
+        img.onerror = (error) => {
+          console.error('Erro ao carregar imagem:', error);
           Swal.fire('Erro', 'Não foi possível carregar a imagem para conversão.', 'error');
           this.isDownloading = false;
         };
+        
+        // Criar blob do SVG com encoding correto
         const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(svgBlob);
         img.src = url;
+        
+        // Timeout de segurança
+        setTimeout(() => {
+          if (this.isDownloading) {
+            URL.revokeObjectURL(url);
+            Swal.fire('Erro', 'Tempo limite excedido ao processar a imagem.', 'error');
+            this.isDownloading = false;
+          }
+        }, 10000);
+        
       } catch (error) {
+        console.error('Erro ao baixar PNG:', error);
         Swal.fire('Erro', 'Não foi possível baixar o PNG.', 'error');
         this.isDownloading = false;
       }

@@ -203,20 +203,83 @@ async function deleteAvatar(avatarUrl) {
 async function exportAvatar(avatarUrl, format) {
   try {
     const proxyUrl = `http://localhost:3000/api/avatar/proxy?url=${encodeURIComponent(avatarUrl)}`;
-    const response = await axios.get(proxyUrl, { responseType: 'blob' });
-    const blob = new Blob([response.data]);
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `devlooks-avatar.${format}`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
+    
+    if (format === 'svg') {
+      // Download direto do SVG
+      const response = await axios.get(proxyUrl, { responseType: 'blob' });
+      const blob = new Blob([response.data], { type: 'image/svg+xml' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `devlooks-avatar.svg`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } else if (format === 'png') {
+      // Conversão SVG para PNG
+      const response = await axios.get(proxyUrl, { responseType: 'text' });
+      const svgText = response.data;
+      
+      const canvas = document.createElement('canvas');
+      const size = 512; // Tamanho padrão
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      // Fundo branco
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, size, size);
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error('Falha ao gerar PNG'));
+              return;
+            }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'devlooks-avatar.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            resolve();
+          }, 'image/png', 1.0);
+        };
+        img.onerror = reject;
+        
+        const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        img.src = url;
+      });
+    }
+    
     Swal.fire({
-      title: 'Erro de Download', text: 'Não foi possível baixar o avatar.', icon: 'error',
-      background: "#1F2937", color: "#E5E7EB",
+      icon: 'success',
+      title: 'Download concluído!',
+      text: `Avatar baixado em ${format.toUpperCase()}.`,
+      timer: 2000,
+      showConfirmButton: false,
+      background: "#1F2937",
+      color: "#E5E7EB",
+      toast: true,
+      position: 'top-end'
+    });
+  } catch (error) {
+    console.error('Erro ao exportar avatar:', error);
+    Swal.fire({
+      title: 'Erro de Download', 
+      text: 'Não foi possível baixar o avatar.',
+      icon: 'error',
+      background: "#1F2937", 
+      color: "#E5E7EB",
     });
   }
 }
