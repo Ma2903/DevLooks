@@ -1,85 +1,119 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center p-6">
-    <div class="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl p-8 border-t-4 border-emerald-400">
-      <h1 class="text-3xl font-bold text-center text-white mb-8">Editar Perfil</h1>
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-200">
+    <div class="m-10 bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-6xl">
+      <div class="text-center mb-10">
+        <img src="../assets/Logo.png" alt="Logo" class="w-28 h-28 mx-auto rounded-full shadow-lg">
+        <h1 class="text-5xl font-extrabold text-[#04d1b0] mt-6">Editar Perfil</h1>
+        <p class="text-gray-400 mt-3 text-lg">Atualize suas informações pessoais</p>
+      </div>
       
       <form v-if="userData" @submit.prevent="handleEdit">
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+
+          <div>
             <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
-            <input type="text" id="name" v-model="userData.name" class="form-input" required>
-          </div>
-
-          <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-            <input type="email" id="email" v-model="userData.email" class="form-input" required>
-          </div>
-        </div>
-
-        <h2 class="text-xl font-semibold text-white mt-6 mb-4 border-b border-gray-700 pb-2">Endereço</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="mb-4 md:col-span-3 flex items-end gap-2">
-            <div class="flex-grow">
-              <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
-              <input 
-                type="text" 
-                id="cep" 
-                v-model="userData.address.cep" 
-                @input="applyCepMask" 
-                class="form-input" 
-                placeholder="00000-000"
-                maxlength="9"
-              >
+            <div class="relative flex items-center">
+              <i class="fas fa-user absolute left-4 text-gray-400 z-10"></i>
+              <input type="text" id="name" v-model="userData.name"
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Digite seu nome" required />
             </div>
-            <button 
-              type="button" 
-              @click="buscarCepManualmente" 
-              class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-colors h-[48px] flex-shrink-0"
-              aria-label="Buscar CEP"
-            >
-              <i class="fas fa-search"></i>
-            </button>
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <div class="relative flex items-center">
+              <i class="fas fa-envelope absolute left-4 text-gray-400 z-10"></i>
+              <input type="email" id="email" v-model="userData.email"
+                      class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="exemplo@email.com" required />
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="cep" class="block text-sm font-medium text-gray-300 mb-2">CEP</label>
+            <div class="relative flex items-center gap-2">
+              <div class="relative flex-grow">
+                <i class="fas fa-map-pin absolute left-4 text-gray-400 z-10 top-1/2 -translate-y-1/2"></i>
+                <input 
+                  type="text" 
+                  id="cep" 
+                  v-model="userData.address.cep" 
+                  @input="applyCepMask" 
+                  class="w-full p-3 pl-12 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                  placeholder="00000-000"
+                  maxlength="9"
+                />
+              </div>
+              <button 
+                type="button" 
+                @click="buscarCepManualmente" 
+                class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-3 px-6 rounded-lg transition-colors flex-shrink-0"
+                aria-label="Buscar CEP"
+              >
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="street" class="block text-sm font-medium text-gray-300 mb-2">Endereço (Rua/Avenida)</label>
+            <input type="text" id="street" v-model="userData.address.street"
+                    class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                    placeholder="Preenchido pelo CEP" />
           </div>
           
-          <div class="mb-4 md:col-span-2">
-            <label for="street" class="block text-sm font-medium text-gray-300 mb-2">Rua</label>
-            <input type="text" id="street" v-model="userData.address.street" class="form-input">
+          <div class="grid grid-cols-2 gap-x-4 md:col-span-2">
+              <div>
+                <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
+                <input type="text" id="number" v-model="userData.address.number"
+                        class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                        placeholder="Ex: 123" />
+              </div>
+              <div>
+                <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento</label>
+                <input type="text" id="complement" v-model="userData.address.complement"
+                        class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                        placeholder="Apto, Bloco, etc."/>
+              </div>
           </div>
-           <div class="mb-4">
-            <label for="number" class="block text-sm font-medium text-gray-300 mb-2">Número</label>
-            <input type="text" id="number" v-model="userData.address.number" class="form-input">
-          </div>
-          <div class="mb-4">
-            <label for="complement" class="block text-sm font-medium text-gray-300 mb-2">Complemento</label>
-            <input type="text" id="complement" v-model="userData.address.complement" class="form-input">
-          </div>
-          <div class="mb-4">
-            <label for="neighborhood" class="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
-            <input type="text" id="neighborhood" v-model="userData.address.neighborhood" class="form-input">
-          </div>
-          <div class="mb-4">
-            <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
-            <input type="text" id="city" v-model="userData.address.city" class="form-input">
-          </div>
-          <div class="mb-4">
-            <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-            <input type="text" id="state" v-model="userData.address.state" class="form-input">
-          </div>
-        </div>
 
+          <div>
+            <label for="neighborhood" class="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
+            <input type="text" id="neighborhood" v-model="userData.address.neighborhood"
+                    class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                    placeholder="Preenchido pelo CEP" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-x-4">
+            <div>
+              <label for="city" class="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
+              <input type="text" id="city" v-model="userData.address.city"
+                      class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Preenchido pelo CEP" />
+            </div>
+            <div>
+              <label for="state" class="block text-sm font-medium text-gray-300 mb-2">Estado</label>
+              <input type="text" id="state" v-model="userData.address.state"
+                      class="w-full p-3 bg-gray-800 rounded-lg focus:outline-none ring-2 ring-transparent focus:ring-[#04d1b0] transition-all duration-300"
+                      placeholder="Preenchido pelo CEP" />
+            </div>
+          </div>
+          
+        </div>
+        
         <div class="mt-8 flex flex-col md:flex-row gap-4">
-          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <i class="fas fa-save"></i>Salvar Alterações
+          <button type="submit" class="w-full bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] hover:from-[#03b89a] hover:to-[#3e3ab8] text-white font-bold py-4 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            <i class="fas fa-save mr-2"></i> Salvar Alterações
           </button>
-          <router-link to="/profile" class="w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+          <router-link to="/profile" class="w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg">
             Cancelar
           </router-link>
         </div>
       </form>
 
       <div v-else class="text-center py-8">
-          <i class="fas fa-spinner fa-spin text-4xl text-emerald-400"></i>
+          <i class="fas fa-spinner fa-spin text-4xl text-[#04d1b0]"></i>
           <p class="mt-4 text-lg">Carregando dados do usuário...</p>
       </div>
     </div>
@@ -220,22 +254,4 @@ export default {
 
 <style scoped>
 @import '@fortawesome/fontawesome-free/css/all.css';
-
-.form-input {
-  width: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  background-color: #374151;
-  color: #e5e7eb;
-  border-radius: 0.5rem;
-  outline: none;
-  border: 1px solid #4b5563;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.form-input:focus {
-  box-shadow: 0 0 0 2px #10b981;
-  border-color: #10b981;
-}
 </style>
