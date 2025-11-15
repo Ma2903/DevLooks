@@ -110,6 +110,7 @@
 
 <script>
 import api from '@/services/main';
+import { getImageUrl } from '@/services/config.js';
 import Swal from 'sweetalert2';
 
 export default {
@@ -125,11 +126,7 @@ export default {
     this.loadWishlist();
   },
   methods: {
-    getImageUrl(imagePath) {
-      if (!imagePath) return '/images/placeholder.png';
-      const cleanPath = imagePath.replace(/^public[\\/]/, '');
-      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
     async loadWishlist() {
       this.loading = true;
       try {

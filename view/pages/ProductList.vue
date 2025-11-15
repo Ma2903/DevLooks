@@ -57,6 +57,7 @@
 
 <script>
 import axios from "@/services/main.js";
+import { getImageUrl } from "@/services/config.js";
 import Swal from 'sweetalert2';
 import SearchBar from "@/components/Search-bar.vue"; // Importa o componente SearchBar
 
@@ -128,11 +129,7 @@ export default {
     isInWishlist(productId) {
       return this.wishlistIds.includes(productId);
     },
-    getImageUrl(imagePath) {
-      if (!imagePath) return '';
-      const cleanPath = imagePath.replace(/^public[\\/]/, '');
-      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
     async addToCart(product) {
       const token = localStorage.getItem('token');
       if (!token) {

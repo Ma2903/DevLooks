@@ -189,13 +189,7 @@ export default {
     }
   },
   methods: {
-    getImageUrl(imagePath) {
-      if (!imagePath) {
-        return 'https://i.imgur.com/L1e3z0x.png'; // Placeholder
-      }
-      const cleanPath = imagePath.replace(/^public[\\/]/, '');
-      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
     async fetchProducts() {
       this.loading = true;
       this.error = null;

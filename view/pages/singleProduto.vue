@@ -280,6 +280,7 @@
 <script>
 // --- A CORREÇÃO PRINCIPAL ESTÁ AQUI ---
 import axios from "@/services/main.js"; // Importa a instância configurada do Axios!
+import { getImageUrl } from "@/services/config.js";
 import Swal from "sweetalert2";
 
 export default {
@@ -326,11 +327,7 @@ export default {
     }
   },
   methods: {
-    getImageUrl(imagePath) {
-      if (!imagePath) return '';
-      const cleanPath = imagePath.replace(/^public[\\/]/, '');
-      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
     async fetchProduct(productId) {
       try {
         const response = await axios.get(`/api/products/${productId}`);

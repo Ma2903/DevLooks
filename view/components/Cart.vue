@@ -375,11 +375,7 @@ async function setFixedShipping() {
     }
 }
 
-function getImageUrl(imagePath) {
-    if (!imagePath) return '';
-    const cleanPath = imagePath.replace(/^public[\\/]/, '');
-    return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-}
+
 
 function goToCheckout() {
     const token = localStorage.getItem('token');

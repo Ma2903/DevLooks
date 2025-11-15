@@ -49,6 +49,7 @@
 <script>
 // --- CORREÇÃO DE IMPORTAÇÃO ---
 import api from '@/services/main.js';
+import { getImageUrl } from '@/services/config.js';
 
 export default {
   name: 'OrderHistory',
@@ -75,11 +76,7 @@ export default {
         this.loading = false;
       }
     },
-    getImageUrl(imagePath) {
-      if (!imagePath) return '';
-      const cleanPath = imagePath.replace(/^public[\\/]/, '');
-      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
     getStatusClass(status) {
       switch (status) {
         case 'Processando': return 'bg-orange-500/30 text-orange-400 border border-orange-500/50';

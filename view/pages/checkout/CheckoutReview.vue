@@ -79,6 +79,8 @@
 </template>
 
 <script>
+import { getImageUrl } from '../../services/config.js';
+
 export default {
   name: "CheckoutReview",
   data() {
@@ -96,11 +98,7 @@ export default {
     else { this.$router.push('/cart'); }
   },
   methods: {
-    getImageUrl(imagePath) {
-        if (!imagePath) return '';
-        const cleanPath = imagePath.replace(/^public[\\/]/, '');
-        return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
   }
 };
 </script>

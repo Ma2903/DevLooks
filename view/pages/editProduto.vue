@@ -84,6 +84,7 @@
 
 <script>
 import axios from "axios";
+import { getImageUrl } from "@/services/config.js";
 import Swal from "sweetalert2";
 
 export default {
@@ -106,11 +107,7 @@ export default {
   },
   methods: {
     // FUNÇÃO CORRIGIDA E PADRONIZADA
-    getImageUrl(imagePath) {
-      if (!imagePath) return '';
-      const cleanPath = imagePath.replace(/^public[\\/]/, '');
-      return `http://localhost:3000/${cleanPath.replace(/\\/g, '/')}`;
-    },
+    getImageUrl,
     async fetchProduct(productId) {
       try {
         const token = localStorage.getItem('token');
