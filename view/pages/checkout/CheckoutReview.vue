@@ -14,6 +14,16 @@
             <p class="font-bold">{{ checkoutData.shippingAddress.street }}, {{ checkoutData.shippingAddress.number }}</p>
             <p>{{ checkoutData.shippingAddress.neighborhood }}, {{ checkoutData.shippingAddress.city }} - {{ checkoutData.shippingAddress.state }}</p>
             <p>CEP: {{ checkoutData.shippingAddress.cep }}</p>
+            
+            <!-- Informações do frete -->
+            <div v-if="checkoutData.shippingInfo" class="mt-3 pt-3 border-t border-gray-700">
+              <p v-if="!checkoutData.shippingInfo.freeShipping" class="text-sm"><strong>Serviço:</strong> {{ checkoutData.shippingInfo.service }}</p>
+              <p class="text-sm"><strong>Prazo:</strong> {{ checkoutData.shippingInfo.deliveryTime }}</p>
+              <p class="text-sm"><strong>Região:</strong> {{ checkoutData.shippingInfo.region }}</p>
+              <p v-if="checkoutData.shippingInfo.freeShipping" class="text-sm text-green-400 font-semibold mt-1">
+                🎉 Frete Grátis - Compra acima de R$ 150,00
+              </p>
+            </div>
           </div>
         </div>
 
@@ -44,9 +54,9 @@
               <span>Desconto ({{ checkoutData.appliedCoupon.code }})</span>
               <span>- R$ {{ checkoutData.discountAmount.toFixed(2) }}</span>
             </div>
-            <div class="flex justify-between text-gray-300">
-              <span>Frete</span>
-              <span>R$ {{ checkoutData.shippingCost.toFixed(2) }}</span>
+            <div class="flex justify-between" :class="checkoutData.shippingCost === 0 ? 'text-green-400' : 'text-gray-300'">
+              <span>Frete {{ checkoutData.shippingInfo?.freeShipping ? '(Grátis)' : '' }}</span>
+              <span>{{ checkoutData.shippingCost === 0 ? 'GRÁTIS' : `R$ ${checkoutData.shippingCost.toFixed(2)}` }}</span>
             </div>
             <div class="border-t border-gray-700 pt-3 mt-3 flex justify-between font-bold text-2xl text-white">
               <span>Total</span>
@@ -76,6 +86,7 @@ export default {
       checkoutData: {
         cartItems: [], appliedCoupon: null, subtotal: 0,
         discountAmount: 0, finalTotal: 0, shippingAddress: null, shippingCost: 0,
+        shippingInfo: null
       },
     };
   },

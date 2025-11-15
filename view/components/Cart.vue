@@ -63,8 +63,37 @@
                     </div>
                     <!-- Resultado do Frete -->
                     <div class="mt-3">
-                        <!-- Frete Fixo -->
-                        <template v-if="shipping.ready && shipping.cost !== null">
+                        <!-- Frete Grátis -->
+                        <template v-if="shipping.ready && subtotal >= 150">
+                            <div class="p-4 bg-gradient-to-r from-green-900/40 to-green-800/40 rounded-lg border-2 border-green-500 shadow-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-gift text-green-400 text-lg"></i>
+                                        <span class="text-white font-bold">Frete Grátis! 🎉</span>
+                                    </div>
+                                    <span class="text-green-400 font-bold text-lg">GRÁTIS</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center gap-2 text-gray-300">
+                                        <i class="fas fa-clock text-green-400"></i>
+                                        <span>Prazo: <strong class="text-white">3 a 7 dias úteis</strong></span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-gray-300">
+                                        <i class="fas fa-map-marker-alt text-green-400"></i>
+                                        <span>CEP: <strong class="text-white">{{ cep }}</strong></span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-gray-600">
+                                    <div class="flex items-center gap-2 text-xs text-green-400">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Parabéns! Você ganhou frete grátis em compras acima de R$ 150,00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <!-- Frete Pago -->
+                        <template v-else-if="shipping.ready && shipping.cost !== null">
                             <div class="p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border-2 border-[#04d1b0] shadow-lg">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
@@ -122,9 +151,9 @@
                         <span>Desconto ({{ appliedCoupon?.code }})</span>
                         <span>- R$ {{ discountAmount.toFixed(2) }}</span>
                     </div>
-                    <div v-if="shipping.ready && shipping.cost !== null" class="flex justify-between text-gray-300">
-                        <span>Frete</span>
-                        <span>R$ {{ (shipping.cost || 0).toFixed(2) }}</span>
+                    <div v-if="shipping.ready && shipping.cost !== null" class="flex justify-between" :class="subtotal >= 150 ? 'text-green-400' : 'text-gray-300'">
+                        <span>Frete {{ subtotal >= 150 ? '(Grátis)' : '' }}</span>
+                        <span>{{ subtotal >= 150 ? 'GRÁTIS' : `R$ ${(shipping.cost || 0).toFixed(2)}` }}</span>
                     </div>
                     <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-xl">
                         <span>Total</span>
@@ -399,7 +428,8 @@ const discountAmount = computed(() => {
 });
 const finalTotal = computed(() => Math.max(0, subtotal.value - discountAmount.value));
 const finalTotalWithShipping = computed(() => {
-    const shippingValue = shipping.cost || 0;
+    // Se o subtotal for >= 150, frete é grátis (0)
+    const shippingValue = subtotal.value >= 150 ? 0 : (shipping.cost || 0);
     return finalTotal.value + shippingValue;
 });
 

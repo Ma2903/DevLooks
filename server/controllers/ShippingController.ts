@@ -128,11 +128,24 @@ const SHIPPING_TABLE: { [key: string]: { cost: number; days: string; region: str
 class ShippingController {
     static calculateShipping: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { cep, cepDestino } = req.body;
+            const { cep, cepDestino, cartTotal } = req.body;
             const finalCepDestino = cep || cepDestino;
 
             if (!finalCepDestino) {
                 res.status(400).json({ error: "CEP de destino não fornecido." });
+                return;
+            }
+
+            // Verifica se o total do carrinho qualifica para frete grátis
+            if (cartTotal && cartTotal >= 150) {
+                console.log(`🎉 Frete grátis! Total do carrinho: R$ ${cartTotal.toFixed(2)}`);
+                res.status(200).json({
+                    service: 'SEDEX',
+                    cost: 0,
+                    deliveryTime: '3 a 7 dias úteis',
+                    region: 'Frete calculado para todo Brasil',
+                    freeShipping: true
+                });
                 return;
             }
 

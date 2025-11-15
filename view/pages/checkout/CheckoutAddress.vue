@@ -75,11 +75,42 @@
       </div>
     </div>
 
-    <div v-if="!loading" class="mt-8 text-right">
-      <button @click="goToReview" 
-              class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-8 rounded-lg text-lg hover:shadow-xl transition transform hover:scale-105">
-        Continuar para Revisão <i class="fas fa-arrow-right ml-2"></i>
-      </button>
+    <div v-if="!loading" class="mt-8">
+      <!-- Exibição do frete calculado -->
+      <div v-if="shippingCalculated" class="bg-gray-800 p-4 rounded-lg border-l-4 mb-6"
+           :class="shippingInfo.freeShipping ? 'border-green-500' : 'border-[#04d1b0]'">
+        <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+          <i class="fas fa-shipping-fast"></i>
+          {{ shippingInfo.freeShipping ? 'Frete Grátis! 🎉' : 'Frete Calculado' }}
+        </h3>
+        <div class="text-gray-300">
+          <p v-if="!shippingInfo.freeShipping"><strong>Serviço:</strong> {{ shippingInfo.service }}</p>
+          <p><strong>Região:</strong> {{ shippingInfo.region }}</p>
+          <p><strong>Prazo:</strong> {{ shippingInfo.deliveryTime }}</p>
+          <p v-if="shippingInfo.freeShipping" class="text-green-400 font-semibold mt-2">
+            Parabéns! Você ganhou frete grátis por compras acima de R$ 150,00
+          </p>
+          <p class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
+            Valor: {{ shippingInfo.freeShipping ? 'GRÁTIS' : `R$ ${shippingInfo.cost.toFixed(2)}` }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <button v-if="!shippingCalculated" @click="calculateShipping" 
+                :disabled="calculatingShipping"
+                class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-3 px-6 rounded-lg transition">
+          <i v-if="calculatingShipping" class="fas fa-spinner fa-spin mr-2"></i>
+          <i v-else class="fas fa-calculator mr-2"></i>
+          {{ calculatingShipping ? 'Calculando...' : 'Calcular Frete' }}
+        </button>
+        
+        <button @click="goToReview" 
+                :disabled="!shippingCalculated"
+                class="bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white font-bold py-3 px-8 rounded-lg text-lg hover:shadow-xl transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+          Continuar para Revisão <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -99,6 +130,15 @@ export default {
         street: "", number: "", complement: "", neighborhood: "",
         city: "", state: "", cep: ""
       },
+      calculatingShipping: false,
+      shippingCalculated: false,
+      shippingInfo: {
+        service: '',
+        cost: 0,
+        deliveryTime: '',
+        region: '',
+        freeShipping: false
+      }
     };
   },
   async created() {
@@ -111,6 +151,11 @@ export default {
       if (this.newAddress.cep.length === 9) {
         this.fetchAddressFromCep(this.newAddress.cep);
       }
+    },
+    addressChoice() {
+      // Reset shipping quando trocar de endereço
+      this.shippingCalculated = false;
+      this.shippingInfo = { service: '', cost: 0, deliveryTime: '', region: '', freeShipping: false };
     }
   },
   methods: {
@@ -168,7 +213,97 @@ export default {
       }
     },
     
+    async calculateShipping() {
+      const selectedAddress = this.addressChoice === 'profile' ? this.profileAddress : this.newAddress;
+      
+      if (!selectedAddress.cep) {
+        Swal.fire({
+          icon: 'warning', title: 'CEP Necessário', 
+          text: 'Por favor, informe o CEP para calcular o frete.',
+          background: '#1F2937', color: '#E5E7EB'
+        });
+        return;
+      }
+
+      // Validar se novo endereço está completo
+      if (this.addressChoice === 'new') {
+        const requiredFields = ['cep', 'street', 'number', 'neighborhood', 'city', 'state'];
+        for (const field of requiredFields) {
+          if (!this.newAddress[field]) {
+            Swal.fire({
+              icon: 'warning', title: 'Campos Obrigatórios', 
+              text: `Por favor, preencha o campo '${field}' do endereço.`,
+              background: '#1F2937', color: '#E5E7EB'
+            });
+            return;
+          }
+        }
+      }
+
+      this.calculatingShipping = true;
+
+      try {
+        // Obter dados do carrinho
+        const checkoutDataString = localStorage.getItem('checkoutData');
+        if (!checkoutDataString) {
+          this.$router.push('/cart');
+          return;
+        }
+        
+        const checkoutData = JSON.parse(checkoutDataString);
+        
+        // Calcular peso total e dimensões estimadas do carrinho
+        const totalWeight = checkoutData.cartItems.reduce((sum, item) => {
+          // Estimativa: cada produto pesa 0.5kg
+          return sum + (item.quantity * 0.5);
+        }, 0);
+
+        // Dimensões estimadas da embalagem (em cm)
+        const dimensions = {
+          height: 20,
+          width: 30,
+          length: 40
+        };
+
+        // Calcular total do carrinho (subtotal - desconto)
+        const cartTotal = checkoutData.subtotal - (checkoutData.discountAmount || 0);
+
+        const response = await api.post('/api/shipping/calculate', {
+          cep: selectedAddress.cep,
+          weight: totalWeight,
+          dimensions: dimensions,
+          cartTotal: cartTotal
+        });
+
+        this.shippingInfo = response.data;
+        this.shippingCalculated = true;
+
+      } catch (error) {
+        console.error('Erro ao calcular frete:', error);
+        Swal.fire({
+          icon: 'error', 
+          title: 'Erro ao Calcular Frete', 
+          text: error.response?.data?.error || 'Não foi possível calcular o frete. Tente novamente.',
+          background: '#1F2937', 
+          color: '#E5E7EB'
+        });
+      } finally {
+        this.calculatingShipping = false;
+      }
+    },
+    
     goToReview() {
+      if (!this.shippingCalculated) {
+        Swal.fire({
+          icon: 'warning', 
+          title: 'Calcule o Frete', 
+          text: 'Por favor, calcule o frete antes de continuar.',
+          background: '#1F2937', 
+          color: '#E5E7EB'
+        });
+        return;
+      }
+
       let shippingAddress = null;
       if (this.addressChoice === 'profile') {
         shippingAddress = this.profileAddress;
@@ -194,6 +329,13 @@ export default {
       
       const checkoutData = JSON.parse(checkoutDataString);
       checkoutData.shippingAddress = shippingAddress;
+      checkoutData.shippingCost = this.shippingInfo.cost;
+      checkoutData.shippingInfo = this.shippingInfo;
+      
+      // Recalcular o total com o frete
+      const subtotalWithDiscount = checkoutData.subtotal - (checkoutData.discountAmount || 0);
+      checkoutData.finalTotal = subtotalWithDiscount + this.shippingInfo.cost;
+      
       localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
       this.$router.push('/checkout/review');
     }
