@@ -161,6 +161,7 @@
 
 <script>
 import ProductService from '../services/ProductService';
+import { getImageUrl } from '../services/config.js';
 import Swal from 'sweetalert2';
 // Importe o serviço de API centralizado
 import api from '@/services/main.js';
