@@ -307,9 +307,12 @@ export default {
 
         console.log('[CheckoutAddress] Resposta da API de frete:', response.data);
         
-        // Garantir que freeShipping existe
+        // Garantir que TODAS as propriedades existam com valores padrão
         this.shippingInfo = {
-          ...response.data,
+          service: response.data.service || '',
+          cost: response.data.cost || 0,
+          deliveryTime: response.data.deliveryTime || '',
+          region: response.data.region || '',
           freeShipping: response.data.freeShipping || false
         };
         
