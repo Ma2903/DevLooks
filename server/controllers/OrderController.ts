@@ -9,6 +9,7 @@ import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { MERCADOPAGO_ACCESS_TOKEN } from "../config/config";
 
 // SDK v2: Inicializa o cliente com as suas credenciais
+console.log('🔑 [MercadoPago] Inicializando com token:', MERCADOPAGO_ACCESS_TOKEN ? `${MERCADOPAGO_ACCESS_TOKEN.substring(0, 15)}...` : 'TOKEN NÃO ENCONTRADO');
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
 
 class OrderController {
@@ -138,8 +139,11 @@ class OrderController {
             
              console.log('[Checkout Log] A criar preferência de pagamento com os dados:', JSON.stringify(preferenceData, null, 2));
             const preference = new Preference(client);
+            
+            console.log('💳 [MercadoPago] Enviando requisição para criar preferência...');
             const response = await preference.create({ body: preferenceData });
-             console.log('[Checkout Log] Preferência de pagamento criada com sucesso. ID:', response.id);
+            console.log('✅ [MercadoPago] Preferência criada com sucesso. ID:', response.id);
+            console.log('✅ [MercadoPago] Init point:', response.init_point);
 
             res.status(201).json({ 
                 message: "Preferência de pagamento criada com sucesso.",
