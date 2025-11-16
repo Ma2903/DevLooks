@@ -77,7 +77,7 @@
 
     <div v-if="!loading" class="mt-8 space-y-4">
       <!-- Exibição do frete calculado -->
-      <div v-if="shippingCalculated" class="bg-gray-800 p-4 rounded-lg border-l-4 mb-6"
+      <div v-if="shippingCalculated && shippingInfo" class="bg-gray-800 p-4 rounded-lg border-l-4 mb-6"
            :class="shippingInfo.freeShipping ? 'border-green-500' : 'border-[#04d1b0]'">
         <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
           <i class="fas fa-shipping-fast"></i>
@@ -90,7 +90,7 @@
           <p v-if="shippingInfo.freeShipping" class="text-green-400 font-semibold mt-2">
             Parabéns! Você ganhou frete grátis por compras acima de R$ 150,00
           </p>
-          <p v-if="shippingInfo.cost !== undefined" class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
+          <p v-if="shippingInfo.cost !== undefined && shippingInfo.cost !== null" class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
             Valor: {{ shippingInfo.freeShipping ? 'GRÁTIS' : `R$ ${Number(shippingInfo.cost).toFixed(2)}` }}
           </p>
         </div>
@@ -307,8 +307,8 @@ export default {
 
         console.log('[CheckoutAddress] Resposta da API de frete:', response.data);
         
-        // Garantir que TODAS as propriedades existam com valores padrão
-        this.shippingInfo = {
+        // Criar um objeto completamente novo para evitar problemas de reatividade
+        const newShippingInfo = {
           service: response.data.service || '',
           cost: response.data.cost || 0,
           deliveryTime: response.data.deliveryTime || '',
@@ -316,9 +316,11 @@ export default {
           freeShipping: response.data.freeShipping || false
         };
         
-        // Usar $nextTick para garantir reatividade
-        await this.$nextTick();
+        console.log('[CheckoutAddress] 🔄 Novo shippingInfo criado:', newShippingInfo);
+        
+        // Primeiro setar shippingCalculated, depois shippingInfo
         this.shippingCalculated = true;
+        this.shippingInfo = newShippingInfo;
         
         console.log('[CheckoutAddress] ✅ Frete calculado com sucesso:', this.shippingInfo);
         console.log('[CheckoutAddress] ✅ shippingCalculated agora é:', this.shippingCalculated);
