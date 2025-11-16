@@ -327,7 +327,9 @@ export default {
     }
   },
   methods: {
-    getImageUrl,
+    getImageUrl(imagePath) {
+      return getImageUrl(imagePath);
+    },
     async fetchProduct(productId) {
       try {
         const response = await axios.get(`/api/products/${productId}`);

@@ -129,7 +129,9 @@ export default {
     isInWishlist(productId) {
       return this.wishlistIds.includes(productId);
     },
-    getImageUrl,
+    getImageUrl(imagePath) {
+      return getImageUrl(imagePath);
+    },
     async addToCart(product) {
       const token = localStorage.getItem('token');
       if (!token) {

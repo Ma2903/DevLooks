@@ -107,7 +107,9 @@ export default {
   },
   methods: {
     // FUNÇÃO CORRIGIDA E PADRONIZADA
-    getImageUrl,
+    getImageUrl(imagePath) {
+      return getImageUrl(imagePath);
+    },
     async fetchProduct(productId) {
       try {
         const token = localStorage.getItem('token');

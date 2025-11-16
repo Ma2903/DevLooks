@@ -126,7 +126,9 @@ export default {
     this.loadWishlist();
   },
   methods: {
-    getImageUrl,
+    getImageUrl(imagePath) {
+      return getImageUrl(imagePath);
+    },
     async loadWishlist() {
       this.loading = true;
       try {

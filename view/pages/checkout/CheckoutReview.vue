@@ -98,7 +98,9 @@ export default {
     else { this.$router.push('/cart'); }
   },
   methods: {
-    getImageUrl,
+    getImageUrl(imagePath) {
+      return getImageUrl(imagePath);
+    },
   }
 };
 </script>

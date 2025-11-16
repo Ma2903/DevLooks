@@ -76,7 +76,9 @@ export default {
         this.loading = false;
       }
     },
-    getImageUrl,
+    getImageUrl(imagePath) {
+      return getImageUrl(imagePath);
+    },
     getStatusClass(status) {
       switch (status) {
         case 'Processando': return 'bg-orange-500/30 text-orange-400 border border-orange-500/50';
