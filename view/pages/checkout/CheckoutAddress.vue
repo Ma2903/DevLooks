@@ -303,13 +303,18 @@ export default {
           cartTotal: cartTotal
         });
 
+        console.log('[CheckoutAddress] Resposta da API de frete:', response.data);
+        
         this.shippingInfo = response.data;
         this.shippingCalculated = true;
         
         console.log('[CheckoutAddress] Frete calculado com sucesso:', this.shippingInfo);
+        console.log('[CheckoutAddress] shippingCalculated agora é:', this.shippingCalculated);
 
       } catch (error) {
-        console.error('Erro ao calcular frete:', error);
+        console.error('[CheckoutAddress] Erro ao calcular frete:', error);
+        console.error('[CheckoutAddress] Detalhes do erro:', error.response?.data);
+        this.shippingCalculated = false;
         Swal.fire({
           icon: 'error', 
           title: 'Erro ao Calcular Frete', 
