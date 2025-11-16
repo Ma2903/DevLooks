@@ -305,6 +305,8 @@ export default {
 
         this.shippingInfo = response.data;
         this.shippingCalculated = true;
+        
+        console.log('[CheckoutAddress] Frete calculado com sucesso:', this.shippingInfo);
 
       } catch (error) {
         console.error('Erro ao calcular frete:', error);

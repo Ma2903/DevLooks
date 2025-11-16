@@ -9,7 +9,7 @@
       <p class="text-gray-300 text-lg">
         Você será redirecionado para o ambiente seguro do Mercado Pago para finalizar a sua compra.
       </p>
-      <img src="https://logopng.com.br/logos/mercado-pago-106.svg" alt="Mercado Pago Logo" class="h-12 mx-auto mt-4"/>
+      <img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/5.21.22/mercadopago/logo__large_plus.png" alt="Mercado Pago Logo" class="h-16 mx-auto mt-4"/>
     </div>
 
     <div class="mt-8 flex justify-between items-center">
@@ -56,18 +56,24 @@ export default {
     async initiatePayment() {
       this.isLoading = true;
       try {
+        console.log('[CheckoutPayment] checkoutData completo:', JSON.stringify(this.checkoutData, null, 2));
+        
         // 1. Monta o payload com os dados do localStorage
         const payload = {
-          items: this.checkoutData.cartItems.map(item => ({
-            product: item.productId || item._id, // Tenta productId primeiro, depois _id
-            quantity: item.quantity,
-          })),
+          items: this.checkoutData.cartItems.map(item => {
+            const productId = item.productId || item.product?._id || item.product || item._id;
+            console.log('[CheckoutPayment] Processando item:', item, 'ProductId extraído:', productId);
+            return {
+              product: productId,
+              quantity: item.quantity,
+            };
+          }),
           shippingAddress: this.checkoutData.shippingAddress,
-          shippingCost: this.checkoutData.shippingCost,
+          shippingCost: this.checkoutData.shippingCost || 0,
           couponCode: this.checkoutData.appliedCoupon ? this.checkoutData.appliedCoupon.code : null,
         };
 
-        console.log('[CheckoutPayment] Payload sendo enviado:', payload);
+        console.log('[CheckoutPayment] Payload sendo enviado:', JSON.stringify(payload, null, 2));
 
         // 2. Chama a API de checkout do nosso back-end
         const response = await api.post('/api/orders/checkout', payload);
@@ -85,10 +91,11 @@ export default {
 
       } catch (error) {
         console.error('[CheckoutPayment] Erro ao iniciar pagamento:', error);
+        console.error('[CheckoutPayment] Detalhes do erro:', error.response?.data);
         Swal.fire({
           icon: 'error',
           title: 'Erro ao Iniciar Pagamento',
-          text: error.response?.data?.message || 'Não foi possível comunicar com o servidor de pagamentos. Por favor, tente novamente.',
+          text: error.response?.data?.message || error.response?.data?.error || 'Não foi possível comunicar com o servidor de pagamentos. Por favor, tente novamente.',
           background: "#1F2937",
           color: "#E5E7EB",
         });
