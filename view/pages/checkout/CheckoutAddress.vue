@@ -312,10 +312,14 @@ export default {
           ...response.data,
           freeShipping: response.data.freeShipping || false
         };
+        
+        // Usar $nextTick para garantir reatividade
+        await this.$nextTick();
         this.shippingCalculated = true;
         
-        console.log('[CheckoutAddress] Frete calculado com sucesso:', this.shippingInfo);
-        console.log('[CheckoutAddress] shippingCalculated agora é:', this.shippingCalculated);
+        console.log('[CheckoutAddress] ✅ Frete calculado com sucesso:', this.shippingInfo);
+        console.log('[CheckoutAddress] ✅ shippingCalculated agora é:', this.shippingCalculated);
+        console.log('[CheckoutAddress] ✅ Botão deve estar habilitado agora!');
 
       } catch (error) {
         console.error('[CheckoutAddress] Erro ao calcular frete:', error);
@@ -334,6 +338,8 @@ export default {
     },
     
     goToReview() {
+      console.log('[CheckoutAddress] 🔘 goToReview chamado. shippingCalculated:', this.shippingCalculated);
+      
       if (!this.shippingCalculated) {
         Swal.fire({
           icon: 'warning', 
