@@ -7,8 +7,14 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:30
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   
-  // Remove barras duplicadas e normaliza o caminho
-  const cleanPath = imagePath.replace(/\\/g, '/').replace(/^\/+/, '');
+  // Primeiro normaliza as barras invertidas para barras normais
+  let cleanPath = imagePath.replace(/\\/g, '/');
+  
+  // Remove 'public/' do início se existir
+  cleanPath = cleanPath.replace(/^public\//, '');
+  
+  // Remove barras duplicadas no início
+  cleanPath = cleanPath.replace(/^\/+/, '');
   
   return `${API_BASE_URL}/${cleanPath}`;
 };
