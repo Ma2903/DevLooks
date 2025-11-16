@@ -315,6 +315,48 @@ async function setFixedShipping() {
     shipping.loading = true;
 
     try {
+        // Verificar se todos produtos são digitais (avatares/skins)
+        let allDigitalProducts = true;
+        
+        for (const item of cartItems.value) {
+            try {
+                const response = await api.get(`/api/products/${item.productId}`);
+                const product = response.data;
+                console.log(`[Cart] 🔍 Produto ${product.name} - Categoria: ${product.category}`);
+                
+                // Se encontrar pelo menos 1 produto físico, não é tudo digital
+                if (product.category !== 'avatares' && product.category !== 'skins') {
+                    allDigitalProducts = false;
+                    break;
+                }
+            } catch (error) {
+                console.error('[Cart] ❌ Erro ao verificar produto:', error);
+                allDigitalProducts = false;
+                break;
+            }
+        }
+
+        // Se todos produtos são digitais, frete grátis automático
+        if (allDigitalProducts && cartItems.value.length > 0) {
+            Object.assign(shipping, {
+                cost: 0,
+                time: 'Imediato',
+                region: 'Produto Digital - Sem Frete',
+                error: '',
+                ready: true,
+                loading: false
+            });
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Download Digital',
+                text: 'Produtos digitais não possuem frete!',
+                background: '#1F2937',
+                color: '#E5E7EB'
+            });
+            return;
+        }
+
         // Calcular peso total e dimensões estimadas
         const totalWeight = cartItems.value.reduce((sum, item) => {
             return sum + (item.quantity * 0.5); // 0.5kg por item
