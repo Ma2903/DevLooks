@@ -77,36 +77,44 @@
 
     <div v-if="!loading" class="mt-8 space-y-4">
       <!-- Exibição do frete calculado -->
-      <div v-show="shippingCalculated && shippingInfo" class="bg-gray-800 p-4 rounded-lg border-l-4 mb-6"
-           :class="shippingInfo && shippingInfo.freeShipping ? 'border-green-500' : 'border-[#04d1b0]'">
-        <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-          <i class="fas fa-shipping-fast"></i>
-          {{ shippingInfo && shippingInfo.freeShipping ? 'Frete Grátis! 🎉' : 'Frete Calculado' }}
-        </h3>
-        <div class="text-gray-300">
-          <p v-if="shippingInfo && !shippingInfo.freeShipping && shippingInfo.service"><strong>Serviço:</strong> {{ shippingInfo.service }}</p>
-          <p v-if="shippingInfo && shippingInfo.region"><strong>Região:</strong> {{ shippingInfo.region }}</p>
-          <p v-if="shippingInfo && shippingInfo.deliveryTime"><strong>Prazo:</strong> {{ shippingInfo.deliveryTime }}</p>
-          <p v-if="shippingInfo && shippingInfo.freeShipping" class="text-green-400 font-semibold mt-2">
-            Parabéns! Você ganhou frete grátis por compras acima de R$ 150,00
-          </p>
-          <p v-if="shippingInfo && shippingInfo.cost !== undefined && shippingInfo.cost !== null" class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
-            Valor: {{ shippingInfo.freeShipping ? 'GRÁTIS' : `R$ ${Number(shippingInfo.cost).toFixed(2)}` }}
-          </p>
+      <transition name="fade">
+        <div v-show="shippingCalculated" 
+             key="shipping-calculated"
+             class="bg-gray-800 p-4 rounded-lg border-l-4 mb-6"
+             :class="shippingInfo.freeShipping ? 'border-green-500' : 'border-[#04d1b0]'">
+          <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+            <i class="fas fa-shipping-fast"></i>
+            {{ shippingInfo.freeShipping ? 'Frete Grátis! 🎉' : 'Frete Calculado' }}
+          </h3>
+          <div class="text-gray-300">
+            <p v-if="!shippingInfo.freeShipping && shippingInfo.service"><strong>Serviço:</strong> {{ shippingInfo.service }}</p>
+            <p v-if="shippingInfo.region"><strong>Região:</strong> {{ shippingInfo.region }}</p>
+            <p v-if="shippingInfo.deliveryTime"><strong>Prazo:</strong> {{ shippingInfo.deliveryTime }}</p>
+            <p v-if="shippingInfo.freeShipping" class="text-green-400 font-semibold mt-2">
+              Parabéns! Você ganhou frete grátis por compras acima de R$ 150,00
+            </p>
+            <p v-if="typeof shippingInfo.cost === 'number'" class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
+              Valor: {{ shippingInfo.freeShipping ? 'GRÁTIS' : `R$ ${Number(shippingInfo.cost).toFixed(2)}` }}
+            </p>
+          </div>
         </div>
-      </div>
+      </transition>
 
       <!-- Botão de calcular frete (centralizado quando não calculado) -->
-      <div v-show="!shippingCalculated" class="text-center">
-        <button @click="calculateShipping" 
-                :disabled="calculatingShipping"
-                class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-4 px-8 rounded-lg transition text-lg shadow-lg">
-          <i v-if="calculatingShipping" class="fas fa-spinner fa-spin mr-2"></i>
-          <i v-else class="fas fa-calculator mr-2"></i>
-          {{ calculatingShipping ? 'Calculando...' : 'Calcular Frete' }}
-        </button>
-        <p class="text-gray-400 text-sm mt-2">É necessário calcular o frete para continuar</p>
-      </div>
+      <transition name="fade">
+        <div v-show="!shippingCalculated" 
+             key="shipping-button"
+             class="text-center">
+          <button @click="calculateShipping" 
+                  :disabled="calculatingShipping"
+                  class="bg-[#04d1b0] hover:bg-[#03b89a] text-white font-bold py-4 px-8 rounded-lg transition text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <i v-if="calculatingShipping" class="fas fa-spinner fa-spin mr-2"></i>
+            <i v-else class="fas fa-calculator mr-2"></i>
+            {{ calculatingShipping ? 'Calculando...' : 'Calcular Frete' }}
+          </button>
+          <p class="text-gray-400 text-sm mt-2">É necessário calcular o frete para continuar</p>
+        </div>
+      </transition>
 
       <!-- Botões de navegação (sempre visíveis) -->
       <div class="flex justify-between items-center pt-4">
