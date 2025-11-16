@@ -305,7 +305,11 @@ export default {
 
         console.log('[CheckoutAddress] Resposta da API de frete:', response.data);
         
-        this.shippingInfo = response.data;
+        // Garantir que freeShipping existe
+        this.shippingInfo = {
+          ...response.data,
+          freeShipping: response.data.freeShipping || false
+        };
         this.shippingCalculated = true;
         
         console.log('[CheckoutAddress] Frete calculado com sucesso:', this.shippingInfo);
