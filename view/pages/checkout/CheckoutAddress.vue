@@ -152,6 +152,25 @@ export default {
   },
   async created() {
     await this.fetchUserData();
+    
+    // Verificar se o frete é grátis automaticamente (compra acima de R$150)
+    const checkoutDataString = localStorage.getItem('checkoutData');
+    if (checkoutDataString) {
+      const checkoutData = JSON.parse(checkoutDataString);
+      const cartTotal = checkoutData.subtotal - (checkoutData.discountAmount || 0);
+      
+      if (cartTotal >= 150) {
+        // Frete grátis automático
+        this.shippingCalculated = true;
+        this.shippingInfo = {
+          service: 'Frete Grátis',
+          cost: 0,
+          deliveryTime: '3 a 7 dias úteis',
+          region: 'Frete calculado para todo Brasil',
+          freeShipping: true
+        };
+      }
+    }
   },
   watch: {
     'newAddress.cep'(newValue) {
