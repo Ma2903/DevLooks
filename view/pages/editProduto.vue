@@ -113,14 +113,17 @@ export default {
     async fetchProduct(productId) {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/products/${productId}`, {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await axios.get(`${API_BASE_URL}/api/products/${productId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         // Garante que 'sizes' seja sempre um array
         response.data.sizes = response.data.sizes || [];
         this.produto = response.data;
+        console.log('✅ Produto carregado:', this.produto);
       } catch (error) {
-        console.error("Erro ao carregar o produto:", error.message);
+        console.error("❌ Erro ao carregar o produto:", error);
+        Swal.fire({ icon: "error", title: "Erro", text: "Não foi possível carregar os dados do produto.", background: "#1F2937", color: "#E5E7EB" });
       }
     },
     onFileChange(event) {
@@ -157,7 +160,8 @@ export default {
           formData.append('imagem', this.newImageFile);
         }
 
-        await axios.put(`/api/products/${this.$route.params.id}`, formData, {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        await axios.put(`${API_BASE_URL}/api/products/${this.$route.params.id}`, formData, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

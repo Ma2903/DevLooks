@@ -53,14 +53,18 @@ class CouponController {
 
     static deleteCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
+            console.log('🗑️ [DeleteCoupon] Tentando deletar cupom ID:', req.params.id);
             const deletedCoupon = await Coupon.findByIdAndDelete(req.params.id);
             if (!deletedCoupon) {
+                console.warn('⚠️ [DeleteCoupon] Cupom não encontrado:', req.params.id);
                 res.status(404).json({ message: "Cupom não encontrado." });
                 return;
             }
+            console.log('✅ [DeleteCoupon] Cupom deletado:', deletedCoupon.code);
             res.status(200).json({ message: "Cupom deletado com sucesso." });
-        } catch (error) {
-            res.status(500).json({ message: "Erro ao deletar cupom.", error });
+        } catch (error: any) {
+            console.error('❌ [DeleteCoupon] Erro:', error);
+            res.status(500).json({ message: "Erro ao deletar cupom.", error: error.message });
         }
     };
     

@@ -306,6 +306,29 @@ export default {
         // Calcular total do carrinho (subtotal - desconto)
         const cartTotal = checkoutData.subtotal - (checkoutData.discountAmount || 0);
 
+        // Verificar se há produtos digitais (avatares) no carrinho
+        const hasDigitalProducts = checkoutData.cartItems.some(item => 
+          item.category === 'avatares' || item.category === 'skins'
+        );
+        
+        const allDigitalProducts = checkoutData.cartItems.every(item => 
+          item.category === 'avatares' || item.category === 'skins'
+        );
+
+        // Se todos produtos são digitais, não cobra frete
+        if (allDigitalProducts) {
+          this.shippingInfo = {
+            service: 'Download Digital',
+            cost: 0,
+            deliveryTime: 'Imediato',
+            region: 'Produto Digital - Sem Frete',
+            freeShipping: true
+          };
+          this.shippingCalculated = true;
+          console.log('[CheckoutAddress] ✅ Todos produtos digitais - frete grátis automático');
+          return;
+        }
+
         const response = await api.post('/api/shipping/calculate', {
           cep: selectedAddress.cep,
           weight: totalWeight,
