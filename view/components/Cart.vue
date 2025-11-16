@@ -206,6 +206,7 @@ import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import CouponService from '@/services/CouponService';
 import api from '@/services/main.js';
+import { getImageUrl } from '@/services/config.js';
 import Swal from 'sweetalert2';
 
 const router = useRouter();
