@@ -198,9 +198,11 @@ export default {
             await axios.delete(`/api/orders/${order._id}`, {
               headers: { 'Authorization': `Bearer ${token}` },
             });
-            this.orders = this.orders.filter(o => o._id !== order._id);
+            this.allOrders = this.allOrders.filter(o => o._id !== order._id);
             Swal.fire('Apagado!', 'O pedido foi apagado com sucesso.', 'success');
+            await this.fetchOrders(); // Recarrega a lista
           } catch (error) {
+            console.error('❌ Erro ao deletar pedido:', error);
             Swal.fire('Erro!', 'Não foi possível apagar o pedido.', 'error');
           }
         }

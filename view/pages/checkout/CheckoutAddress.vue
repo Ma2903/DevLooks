@@ -306,17 +306,30 @@ export default {
         // Calcular total do carrinho (subtotal - desconto)
         const cartTotal = checkoutData.subtotal - (checkoutData.discountAmount || 0);
 
-        // Verificar se há produtos digitais (avatares) no carrinho
-        const hasDigitalProducts = checkoutData.cartItems.some(item => 
-          item.category === 'avatares' || item.category === 'skins'
-        );
+        // Verificar se todos os produtos no carrinho são digitais
+        // Busca detalhes dos produtos para verificar categoria
+        let allDigitalProducts = true;
         
-        const allDigitalProducts = checkoutData.cartItems.every(item => 
-          item.category === 'avatares' || item.category === 'skins'
-        );
+        for (const item of checkoutData.cartItems) {
+          try {
+            const response = await api.get(`/api/products/${item.productId}`);
+            const product = response.data;
+            console.log(`[CheckoutAddress] 🔍 Produto ${product.name} - Categoria: ${product.category}`);
+            
+            // Se encontrar pelo menos 1 produto físico, não é tudo digital
+            if (product.category !== 'avatares' && product.category !== 'skins') {
+              allDigitalProducts = false;
+              break;
+            }
+          } catch (error) {
+            console.error('[CheckoutAddress] ❌ Erro ao verificar produto:', error);
+            allDigitalProducts = false;
+            break;
+          }
+        }
 
         // Se todos produtos são digitais, não cobra frete
-        if (allDigitalProducts) {
+        if (allDigitalProducts && checkoutData.cartItems.length > 0) {
           this.shippingInfo = {
             service: 'Download Digital',
             cost: 0,
