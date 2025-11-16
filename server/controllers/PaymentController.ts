@@ -15,8 +15,13 @@ class PaymentController {
      */
     static webhook: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
-            console.log('🔔 [Webhook] Notificação recebida do Mercado Pago:', JSON.stringify(req.body, null, 2));
-            console.log('📋 [Webhook] Query params:', req.query);
+            console.log('🔔🔔🔔 [Webhook] ========================================');
+            console.log('🔔 [Webhook] NOTIFICAÇÃO RECEBIDA DO MERCADO PAGO!');
+            console.log('🔔 [Webhook] Timestamp:', new Date().toISOString());
+            console.log('🔔 [Webhook] Body completo:', JSON.stringify(req.body, null, 2));
+            console.log('🔔 [Webhook] Headers:', JSON.stringify(req.headers, null, 2));
+            console.log('🔔 [Webhook] Query params:', req.query);
+            console.log('🔔🔔🔔 [Webhook] ========================================');
 
             const { type, data } = req.body;
 
@@ -32,8 +37,12 @@ class PaymentController {
                 const payment = new Payment(client);
                 const paymentInfo = await payment.get({ id: paymentId });
 
+                console.log('📊📊📊 [Webhook] DADOS COMPLETOS DO PAGAMENTO:');
+                console.log(JSON.stringify(paymentInfo, null, 2));
                 console.log('📊 [Webhook] Status do pagamento:', paymentInfo.status);
                 console.log('🔗 [Webhook] External Reference:', paymentInfo.external_reference);
+                console.log('💰 [Webhook] Transaction Amount:', paymentInfo.transaction_amount);
+                console.log('📦 [Webhook] Metadata:', paymentInfo.metadata);
 
                 const externalReference = paymentInfo.external_reference;
                 if (!externalReference) {
