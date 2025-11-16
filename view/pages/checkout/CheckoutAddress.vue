@@ -84,14 +84,14 @@
           {{ shippingInfo.freeShipping ? 'Frete Grátis! 🎉' : 'Frete Calculado' }}
         </h3>
         <div class="text-gray-300">
-          <p v-if="!shippingInfo.freeShipping"><strong>Serviço:</strong> {{ shippingInfo.service }}</p>
-          <p><strong>Região:</strong> {{ shippingInfo.region }}</p>
-          <p><strong>Prazo:</strong> {{ shippingInfo.deliveryTime }}</p>
+          <p v-if="!shippingInfo.freeShipping && shippingInfo.service"><strong>Serviço:</strong> {{ shippingInfo.service }}</p>
+          <p v-if="shippingInfo.region"><strong>Região:</strong> {{ shippingInfo.region }}</p>
+          <p v-if="shippingInfo.deliveryTime"><strong>Prazo:</strong> {{ shippingInfo.deliveryTime }}</p>
           <p v-if="shippingInfo.freeShipping" class="text-green-400 font-semibold mt-2">
             Parabéns! Você ganhou frete grátis por compras acima de R$ 150,00
           </p>
-          <p class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
-            Valor: {{ shippingInfo.freeShipping ? 'GRÁTIS' : `R$ ${shippingInfo.cost.toFixed(2)}` }}
+          <p v-if="shippingInfo.cost !== undefined" class="text-xl font-bold mt-2" :class="shippingInfo.freeShipping ? 'text-green-500' : 'text-[#04d1b0]'">
+            Valor: {{ shippingInfo.freeShipping ? 'GRÁTIS' : `R$ ${Number(shippingInfo.cost).toFixed(2)}` }}
           </p>
         </div>
       </div>
