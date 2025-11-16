@@ -148,11 +148,13 @@ class OrderController {
             });
 
         } catch (error: any) {
-            console.error("Erro detalhado durante o checkout:", error); // Log do erro completo
+            console.error("❌ [Checkout Error] Erro detalhado durante o checkout:", error);
+            console.error("❌ [Checkout Error] Stack trace:", error.stack);
+            console.error("❌ [Checkout Error] Cause:", error.cause);
             res.status(500).json({ 
                 message: "Erro ao processar o checkout.",
-                // Tenta fornecer uma mensagem de erro mais específica se disponível
-                error: error?.cause?.message || error?.message || "Erro desconhecido" 
+                error: error?.cause?.message || error?.message || "Erro desconhecido",
+                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
             });
         }
     }

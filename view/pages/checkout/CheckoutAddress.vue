@@ -181,9 +181,11 @@ export default {
       }
     },
     addressChoice() {
-      // Reset shipping quando trocar de endereço
-      this.shippingCalculated = false;
-      this.shippingInfo = { service: '', cost: 0, deliveryTime: '', region: '', freeShipping: false };
+      // Reset shipping quando trocar de endereço (exceto se já tiver frete grátis automático)
+      if (!this.shippingInfo.freeShipping) {
+        this.shippingCalculated = false;
+        this.shippingInfo = { service: '', cost: 0, deliveryTime: '', region: '', freeShipping: false };
+      }
     }
   },
   methods: {
