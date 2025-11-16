@@ -106,35 +106,71 @@ class PaymentController {
         try {
             console.log(`📦 [CreateOrder] Criando pedido para usuário ${userId}`);
 
-            // Buscar itens do pagamento
-            const items = paymentInfo.additional_info?.items || [];
+            // Buscar endereço de entrega do metadata
+            let shippingAddress = {
+                street: 'A definir',
+                number: '0',
+                neighborhood: 'A definir',
+                city: 'A definir',
+                state: 'A definir',
+                cep: '00000-000'
+            };
+
+            if (paymentInfo.metadata?.shipping_address) {
+                try {
+                    shippingAddress = JSON.parse(paymentInfo.metadata.shipping_address);
+                    console.log('📍 [CreateOrder] Endereço recuperado do metadata:', shippingAddress);
+                } catch (e) {
+                    console.warn('⚠️ [CreateOrder] Erro ao parsear endereço do metadata');
+                }
+            }
+
+            // Buscar itens do metadata primeiro (mais confiável)
+            let items = [];
+            if (paymentInfo.metadata?.items) {
+                try {
+                    items = JSON.parse(paymentInfo.metadata.items);
+                    console.log('📦 [CreateOrder] Itens recuperados do metadata:', items);
+                } catch (e) {
+                    console.warn('⚠️ [CreateOrder] Erro ao parsear itens do metadata, usando additional_info');
+                    items = paymentInfo.additional_info?.items || [];
+                }
+            } else {
+                items = paymentInfo.additional_info?.items || [];
+            }
             
             const orderItems = [];
             let total = 0;
 
             for (const item of items) {
+                // Se veio do metadata, já tem o ID correto
+                const productId = item.product || item.id;
+                
                 // Pular item de frete
-                if (item.id === 'shipping') {
+                if (productId === 'shipping') {
                     continue;
                 }
 
-                const product = await ProductModel.findById(item.id);
+                const product = await ProductModel.findById(productId);
                 if (!product) {
-                    console.warn(`⚠️ [CreateOrder] Produto não encontrado: ${item.id}`);
+                    console.warn(`⚠️ [CreateOrder] Produto não encontrado: ${productId}`);
                     continue;
                 }
 
+                const quantity = item.quantity;
+                
                 // Reduzir estoque
-                product.stock -= item.quantity;
+                product.stock -= quantity;
                 await product.save();
+                console.log(`📉 [CreateOrder] Estoque reduzido: ${product.name} (${product.stock} restantes)`);
 
                 orderItems.push({
                     product: product._id,
-                    quantity: item.quantity,
-                    price: item.unit_price,
+                    quantity: quantity,
+                    price: product.promotion_price || product.price,
                 });
 
-                total += item.unit_price * item.quantity;
+                total += (product.promotion_price || product.price) * quantity;
             }
 
             // Criar pedido
@@ -146,14 +182,7 @@ class PaymentController {
                 paymentMethod: paymentInfo.payment_method_id,
                 paymentStatus: paymentInfo.status,
                 mercadoPagoPaymentId: paymentInfo.id,
-                shippingAddress: {
-                    street: 'A definir',
-                    number: '0',
-                    neighborhood: 'A definir',
-                    city: 'A definir',
-                    state: 'A definir',
-                    cep: '00000-000'
-                }
+                shippingAddress: shippingAddress
             });
 
             console.log(`✅ [CreateOrder] Pedido criado com sucesso: ${order._id}`);

@@ -135,6 +135,13 @@ class OrderController {
                 },
                 external_reference: tempOrderId,
                 statement_descriptor: "DevLooks",
+                metadata: {
+                    shipping_address: JSON.stringify(shippingAddress),
+                    items: JSON.stringify(items.map(item => ({
+                        product: item.product,
+                        quantity: item.quantity
+                    })))
+                }
             };
             
              console.log('[Checkout Log] A criar preferência de pagamento com os dados:', JSON.stringify(preferenceData, null, 2));
