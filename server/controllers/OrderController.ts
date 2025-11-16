@@ -105,15 +105,16 @@ class OrderController {
                 }
             }
             
-            total += shippingCost;
-             console.log(`[Checkout Log] Custo de envio adicionado: ${shippingCost.toFixed(2)}. Total atualizado: ${total.toFixed(2)}`);
+            const finalShippingCost = shippingCost || 0;
+            total += finalShippingCost;
+            console.log(`[Checkout Log] Custo de envio adicionado: ${finalShippingCost.toFixed(2)}. Total atualizado: ${total.toFixed(2)}`);
             
-            if (shippingCost > 0) {
+            if (finalShippingCost > 0) {
                 items_for_mp.push({
                     id: 'shipping',
                     title: 'Custo de Envio',
                     quantity: 1,
-                    unit_price: shippingCost,
+                    unit_price: finalShippingCost,
                     currency_id: 'BRL',
                 });
             }
