@@ -2,6 +2,8 @@
 import { onMounted, ref, onUnmounted } from 'vue';
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
+import MobileBottomNav from './components/MobileBottomNav.vue';
+import AcademicBanner from './components/AcademicBanner.vue';
 import Swal from 'sweetalert2';
 
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -53,10 +55,16 @@ onUnmounted(() => {
 
 <template>
   <div>
+    <!-- 🎓 Banner de aviso acadêmico (topo fixo) -->
+    <AcademicBanner />
+    
     <Header :user="user" @navigate="navigateTo" />
-    <main class="mt-0">
+    <main class="mt-0 pb-20 md:pb-0">
       <router-view :user="user" @login="handleLogin" />
     </main>
     <Footer />
+    
+    <!-- 📱 Barra de navegação inferior mobile -->
+    <MobileBottomNav />
   </div>
 </template>

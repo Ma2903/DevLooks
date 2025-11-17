@@ -1,40 +1,51 @@
 // view/router.js
 
 import { createRouter, createWebHistory } from 'vue-router';
-// Seus imports de componentes estão corretos e foram mantidos
+
+// 🚀 PERFORMANCE: Apenas páginas críticas carregadas imediatamente
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
 import Register from './components/Register.vue';
-import ProductList from './pages/ProductList.vue';
-import SingleProduct from './pages/singleProduto.vue';
-import CreateAvatar from './components/CreateAvatar.vue';
-import Profile from './components/Profile.vue';
-import Cart from './components/Cart.vue';
-import OrderHistory from './pages/OrderHistory.vue';
-import ResetPassword from './components/ResetPassword.vue';
-import ConfirmReset from './components/ConfirmReset.vue';
-import EditUser from './components/EditUser.vue';
-import AdminProducts from './pages/AdminProducts.vue';
-import AddProduct from './pages/addProduto.vue';
-import EditProduct from './pages/editProduto.vue';
-import AdminUsers from './pages/AdminUsers.vue';
-import EditUserAdmin from './pages/EditUserAdmin.vue';
-import AdminOrders from './pages/AdminOrders.vue';
-import AdminCoupons from './pages/AdminCoupons.vue';
-import CouponForm from './pages/CouponForm.vue';
-import AboutUs from './pages/AboutUs.vue';
-import FAQ from './pages/FAQ.vue';
-import AboutProject from './pages/AboutProject.vue';
-import PrivacyPolicy from './pages/PrivacyPolicy.vue';
-import TermsOfService from './pages/TermsOfService.vue';
-import CheckoutWrapper from './pages/checkout/CheckoutWrapper.vue';
-import CheckoutAddress from './pages/checkout/CheckoutAddress.vue';
-import CheckoutReview from './pages/checkout/CheckoutReview.vue';
-import CheckoutPayment from './pages/checkout/CheckoutPayment.vue';
-import Wishlist from './pages/Wishlist.vue';
-import PaymentSuccess from './pages/PaymentSuccess.vue';
-import PaymentFailure from './pages/PaymentFailure.vue';
-import PaymentPending from './pages/PaymentPending.vue';
+
+// ⚡ LAZY LOADING: Code splitting automático - componentes carregados sob demanda
+const ProductList = () => import('./pages/ProductList.vue');
+const SingleProduct = () => import('./pages/singleProduto.vue');
+const CreateAvatar = () => import('./components/CreateAvatar.vue');
+const Profile = () => import('./components/Profile.vue');
+const Cart = () => import('./components/Cart.vue');
+const OrderHistory = () => import('./pages/OrderHistory.vue');
+const ResetPassword = () => import('./components/ResetPassword.vue');
+const ConfirmReset = () => import('./components/ConfirmReset.vue');
+const EditUser = () => import('./components/EditUser.vue');
+const Wishlist = () => import('./pages/Wishlist.vue');
+
+// 🔐 ADMIN: Carregado apenas quando usuário admin acessa
+const AdminProducts = () => import('./pages/AdminProducts.vue');
+const AddProduct = () => import('./pages/addProduto.vue');
+const EditProduct = () => import('./pages/editProduto.vue');
+const AdminUsers = () => import('./pages/AdminUsers.vue');
+const EditUserAdmin = () => import('./pages/EditUserAdmin.vue');
+const AdminOrders = () => import('./pages/AdminOrders.vue');
+const AdminCoupons = () => import('./pages/AdminCoupons.vue');
+const CouponForm = () => import('./pages/CouponForm.vue');
+
+// 📄 INSTITUCIONAL: Lazy loading para páginas informativas
+const AboutUs = () => import('./pages/AboutUs.vue');
+const FAQ = () => import('./pages/FAQ.vue');
+const AboutProject = () => import('./pages/AboutProject.vue');
+const PrivacyPolicy = () => import('./pages/PrivacyPolicy.vue');
+const TermsOfService = () => import('./pages/TermsOfService.vue');
+
+// 💳 CHECKOUT: Carregado apenas quando usuário vai comprar (reduz bundle inicial)
+const CheckoutWrapper = () => import('./pages/checkout/CheckoutWrapper.vue');
+const CheckoutAddress = () => import('./pages/checkout/CheckoutAddress.vue');
+const CheckoutReview = () => import('./pages/checkout/CheckoutReview.vue');
+const CheckoutPayment = () => import('./pages/checkout/CheckoutPayment.vue');
+
+// ✅ PAGAMENTO: Páginas de retorno lazy loaded
+const PaymentSuccess = () => import('./pages/PaymentSuccess.vue');
+const PaymentFailure = () => import('./pages/PaymentFailure.vue');
+const PaymentPending = () => import('./pages/PaymentPending.vue');
 
 // Sua estrutura de rotas está ótima e foi mantida
 const routes = [

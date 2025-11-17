@@ -17,6 +17,9 @@
       </nav>
 
       <div class="hidden md:flex items-center space-x-6">
+        <!-- 🎨 Toggle Dark/Light Mode -->
+        <ThemeToggle />
+        
         <!-- Notificações -->
         <div v-if="user" class="relative">
           <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors" aria-label="Notificações" :aria-expanded="isNotificationsOpen">
@@ -136,6 +139,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import api from '@/services/main.js';
+import ThemeToggle from './ThemeToggle.vue';
 
 const router = useRouter();
 const user = ref(null);

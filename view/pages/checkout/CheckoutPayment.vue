@@ -31,6 +31,7 @@
 <script>
 import api from '@/services/main';
 import Swal from 'sweetalert2';
+import { useMercadoPago } from '@/composables/useMercadoPago';
 
 export default {
   name: "CheckoutPayment",
@@ -40,13 +41,29 @@ export default {
       isLoading: false,
     };
   },
-  created() {
+  async created() {
     const data = localStorage.getItem('checkoutData');
     if (data) {
       this.checkoutData = JSON.parse(data);
     } else {
       // Se não houver dados, volta para o carrinho para segurança
       this.$router.push('/cart');
+      return;
+    }
+
+    // ⚡ PERFORMANCE: Carrega SDK do Mercado Pago apenas quando usuário chega ao checkout
+    const { loadMercadoPagoSDK } = useMercadoPago();
+    try {
+      await loadMercadoPagoSDK();
+    } catch (error) {
+      console.error('Erro ao carregar SDK do Mercado Pago:', error);
+      Swal.fire({
+        icon: 'warning',
+        title: 'Atenção',
+        text: 'Houve um problema ao carregar o sistema de pagamento. Recarregue a página.',
+        background: "#1F2937",
+        color: "#E5E7EB",
+      });
     }
   },
   methods: {

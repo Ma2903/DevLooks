@@ -1,6 +1,47 @@
 @import "tailwindcss";
 
 /* ======================
+   Otimização de Fontes
+   ====================== */
+/* ⚡ PERFORMANCE: font-display: swap previne FOIT (Flash of Invisible Text) */
+@font-face {
+  font-family: 'System';
+  font-display: swap;
+  src: local('Arial'), local('Helvetica'), local('sans-serif');
+}
+
+/* ======================
+   Variáveis CSS para Dark/Light Mode
+   ====================== */
+:root {
+  /* Dark Mode (padrão) */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-tertiary: #9ca3af;
+  --accent-primary: #04d1b0;
+  --accent-secondary: #4e44e1;
+  --border-color: rgba(4, 209, 176, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  /* Light Mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --bg-tertiary: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-tertiary: #6b7280;
+  --accent-primary: #059669;
+  --accent-secondary: #4338ca;
+  --border-color: rgba(5, 150, 105, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ======================
    Microinterações e Animações
    ====================== */
 
