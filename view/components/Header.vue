@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-gray-800 text-white p-4 shadow-lg sticky top-0 z-50">
+  <header class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white p-4 shadow-lg sticky top-0 z-50 transition-colors duration-300">
     <div class="container mx-auto flex justify-between items-center">
       <router-link to="/" class="flex items-center gap-3 flex-shrink-0 group">
         <div class="relative">
