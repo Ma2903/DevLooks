@@ -8,8 +8,12 @@
 
 ---
 
+## 🎓 Projeto Acadêmico
+
+> **Importante**: Este é um **projeto acadêmico** desenvolvido para fins de aprendizado e demonstração de habilidades em desenvolvimento web full-stack. Embora utilize tecnologias reais (incluindo integração com API do Mercado Pago em modo sandbox), **não representa um negócio comercial real com estoque físico**.
+
 **DevLooks** é uma plataforma de e-commerce full-stack, desenvolvida do zero e voltada para o público de tecnologia.  
-O projeto permite que programadores expressem seu estilo através da compra de produtos como camisetas, skins e itens de setup, além de contar com um sistema exclusivo para criação de avatares personalizados.
+O projeto permite que programadores expressem seu estilo através da compra simulada de produtos como camisetas, acessórios e itens de setup, além de contar com um sistema exclusivo para criação de avatares personalizados com IA.
 
 A aplicação foi construída com foco em uma experiência de usuário moderna e uma arquitetura robusta, separando claramente as responsabilidades entre front-end e back-end.
 
@@ -22,17 +26,21 @@ O projeto conta com um sistema completo, incluindo funcionalidades para clientes
 ### 👥 Para Clientes
 - **Autenticação de Usuários:** Sistema completo de cadastro e login com tokens JWT.  
 - **Catálogo de Produtos:** Navegação por produtos com filtros por categoria e busca por nome/descrição.  
+- **Lista de Favoritos (Wishlist):** Salvar produtos favoritos para comprar depois.
 - **Carrinho de Compras:** Adição, remoção e atualização de quantidade de itens.  
-- **Criação de Avatares:** Ferramenta para personalizar e salvar avatares únicos.  
+- **Criação de Avatares com IA:** Ferramenta para personalizar e salvar avatares únicos usando Google Gemini AI.  
 - **Sistema de Cupons:** Aplicação de cupons de desconto (valor fixo ou porcentagem).  
-- **Checkout Completo:** Processo de finalização de compra com cálculo de frete e integração de pagamento via **MercadoPago**.  
-- **Histórico de Pedidos:** Área para o usuário visualizar suas compras anteriores.  
+- **Checkout Completo:** Processo de finalização de compra com cálculo de frete e integração de pagamento via **Mercado Pago** (modo sandbox).  
+- **Histórico de Pedidos:** Área para o usuário visualizar suas compras anteriores.
+- **Avaliações com IA:** Sistema de reviews com análise de sentimento automatizada usando Gemini AI.
+- **Notificações:** Sistema de notificações em tempo real sobre pedidos e promoções.
 
 ### 🛠️ Painel de Administração
-- **Gerenciamento de Produtos (CRUD):** Adicionar, visualizar, editar e remover produtos.  
+- **Gerenciamento de Produtos (CRUD):** Adicionar, visualizar, editar e remover produtos com upload de múltiplas imagens.  
 - **Gerenciamento de Usuários:** Visualização e alteração de permissões de usuários.  
 - **Gerenciamento de Pedidos:** Acompanhamento e atualização do status dos pedidos.  
-- **Gerenciamento de Cupons:** Criação e administração de cupons de desconto.  
+- **Gerenciamento de Cupons:** Criação e administração de cupons de desconto com datas de validade.
+- **Dashboard com Estatísticas:** Visão geral de vendas, produtos mais vendidos e análise de reviews.  
 
 ---
 
@@ -44,15 +52,31 @@ O projeto foi construído com uma arquitetura moderna, utilizando as seguintes t
 ![Vue.js](https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 
 ### **Back-End**
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongoose&logoColor=white)
+
+### **Integrações e APIs**
+- **Mercado Pago SDK v2** - Gateway de pagamento (modo sandbox)
+- **Google Gemini AI** - Análise de sentimentos e resumo de avaliações
+- **Nodemailer** - Envio de emails para recuperação de senha
+- **bcrypt** - Criptografia de senhas
+- **JWT** - Autenticação stateless
+
+### **Deploy e Hospedagem**
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
+![MongoDB Atlas](https://img.shields.io/badge/MongoDB_Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 
 ### **Ferramentas e Outros**
-- **Autenticação:** JWT (JSON Web Tokens)
+- **SweetAlert2** - Modais e notificações elegantes
+- **Padrões de Design**: Factory Pattern, Observer Pattern
+- **Arquitetura MVC** - Separação de responsabilidades
 
 ---
 
@@ -92,9 +116,17 @@ MAIL_USER=seu_email@example.com
 MAIL_PASS=sua_senha_de_email
 OWNER_EMAIL=email_do_dono_para_testes@example.com
 
+# Mercado Pago (modo sandbox para testes)
+MERCADOPAGO_ACCESS_TOKEN=SEU_ACCESS_TOKEN_DO_MERCADO_PAGO
+
+# Google Gemini AI
+GEMINI_API_KEY=SUA_CHAVE_API_DO_GEMINI
+
 # CEP de origem para cálculo de frete
 CORREIOS_CEP_ORIGEM=SEU_CEP_DE_ORIGEM
 ```
+
+> **Nota sobre Mercado Pago**: Use o modo sandbox e os [cartões de teste oficiais](https://www.mercadopago.com.br/developers/pt/docs/shopify/additional-content/your-integrations/test/cards) para simular pagamentos.
 
 ### 3. Instalação e Execução
 
@@ -123,6 +155,45 @@ npm run dev
 ```
 
 A aplicação estará acessível em **[http://localhost:5173](http://localhost:5173)**
+
+---
+
+## 🎨 Melhorias de UX/UI Implementadas
+
+O projeto foi desenvolvido com foco em proporcionar uma experiência de usuário excepcional:
+
+### 📱 Responsividade Mobile-First
+- Interface totalmente responsiva adaptada para diferentes tamanhos de tela
+- Botões de favoritos otimizados para touch em dispositivos móveis (44x44px mínimo)
+- Áreas de toque ("thumb zone") pensadas para uso com uma mão
+- Menu hambúrguer eficiente para navegação mobile
+
+### ✨ Microinterações e Feedback Visual
+- Animações suaves em transições de página e estados
+- Feedback imediato ao adicionar produtos ao carrinho ou favoritos
+- Loading states com skeleton screens para melhor percepção de performance
+- Efeitos hover com elevação e escala em cards de produtos
+- Animação de "heartbeat" ao favoritar produtos
+
+### ⚡ Performance e Otimização
+- Lazy loading de imagens com Intersection Observer API
+- Hardware acceleration para animações suaves
+- Imagens com skeleton loading durante carregamento
+- Minificação de assets e cache apropriado
+- Smooth scroll para navegação fluida
+
+### ♿ Acessibilidade
+- Contraste adequado de cores (WCAG compliance)
+- Textos alternativos em todas as imagens
+- Focus visível para navegação por teclado
+- ARIA labels em botões de ação
+- Estrutura semântica de HTML
+
+### 🔒 Transparência e Segurança
+- Aviso claro sobre natureza acadêmica do projeto no rodapé
+- Páginas institucionais (Sobre, Privacidade, Termos de Uso)
+- Comunicação transparente sobre uso de dados
+- HTTPS em produção (Vercel/Render)
 
 ---
 

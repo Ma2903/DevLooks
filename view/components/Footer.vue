@@ -31,8 +31,30 @@
       </div>
 
     </div>
-    <div class="mt-10 pt-6 border-t border-gray-700 text-center text-sm">
-      <p>&copy; 2025 DevLooks. Todos os direitos reservados. Projeto Temático.</p>
+    <div class="mt-10 pt-6 border-t border-gray-700">
+      <!-- Aviso Legal sobre Projeto Acadêmico -->
+      <div class="bg-gradient-to-r from-emerald-500/10 to-purple-500/10 border border-emerald-500/30 rounded-lg p-4 mb-6">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-graduation-cap text-emerald-400 text-xl mt-1"></i>
+          <div class="text-sm">
+            <h4 class="text-white font-semibold mb-1">📚 Projeto Acadêmico</h4>
+            <p class="text-gray-300">
+              Este e-commerce é parte de um <strong>projeto acadêmico</strong> para fins de prática e aprendizado. 
+              Embora a API do Mercado Pago esteja integrada e funcional, este site <strong>não representa um negócio real com estoque físico</strong>. 
+              Desenvolvido com Vue.js, Node.js, TypeScript, MongoDB e Gemini AI.
+            </p>
+            <div class="mt-2 flex flex-wrap gap-2 text-xs">
+              <router-link to="/about" class="text-emerald-400 hover:text-emerald-300 underline">Sobre o Projeto</router-link>
+              <span class="text-gray-600">•</span>
+              <router-link to="/privacy" class="text-emerald-400 hover:text-emerald-300 underline">Política de Privacidade</router-link>
+              <span class="text-gray-600">•</span>
+              <router-link to="/terms" class="text-emerald-400 hover:text-emerald-300 underline">Termos de Uso</router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <p class="text-center text-sm">&copy; 2025 DevLooks. Projeto Temático - Todos os direitos reservados.</p>
     </div>
   </footer>
 </template>

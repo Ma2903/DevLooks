@@ -23,13 +23,14 @@
           <button
             v-if="isLoggedIn"
             @click.stop="toggleWishlist(product._id)"
-            class="absolute top-3 right-3 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm"
+            class="absolute top-3 right-3 z-20 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-sm touch-manipulation"
             :class="isInWishlist(product._id) 
-              ? 'bg-red-500 text-white hover:bg-red-600' 
-              : 'bg-gray-800/80 text-red-400 hover:bg-red-500 hover:text-white'"
+              ? 'bg-red-500 text-white hover:bg-red-600 hover:scale-110' 
+              : 'bg-gray-800/90 text-red-400 hover:bg-red-500 hover:text-white hover:scale-110'"
             :title="isInWishlist(product._id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+            :aria-label="isInWishlist(product._id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
           >
-            <i :class="isInWishlist(product._id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+            <i :class="isInWishlist(product._id) ? 'fas fa-heart text-xl' : 'far fa-heart text-xl'"></i>
           </button>
 
           <router-link :to="'/products/' + product._id" class="flex flex-col flex-grow">
