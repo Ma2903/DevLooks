@@ -41,16 +41,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useTheme } from '@/composables/useTheme';
 
-const { currentTheme, toggleTheme, initTheme } = useTheme();
+const { currentTheme, toggleTheme } = useTheme();
 
 const isDark = computed(() => currentTheme.value === 'dark');
-
-onMounted(() => {
-  initTheme();
-});
 </script>
 
 <style scoped>

@@ -4,10 +4,14 @@ import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
 import MobileBottomNav from './components/MobileBottomNav.vue';
 import AcademicBanner from './components/AcademicBanner.vue';
+import { useTheme } from './composables/useTheme';
 import Swal from 'sweetalert2';
 
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
+
+// 🎨 Inicializa o tema globalmente
+const { initTheme } = useTheme();
 
 const currentPage = ref('login');
 const user = ref(null);
@@ -44,6 +48,7 @@ const handleAuthChange = () => {
 };
 
 onMounted(() => {
+  initTheme(); // Garante que o tema seja aplicado
   navigateToUrl('login');
   window.addEventListener('auth-change', handleAuthChange);
 });
