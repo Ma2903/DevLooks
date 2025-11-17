@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-900 dark:text-gray-200 transition-colors duration-300">
+  <div class="min-h-screen bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-gray-900">
     <div class="container mx-auto py-16 px-4">
       <h1 class="text-4xl font-bold text-[#04d1b0] text-center mb-10 flex items-center justify-center gap-3">
         <i class="fas fa-th-list text-5xl text-[#04d1b0]"></i>
@@ -19,7 +19,7 @@
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        <div v-for="product in produtosFiltrados" :key="product._id" class="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 flex flex-col relative">
+        <div v-for="product in produtosFiltrados" :key="product._id" class="bg-gray-900 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 flex flex-col relative">
           <button
             v-if="isLoggedIn"
             @click.stop="toggleWishlist(product._id)"

@@ -1,9 +1,9 @@
 <template>
-  <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 py-12 px-4 border-t-2 border-emerald-500/20 transition-colors duration-300">
+  <footer class="bg-gray-800 text-gray-400 py-12 px-4 border-t-2 border-emerald-500/20">
     <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
       
       <div class="md:col-span-2">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <img src="@/assets/Logo.png" alt="DevLooks Logo" class="h-8">
           DevLooks
         </h3>
@@ -13,7 +13,7 @@
       </div>
 
       <div>
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Institucional</h3>
+        <h3 class="text-lg font-bold text-white mb-4">Institucional</h3>
         <ul class="space-y-2">
           <li><router-link to="/about" class="hover:text-emerald-400 transition-colors">Sobre Nós</router-link></li>
           <li><router-link to="/faq" class="hover:text-emerald-400 transition-colors">Perguntas Frequentes (FAQ)</router-link></li>
@@ -22,7 +22,7 @@
       </div>
 
       <div>
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Siga-nos</h3>
+        <h3 class="text-lg font-bold text-white mb-4">Siga-nos</h3>
         <div class="flex space-x-4">
           <a href="#" class="text-2xl hover:text-emerald-400 transition-colors"><i class="fab fa-github"></i></a>
           <a href="#" class="text-2xl hover:text-emerald-400 transition-colors"><i class="fab fa-linkedin"></i></a>
@@ -37,8 +37,8 @@
         <div class="flex items-start gap-3">
           <i class="fas fa-graduation-cap text-emerald-400 text-xl mt-1"></i>
           <div class="text-sm">
-            <h4 class="text-gray-900 dark:text-white font-semibold mb-1">📚 Projeto Acadêmico</h4>
-            <p class="text-gray-700 dark:text-gray-300">
+            <h4 class="text-white font-semibold mb-1">📚 Projeto Acadêmico</h4>
+            <p class="text-gray-300">
               Este e-commerce é parte de um <strong>projeto acadêmico</strong> para fins de prática e aprendizado. 
               Embora a API do Mercado Pago esteja integrada e funcional, este site <strong>não representa um negócio real com estoque físico</strong>. 
               Desenvolvido com Vue.js, Node.js, TypeScript, MongoDB e Gemini AI.

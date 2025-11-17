@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white p-4 shadow-lg sticky top-0 z-50 transition-colors duration-300">
+  <header class="bg-gray-800 text-white p-4 shadow-lg sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
       <router-link to="/" class="flex items-center gap-3 flex-shrink-0 group">
         <div class="relative">
@@ -17,9 +17,6 @@
       </nav>
 
       <div class="hidden md:flex items-center space-x-6">
-        <!-- 🎨 Toggle Dark/Light Mode -->
-        <ThemeToggle />
-        
         <!-- Notificações -->
         <div v-if="user" class="relative">
           <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors" aria-label="Notificações" :aria-expanded="isNotificationsOpen">
@@ -139,7 +136,6 @@ import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import api from '@/services/main.js';
-import ThemeToggle from './ThemeToggle.vue';
 
 const router = useRouter();
 const user = ref(null);

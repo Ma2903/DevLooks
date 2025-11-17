@@ -4,7 +4,6 @@ import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
 import MobileBottomNav from './components/MobileBottomNav.vue';
 import AcademicBanner from './components/AcademicBanner.vue';
-import { useTheme } from './composables/useTheme';
 import Swal from 'sweetalert2';
 
 // ⚡ PERFORMANCE: FontAwesome carregado de forma assíncrona
@@ -16,9 +15,6 @@ const loadFontAwesome = async () => {
     console.error('Erro ao carregar FontAwesome:', error);
   }
 };
-
-// 🎨 Inicializa o tema globalmente
-const { initTheme } = useTheme();
 
 const currentPage = ref('login');
 const user = ref(null);
@@ -55,7 +51,6 @@ const handleAuthChange = () => {
 };
 
 onMounted(() => {
-  initTheme(); // Garante que o tema seja aplicado
   loadFontAwesome(); // Carrega FontAwesome de forma assíncrona
   navigateToUrl('login');
   window.addEventListener('auth-change', handleAuthChange);

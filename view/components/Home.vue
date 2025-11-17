@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen font-mono relative bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 transition-colors duration-300">
+  <div class="min-h-screen font-mono relative bg-gray-900 text-gray-200">
     <section id="home" class="relative bg-gradient-to-r from-[#04d1b0] to-[#4e44e1] text-white text-center py-40 overflow-hidden">
       <div class="absolute inset-0 bg-black opacity-60 bg-cover bg-center" style="background-image: url('https://cdn.pixabay.com/photo/2016/11/29/09/08/online-shopping-1869235_960_720.jpg');"></div>
       <div class="relative z-10 container mx-auto px-4 md:px-6">
@@ -28,10 +28,10 @@
         <i class="fas fa-th-large mr-2"></i>Categorias
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div v-for="cat in categorias" :key="cat.nome" class="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-[#04d1b0] transition duration-300 flex flex-col items-center cursor-default group">
+        <div v-for="cat in categorias" :key="cat.nome" class="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-[#04d1b0] transition duration-300 flex flex-col items-center cursor-default group">
           <i :class="cat.icone + ' text-5xl text-[#04d1b0] mb-4 group-hover:scale-110 transition'"></i>
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ cat.nome }}</h3>
-          <p class="text-gray-600 dark:text-gray-300 mt-2">{{ cat.desc }}</p>
+          <h3 class="text-lg font-bold text-white">{{ cat.nome }}</h3>
+          <p class="text-gray-300 mt-2">{{ cat.desc }}</p>
         </div>
       </div>
     </section>
