@@ -188,75 +188,54 @@ Escreva um resumo profissional analisando esses comentários:`;
             const sentimentPromises = reviewsData.map(async (review: any, index: number) => {
                 const { comment, rating } = review;
                 
-                // Lógica híbrida mais equilibrada: Estrelas + IA
-                let sentiment = 'NEUTRO';
+                // SEMPRE analisa o texto primeiro
+                let textSentiment = 'NEUTRO';
                 
-                // Escala equilibrada baseada nas estrelas:
-                // 5 estrelas = muito provável POSITIVO
-                // 4 estrelas = provável POSITIVO (a menos que texto seja negativo)
-                // 3 estrelas = NEUTRO (análise pela IA)
-                // 2 estrelas = pode ser NEGATIVO ou NEUTRO (depende do texto)
-                // 1 estrela = muito provável NEGATIVO
+                try {
+                    const prompt = `Analise APENAS o texto do comentário e classifique o sentimento como POSITIVO, NEGATIVO ou NEUTRO.
+
+Comentário: "${comment}"
+
+Responda APENAS uma palavra: POSITIVO, NEGATIVO ou NEUTRO`;
+                    
+                    const response = await AIController.callGeminiAPI(prompt, 0.3, 20);
+                    const aiResponse = response.trim().toUpperCase().replace(/[^A-ZÁÉÍÓÚÂÊÔÃÕÇ]/g, '');
+                    
+                    if (['POSITIVO', 'NEGATIVO', 'NEUTRO'].includes(aiResponse)) {
+                        textSentiment = aiResponse;
+                    }
+                } catch (error) {
+                    console.error(`⚠️ Erro ao analisar comentário ${index + 1}:`, error);
+                }
                 
-                if (rating === 5) {
-                    // 5 estrelas: quase sempre positivo
-                    sentiment = 'POSITIVO';
-                    
-                } else if (rating === 4) {
-                    // 4 estrelas: positivo, mas verifica se há críticas
-                    const prompt = `Analise: "${comment}"
-Tem críticas ou problemas sérios? Responda: SIM ou NAO`;
-                    
-                    try {
-                        const response = await AIController.callGeminiAPI(prompt, 0.3, 10);
-                        const hasCriticism = response.trim().toUpperCase().includes('SIM');
-                        sentiment = hasCriticism ? 'NEUTRO' : 'POSITIVO';
-                    } catch {
-                        sentiment = 'POSITIVO';
-                    }
-                    
-                } else if (rating === 3) {
-                    // 3 estrelas: análise completa pela IA
-                    const prompt = `Classifique o sentimento: "${comment}"
-Responda apenas: POSITIVO, NEGATIVO ou NEUTRO`;
-                    
-                    try {
-                        const response = await AIController.callGeminiAPI(prompt, 0.4, 10);
-                        const aiSentiment = response.trim().toUpperCase().replace(/[^A-ZÁÉÍÓÚÂÊÔÃÕÇ]/g, '');
-                        sentiment = ['POSITIVO', 'NEGATIVO', 'NEUTRO'].includes(aiSentiment) ? aiSentiment : 'NEUTRO';
-                    } catch {
-                        sentiment = 'NEUTRO';
-                    }
-                    
-                } else if (rating === 2) {
-                    // 2 estrelas: verifica se há algum ponto positivo
-                    const prompt = `Analise: "${comment}"
-Apesar da nota baixa, há pontos positivos ou elogios? Responda: SIM ou NAO`;
-                    
-                    try {
-                        const response = await AIController.callGeminiAPI(prompt, 0.3, 10);
-                        const hasPositive = response.trim().toUpperCase().includes('SIM');
-                        sentiment = hasPositive ? 'NEUTRO' : 'NEGATIVO';
-                    } catch {
-                        sentiment = 'NEUTRO'; // Mais justo do que sempre NEGATIVO
-                    }
-                    
-                } else if (rating === 1) {
-                    // 1 estrela: negativo, mas verifica se não é só uma reclamação pontual
-                    const prompt = `Analise: "${comment}"
-É uma crítica severa ou apenas um problema pontual? Responda: SEVERA ou PONTUAL`;
-                    
-                    try {
-                        const response = await AIController.callGeminiAPI(prompt, 0.3, 10);
-                        const isSevere = response.trim().toUpperCase().includes('SEVERA');
-                        sentiment = isSevere ? 'NEGATIVO' : 'NEUTRO';
-                    } catch {
-                        sentiment = 'NEGATIVO';
+                // Combina análise do texto com as estrelas
+                let finalSentiment = textSentiment;
+                
+                // Se o texto é NEGATIVO, sempre prevalece (independente das estrelas)
+                if (textSentiment === 'NEGATIVO') {
+                    finalSentiment = 'NEGATIVO';
+                    console.log(`  ➜ [${rating}⭐] Comentário ${index + 1}: ${finalSentiment} (texto negativo prevalece)`);
+                }
+                // Se o texto é POSITIVO, prevalece (independente das estrelas)
+                else if (textSentiment === 'POSITIVO') {
+                    finalSentiment = 'POSITIVO';
+                    console.log(`  ➜ [${rating}⭐] Comentário ${index + 1}: ${finalSentiment} (texto positivo prevalece)`);
+                }
+                // Se o texto é NEUTRO, usa as estrelas como desempate
+                else {
+                    if (rating >= 4) {
+                        finalSentiment = 'POSITIVO';
+                        console.log(`  ➜ [${rating}⭐] Comentário ${index + 1}: ${finalSentiment} (estrelas altas + texto neutro)`);
+                    } else if (rating <= 2) {
+                        finalSentiment = 'NEGATIVO';
+                        console.log(`  ➜ [${rating}⭐] Comentário ${index + 1}: ${finalSentiment} (estrelas baixas + texto neutro)`);
+                    } else {
+                        finalSentiment = 'NEUTRO';
+                        console.log(`  ➜ [${rating}⭐] Comentário ${index + 1}: ${finalSentiment} (texto e estrelas neutros)`);
                     }
                 }
                 
-                console.log(`  ➜ [${rating}⭐] Comentário ${index + 1}: ${sentiment}`);
-                return sentiment;
+                return finalSentiment;
             });
 
             const sentiments = await Promise.all(sentimentPromises);
