@@ -175,8 +175,12 @@ class PaymentController {
 
                 orderItems.push({
                     product: product._id,
+                    productId: product._id, // Compatibilidade
+                    name: product.name,
                     quantity: quantity,
                     price: product.promotion_price || product.price,
+                    image: product.image,
+                    selectedSize: item.selectedSize || undefined
                 });
 
                 total += (product.promotion_price || product.price) * quantity;

@@ -17,7 +17,7 @@
             Frete grátis acima de R$ 150
           </span>
           <span class="bg-[#4e44e1] text-white px-4 py-2 rounded-full font-bold shadow-lg animate-pulse">
-            10% OFF na primeira compra!
+            Use PRIMEIRACOMPRA10% e ganhe 10% OFF!
           </span>
         </div>
       </div>

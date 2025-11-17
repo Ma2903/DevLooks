@@ -40,7 +40,7 @@ const faqItems = ref([
   },
   { 
     question: '💸 Posso usar um cupom mais de uma vez?', 
-    answer: 'Depende do cupom. Cupons promocionais geralmente podem ser usados várias vezes, mas cupons especiais, como os de primeira compra, são de uso único por usuário e ficam indisponíveis após o primeiro uso.', 
+    answer: 'Depende do cupom. Cupons promocionais geralmente podem ser usados várias vezes, mas cupons especiais, como o PRIMEIRACOMPRA10%, são de uso único por usuário.', 
     open: false 
   }
 ]);

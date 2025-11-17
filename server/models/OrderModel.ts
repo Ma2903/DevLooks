@@ -13,11 +13,12 @@ export interface IShippingAddress {
 }
 
 export interface IOrderItem extends Document {
-    productId: Schema.Types.ObjectId;
-    name: string;
+    product: Schema.Types.ObjectId;
+    productId?: Schema.Types.ObjectId; // Compatibilidade com código antigo
+    name?: string;
     quantity: number;
     price: number;
-    image: string;
+    image?: string;
     selectedSize?: string;
 }
 
@@ -25,8 +26,11 @@ export interface IOrder extends Document {
     user: Schema.Types.ObjectId | IUser;
     items: IOrderItem[];
     total: number;
-    status: 'Aguardando Pagamento' | 'Processando' | 'Enviado' | 'Entregue' | 'Cancelado';
+    status: 'Aguardando Pagamento' | 'Processando' | 'Enviado' | 'Entregue' | 'Cancelado' | 'paid' | 'pending' | 'cancelled' | 'refunded';
     shippingAddress: IShippingAddress;
+    paymentMethod?: string;
+    paymentStatus?: string;
+    mercadoPagoPaymentId?: string;
     createdAt: Date;
 }
 
@@ -41,11 +45,12 @@ const ShippingAddressSchema = new Schema<IShippingAddress>({
 }, { _id: false });
 
 const OrderItemSchema = new Schema<IOrderItem>({
-    productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-    name: { type: String, required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: false },
+    productId: { type: Schema.Types.ObjectId, ref: 'Product', required: false }, // Compatibilidade
+    name: { type: String, required: false },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    image: { type: String, required: true },
+    image: { type: String, required: false },
     selectedSize: { type: String, required: false },
 });
 
@@ -53,8 +58,15 @@ const OrderSchema = new Schema<IOrder>({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     items: [OrderItemSchema],
     total: { type: Number, required: true },
-    status: { type: String, enum: ['Aguardando Pagamento', 'Processando', 'Enviado', 'Entregue', 'Cancelado'], default: 'Processando' },
+    status: { 
+        type: String, 
+        enum: ['Aguardando Pagamento', 'Processando', 'Enviado', 'Entregue', 'Cancelado', 'paid', 'pending', 'cancelled', 'refunded'], 
+        default: 'Processando' 
+    },
     shippingAddress: { type: ShippingAddressSchema, required: true },
+    paymentMethod: { type: String, required: false },
+    paymentStatus: { type: String, required: false },
+    mercadoPagoPaymentId: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
 });
 

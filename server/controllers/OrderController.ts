@@ -138,8 +138,9 @@ class OrderController {
                 metadata: {
                     shipping_address: JSON.stringify(shippingAddress),
                     items: JSON.stringify(items.map(item => ({
-                        product: item.product,
-                        quantity: item.quantity
+                        product: typeof item.product === 'object' && item.product?._id ? item.product._id : item.product,
+                        quantity: item.quantity,
+                        selectedSize: item.selectedSize
                     })))
                 }
             };
