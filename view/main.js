@@ -17,7 +17,7 @@ const initializeTheme = () => {
     theme = prefersDark ? 'dark' : 'light';
   }
   
-  // Aplica o tema
+  // Aplica o tema no HTML (importante para Tailwind dark mode)
   document.documentElement.setAttribute('data-theme', theme);
   
   if (theme === 'dark') {
@@ -28,7 +28,7 @@ const initializeTheme = () => {
     document.body.classList.add('bg-white', 'text-gray-900');
   }
   
-  console.log('🎨 Tema inicial:', theme);
+  console.log('🎨 Tema inicial:', theme, '| Classes HTML:', document.documentElement.className);
 };
 
 initializeTheme();

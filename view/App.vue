@@ -7,8 +7,15 @@ import AcademicBanner from './components/AcademicBanner.vue';
 import { useTheme } from './composables/useTheme';
 import Swal from 'sweetalert2';
 
-import '@fortawesome/fontawesome-free/css/all.css';
-import '@fortawesome/fontawesome-free/js/all.js';
+// ⚡ PERFORMANCE: FontAwesome carregado de forma assíncrona
+const loadFontAwesome = async () => {
+  try {
+    await import('@fortawesome/fontawesome-free/css/all.css');
+    await import('@fortawesome/fontawesome-free/js/all.js');
+  } catch (error) {
+    console.error('Erro ao carregar FontAwesome:', error);
+  }
+};
 
 // 🎨 Inicializa o tema globalmente
 const { initTheme } = useTheme();
@@ -49,6 +56,7 @@ const handleAuthChange = () => {
 
 onMounted(() => {
   initTheme(); // Garante que o tema seja aplicado
+  loadFontAwesome(); // Carrega FontAwesome de forma assíncrona
   navigateToUrl('login');
   window.addEventListener('auth-change', handleAuthChange);
 });

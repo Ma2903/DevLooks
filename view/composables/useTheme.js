@@ -39,19 +39,23 @@ export function useTheme() {
     // Atributo data-theme para variáveis CSS
     document.documentElement.setAttribute('data-theme', theme);
     
-    // Remove todas as classes relacionadas ao tema primeiro
-    document.documentElement.classList.remove('dark');
-    document.body.classList.remove('bg-gray-900', 'text-white', 'bg-white', 'text-gray-900');
-    
-    // Aplica novas classes
+    // Tailwind dark mode requer a classe 'dark' no elemento HTML
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    // Aplica classes no body também para transição suave
+    document.body.classList.remove('bg-gray-900', 'text-white', 'bg-white', 'text-gray-900');
+    if (theme === 'dark') {
       document.body.classList.add('bg-gray-900', 'text-white');
     } else {
       document.body.classList.add('bg-white', 'text-gray-900');
     }
     
     localStorage.setItem(THEME_KEY, theme);
+    console.log('✅ Tema aplicado! Classes no HTML:', document.documentElement.classList.toString());
   };
 
   // Alterna entre dark e light
