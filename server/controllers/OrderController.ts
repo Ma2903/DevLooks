@@ -80,7 +80,9 @@ class OrderController {
                 });
             }
 
-             if (couponCode) {
+            // Aplicar cupom de desconto ANTES de adicionar ao Mercado Pago
+            let discount = 0;
+            if (couponCode) {
                 const coupon = await CouponModel.findOne({ 
                     code: couponCode.toUpperCase(), 
                     isActive: true 
@@ -92,15 +94,25 @@ class OrderController {
                         return res.status(400).json({ message: "Cupom expirado." });
                     }
                     
-                    let discount = 0;
                     if (coupon.discountType === 'percentage') {
                         discount = (total * coupon.discountValue) / 100;
                     } else if (coupon.discountType === 'fixed') {
                         discount = coupon.discountValue;
                     }
                     
+                    // Adicionar desconto como item negativo no Mercado Pago
+                    if (discount > 0) {
+                        items_for_mp.push({
+                            id: 'discount',
+                            title: `Desconto - ${coupon.code}`,
+                            quantity: 1,
+                            unit_price: -discount,
+                            currency_id: 'BRL',
+                        });
+                        console.log(`[Checkout Log] Cupão ${couponCode} aplicado. Tipo: ${coupon.discountType}, Valor: ${coupon.discountValue}, Desconto: R$ ${discount.toFixed(2)}`);
+                    }
+                    
                     total -= discount;
-                    console.log(`[Checkout Log] Cupão ${couponCode} aplicado. Tipo: ${coupon.discountType}, Valor: ${coupon.discountValue}, Desconto: R$ ${discount.toFixed(2)}`);
                 } else {
                      console.warn(`[Checkout Warn] Cupão não encontrado ou inativo: ${couponCode}. Prosseguindo sem desconto.`);
                 }
