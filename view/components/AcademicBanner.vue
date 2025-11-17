@@ -2,7 +2,7 @@
   <!-- 🎓 Banner de Aviso: Projeto Acadêmico -->
   <div 
     v-if="!isDismissed"
-    class="academic-banner bg-gradient-to-r from-yellow-500/20 via-amber-500/20 to-orange-500/20 border-b-2 border-yellow-500/50 px-4 py-3 relative"
+    class="academic-banner bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 border-b-2 border-yellow-400 px-4 py-3 relative"
     role="alert"
     aria-live="polite"
   >
@@ -10,19 +10,19 @@
       <!-- Ícone e Mensagem -->
       <div class="flex items-center gap-3 flex-1 min-w-0">
         <div class="flex-shrink-0">
-          <i class="fas fa-graduation-cap text-yellow-400 text-2xl"></i>
+          <i class="fas fa-graduation-cap text-white text-2xl drop-shadow-lg"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm md:text-base text-white font-medium">
-            <span class="font-bold text-yellow-300">⚠️ ATENÇÃO:</span> 
+          <p class="text-sm md:text-base text-white font-bold drop-shadow-md">
+            <span class="font-extrabold">⚠️ ATENÇÃO:</span> 
             Este é um projeto acadêmico desenvolvido para fins educacionais.
             <span class="hidden md:inline">
               Pagamentos são processados via Mercado Pago em modo de produção.
             </span>
           </p>
-          <p class="text-xs text-gray-300 mt-1 hidden sm:block">
+          <p class="text-xs text-gray-100 mt-1 hidden sm:block drop-shadow">
             Desenvolvido por Mayara Silva • 
-            <router-link to="/project" class="text-yellow-300 hover:text-yellow-200 underline">
+            <router-link to="/project" class="text-white hover:text-yellow-200 underline font-semibold">
               Saiba mais sobre o projeto
             </router-link>
           </p>
@@ -33,7 +33,7 @@
       <div class="flex items-center gap-2 flex-shrink-0">
         <router-link 
           to="/terms"
-          class="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 font-semibold px-4 py-2 rounded-lg text-sm transition-all border border-yellow-500/30"
+          class="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all border-2 border-white/40 backdrop-blur-sm"
         >
           <i class="fas fa-file-contract mr-1"></i>
           <span class="hidden sm:inline">Ver </span>Termos
@@ -41,7 +41,7 @@
         
         <button
           @click="dismissBanner"
-          class="text-yellow-300 hover:text-white transition-colors p-2"
+          class="text-white hover:text-gray-200 transition-colors p-2 bg-black/20 rounded-lg hover:bg-black/30"
           aria-label="Fechar aviso"
         >
           <i class="fas fa-times text-lg"></i>

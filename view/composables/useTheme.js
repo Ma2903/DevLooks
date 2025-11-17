@@ -21,8 +21,22 @@ export function useTheme() {
 
   // Aplica o tema ao documento
   const applyTheme = (theme) => {
+    // Atributo data-theme para variáveis CSS
     document.documentElement.setAttribute('data-theme', theme);
+    
+    // Classe para Tailwind dark mode
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('bg-gray-900', 'text-white');
+      document.body.classList.remove('bg-white', 'text-gray-900');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('bg-gray-900', 'text-white');
+      document.body.classList.add('bg-white', 'text-gray-900');
+    }
+    
     localStorage.setItem(THEME_KEY, theme);
+    console.log('🎨 Tema aplicado:', theme);
   };
 
   // Alterna entre dark e light
