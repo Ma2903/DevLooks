@@ -68,7 +68,7 @@
             <li class="flex items-start gap-3">
               <i class="fas fa-check-circle text-yellow-400 mt-1"></i>
               <div>
-                A integração com Mercado Pago está em <strong>modo sandbox</strong> (teste)
+                A integração com Mercado Pago está <strong>ativa e funcional</strong>
               </div>
             </li>
             <li class="flex items-start gap-3">
@@ -128,16 +128,15 @@
             4. Pagamentos e Transações
           </h2>
           <div class="space-y-4 text-gray-300">
-            <div class="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <p class="text-red-300 font-semibold mb-2 flex items-center gap-2">
+            <div class="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+              <p class="text-yellow-300 font-semibold mb-2 flex items-center gap-2">
                 <i class="fas fa-exclamation-circle"></i>
-                ATENÇÃO: Pagamentos em Modo de Teste
+                ATENÇÃO: Pagamentos Reais
               </p>
               <p class="text-sm">
-                A integração com Mercado Pago está configurada em <strong>modo sandbox (teste)</strong>. 
-                Use apenas os <a href="https://www.mercadopago.com.br/developers/pt/docs/shopify/additional-content/your-integrations/test/cards" 
-                target="_blank" class="text-blue-400 underline hover:text-blue-300">cartões de teste oficiais</a> 
-                fornecidos pelo Mercado Pago.
+                A integração com Mercado Pago está <strong>ativa e funcional</strong>. 
+                Transações realizadas neste site <strong>podem resultar em cobranças reais</strong>. 
+                Recomendamos usar apenas para fins de demonstração e aprendizado.
               </p>
             </div>
             
@@ -145,15 +144,19 @@
             <ul class="space-y-2 ml-4">
               <li class="flex items-start gap-2">
                 <span class="text-yellow-400">•</span>
-                <span>Nenhuma cobrança real será processada</span>
+                <span>As transações são processadas pelo Mercado Pago</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-yellow-400">•</span>
-                <span>Nenhum produto será enviado fisicamente</span>
+                <span>Nenhum produto físico será enviado</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-yellow-400">•</span>
-                <span>As transações servem apenas para demonstração da funcionalidade</span>
+                <span>As transações servem para demonstração da funcionalidade do projeto</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-yellow-400">•</span>
+                <span>Em caso de cobranças não intencionais, entre em contato conosco</span>
               </li>
             </ul>
           </div>

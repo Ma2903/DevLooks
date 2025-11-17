@@ -10,7 +10,7 @@
 
 ## 🎓 Projeto Acadêmico
 
-> **Importante**: Este é um **projeto acadêmico** desenvolvido para fins de aprendizado e demonstração de habilidades em desenvolvimento web full-stack. Embora utilize tecnologias reais (incluindo integração com API do Mercado Pago em modo sandbox), **não representa um negócio comercial real com estoque físico**.
+> **Importante**: Este é um **projeto acadêmico** desenvolvido para fins de aprendizado e demonstração de habilidades em desenvolvimento web full-stack. Embora utilize tecnologias reais (incluindo integração com API do Mercado Pago), **não representa um negócio comercial real com estoque físico**.
 
 **DevLooks** é uma plataforma de e-commerce full-stack, desenvolvida do zero e voltada para o público de tecnologia.  
 O projeto permite que programadores expressem seu estilo através da compra simulada de produtos como camisetas, acessórios e itens de setup, além de contar com um sistema exclusivo para criação de avatares personalizados com IA.
@@ -30,7 +30,7 @@ O projeto conta com um sistema completo, incluindo funcionalidades para clientes
 - **Carrinho de Compras:** Adição, remoção e atualização de quantidade de itens.  
 - **Criação de Avatares com IA:** Ferramenta para personalizar e salvar avatares únicos usando Google Gemini AI.  
 - **Sistema de Cupons:** Aplicação de cupons de desconto (valor fixo ou porcentagem).  
-- **Checkout Completo:** Processo de finalização de compra com cálculo de frete e integração de pagamento via **Mercado Pago** (modo sandbox).  
+- **Checkout Completo:** Processo de finalização de compra com cálculo de frete e integração de pagamento via **Mercado Pago**.  
 - **Histórico de Pedidos:** Área para o usuário visualizar suas compras anteriores.
 - **Avaliações com IA:** Sistema de reviews com análise de sentimento automatizada usando Gemini AI.
 - **Notificações:** Sistema de notificações em tempo real sobre pedidos e promoções.
@@ -62,7 +62,7 @@ O projeto foi construído com uma arquitetura moderna, utilizando as seguintes t
 ![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongoose&logoColor=white)
 
 ### **Integrações e APIs**
-- **Mercado Pago SDK v2** - Gateway de pagamento (modo sandbox)
+- **Mercado Pago SDK v2** - Gateway de pagamento funcional
 - **Google Gemini AI** - Análise de sentimentos e resumo de avaliações
 - **Nodemailer** - Envio de emails para recuperação de senha
 - **bcrypt** - Criptografia de senhas
@@ -116,7 +116,7 @@ MAIL_USER=seu_email@example.com
 MAIL_PASS=sua_senha_de_email
 OWNER_EMAIL=email_do_dono_para_testes@example.com
 
-# Mercado Pago (modo sandbox para testes)
+# Mercado Pago
 MERCADOPAGO_ACCESS_TOKEN=SEU_ACCESS_TOKEN_DO_MERCADO_PAGO
 
 # Google Gemini AI
@@ -126,7 +126,7 @@ GEMINI_API_KEY=SUA_CHAVE_API_DO_GEMINI
 CORREIOS_CEP_ORIGEM=SEU_CEP_DE_ORIGEM
 ```
 
-> **Nota sobre Mercado Pago**: Use o modo sandbox e os [cartões de teste oficiais](https://www.mercadopago.com.br/developers/pt/docs/shopify/additional-content/your-integrations/test/cards) para simular pagamentos.
+> **Nota sobre Mercado Pago**: A integração está ativa. Tenha cuidado ao processar pagamentos, pois são transações reais.
 
 ### 3. Instalação e Execução
 

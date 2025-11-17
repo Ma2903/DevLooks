@@ -1,9 +1,11 @@
 <template>
   <header class="bg-gray-800 text-white p-4 shadow-lg sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
-      <router-link to="/" class="flex items-center gap-2 flex-shrink-0">
-        <img src="@/assets/Logo.png" alt="DevLooks Logo" class="h-10">
-        <span class="text-2xl font-bold text-white hidden sm:inline">DevLooks</span>
+      <router-link to="/" class="flex items-center gap-3 flex-shrink-0 group">
+        <div class="relative">
+          <img src="@/assets/Logo-removebg.png" alt="DevLooks Logo" class="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110">
+        </div>
+        <span class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent hidden sm:inline">DevLooks</span>
       </router-link>
 
       <nav class="hidden lg:flex items-center space-x-6">
