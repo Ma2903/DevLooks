@@ -25,7 +25,8 @@ export default defineConfig({
   },
   build: {
     // 🚀 Otimizações de performance para produção
-    minify: 'esbuild', // Usando esbuild (mais rápido e já incluído no Vite)
+    minify: 'esbuild',
+    cssCodeSplit: true, // Separa CSS por rota
     rollupOptions: {
       output: {
         // Code splitting inteligente para reduzir chunks grandes
@@ -41,13 +42,20 @@ export default defineConfig({
             if (id.includes('axios')) {
               return 'vendor-axios';
             }
-            if (id.includes('@fortawesome')) {
-              return 'vendor-fontawesome';
-            }
             // Outros vendors
             return 'vendor-misc';
           }
         },
+        // Otimiza nomes de arquivos
+        assetFileNames: (assetInfo) => {
+          let extType = assetInfo.name.split('.').at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img';
+          }
+          return `assets/${extType}/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
       },
     },
     // Aumenta o limite para evitar warnings
