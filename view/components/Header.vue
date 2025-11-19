@@ -1,9 +1,9 @@
 <template>
   <header class="bg-gray-800 text-white p-4 shadow-lg sticky top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
-      <router-link to="/" class="flex items-center gap-3 flex-shrink-0 group">
+      <router-link to="/" class="flex items-center gap-3 flex-shrink-0 group" aria-label="Ir para página inicial do DevLooks">
         <div class="relative">
-          <img src="@/assets/Logo-removebg.png" alt="DevLooks Logo" class="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110">
+          <img src="@/assets/Logo-removebg.png" alt="DevLooks Logo" width="48" height="48" class="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110">
         </div>
         <span class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent hidden sm:inline">DevLooks</span>
       </router-link>
@@ -19,7 +19,7 @@
       <div class="hidden md:flex items-center space-x-6">
         <!-- Notificações -->
         <div v-if="user" class="relative">
-          <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors" aria-label="Notificações" :aria-expanded="isNotificationsOpen">
+          <button @click="toggleNotifications" class="relative hover:text-emerald-400 transition-colors" aria-label="Notificações" :aria-expanded="isNotificationsOpen" type="button">
             <i class="fas fa-bell text-xl"></i>
             <span v-if="notificationCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ notificationCount }}</span>
           </button>
@@ -63,8 +63,8 @@
         </router-link>
         
         <div v-if="user" class="relative">
-          <button @click="toggleDropdown" class="flex items-center gap-2" aria-label="Menu do Usuário" :aria-expanded="isDropdownOpen">
-            <img v-if="user.avatarUrl" :src="user.avatarUrl" :alt="`Avatar de ${user.name}`" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
+          <button @click="toggleDropdown" class="flex items-center gap-2" aria-label="Menu do Usuário" :aria-expanded="isDropdownOpen" type="button">
+            <img v-if="user.avatarUrl" :src="user.avatarUrl" :alt="`Avatar de ${user.name}`" width="32" height="32" class="w-8 h-8 rounded-full object-cover border-2 border-gray-600">
             <div v-else class="w-8 h-8 rounded-full bg-gray-600 border-2 border-gray-500 flex items-center justify-center">
               <i class="fas fa-user text-gray-400 text-sm"></i>
             </div>
@@ -98,7 +98,7 @@
           <i class="fas fa-shopping-cart text-xl"></i>
             <span v-if="user && cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" aria-label="Itens no carrinho">{{ cartItemCount }}</span>
         </router-link>
-        <button @click="isMobileMenuOpen = !isMobileMenuOpen" aria-label="Abrir Menu Principal" :aria-expanded="isMobileMenuOpen">
+        <button @click="isMobileMenuOpen = !isMobileMenuOpen" aria-label="Menu de navegação" :aria-expanded="isMobileMenuOpen" type="button">
           <i class="fas fa-bars text-2xl"></i>
         </button>
       </div>
@@ -334,7 +334,6 @@ watch(user, (newUser) => {
 
 <style scoped>
 /* SEUS ESTILOS ORIGINAIS ESTÃO AQUI */
-@import '@fortawesome/fontawesome-free/css/all.css';
 
 .router-link-exact-active { color: #34d399; }
 .nav-link { position: relative; transition: color 0.3s; }

@@ -23,4 +23,31 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./view', import.meta.url))
     },
   },
+  build: {
+    // 🚀 Otimizações de performance para produção
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.logs em produção
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        // Code splitting inteligente
+        manualChunks: {
+          'vendor': ['vue', 'vue-router'],
+          'ui': ['sweetalert2'],
+        },
+      },
+    },
+    // Otimiza chunks
+    chunkSizeWarningLimit: 600,
+    // Sourcemap apenas em dev
+    sourcemap: false,
+  },
+  // ⚡ Otimizações adicionais
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'axios', 'sweetalert2'],
+  },
 })

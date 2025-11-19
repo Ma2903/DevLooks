@@ -6,11 +6,10 @@ import MobileBottomNav from './components/MobileBottomNav.vue';
 import AcademicBanner from './components/AcademicBanner.vue';
 import Swal from 'sweetalert2';
 
-// ⚡ PERFORMANCE: FontAwesome carregado de forma assíncrona
+// ⚡ PERFORMANCE: FontAwesome carregado de forma assíncrona apenas o CSS
 const loadFontAwesome = async () => {
   try {
-    await import('@fortawesome/fontawesome-free/css/all.css');
-    await import('@fortawesome/fontawesome-free/js/all.js');
+    await import('@fortawesome/fontawesome-free/css/all.min.css');
   } catch (error) {
     console.error('Erro ao carregar FontAwesome:', error);
   }

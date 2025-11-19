@@ -1,0 +1,27 @@
+{
+  "name": "DevLooks - E-commerce para Desenvolvedores",
+  "short_name": "DevLooks",
+  "description": "Projeto acadêmico de e-commerce desenvolvido com Vue.js e Node.js",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#04d1b0",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/view/assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/view/assets/Logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["shopping", "education"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}

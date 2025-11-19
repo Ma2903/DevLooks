@@ -32,12 +32,28 @@
     
     <!-- ⚡ Preconnect para melhor performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://sdk.mercadopago.com">
+    <link rel="dns-prefetch" href="https://api.mercadopago.com">
+    
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="/view/assets/main.css" as="style">
     
     <!-- 🔗 Favicon -->
     <link rel="icon" href="/view/assets/favicon.png" type="image/png">
     
+    <!-- 📱 PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
     <title>DevLooks - E-commerce para Desenvolvedores</title>
+    
+    <!-- ⚡ Performance: Inline critical CSS for first paint -->
+    <style>
+      /* Critical CSS para evitar FOUC (Flash of Unstyled Content) */
+      body { margin: 0; background-color: #111827; color: #f9fafb; font-family: system-ui, -apple-system, sans-serif; }
+      #app { min-height: 100vh; }
+    </style>
   </head>
   <body>
     <div id="app"></div>

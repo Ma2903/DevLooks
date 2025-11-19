@@ -124,7 +124,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
           <p class="text-gray-300 mb-4">"Produtos de ótima qualidade e entrega super rápida. A camiseta de 'Hello World' é minha favorita!"</p>
           <div class="flex items-center justify-center">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 1" class="w-12 h-12 rounded-full mr-4">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 1" width="48" height="48" loading="lazy" class="w-12 h-12 rounded-full mr-4">
         <div>
           <p class="font-bold text-white">Lucas Martins</p>
           <p class="text-sm text-gray-400">Desenvolvedor Full-Stack</p>
@@ -134,7 +134,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
           <p class="text-gray-300 mb-4">"Finalmente uma loja que entende a gente! A caneca de JavaScript é perfeita para os longos dias de codificação."</p>
           <div class="flex items-center justify-center">
-        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Cliente 2" class="w-12 h-12 rounded-full mr-4">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Cliente 2" width="48" height="48" loading="lazy" class="w-12 h-12 rounded-full mr-4">
         <div>
           <p class="font-bold text-white">Marina Souza</p>
           <p class="text-sm text-gray-400">Engenheira de Software</p>
@@ -144,7 +144,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
           <p class="text-gray-300 mb-4">"O criador de avatares é incrível! Pude fazer um avatar único para usar em todas as minhas redes."</p>
           <div class="flex items-center justify-center">
-            <img src="https://i.pravatar.cc/50?u=woman" alt="Cliente 3" class="w-12 h-12 rounded-full mr-4">
+            <img src="https://i.pravatar.cc/50?u=woman" alt="Cliente 3" width="48" height="48" loading="lazy" class="w-12 h-12 rounded-full mr-4">
             <div>
               <p class="font-bold text-white">Fernanda L.</p>
               <p class="text-sm text-gray-400">UI/UX Designer</p>

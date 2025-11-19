@@ -11,7 +11,7 @@
           <div v-for="(item, index) in cartItems" :key="item.productId + (item.selectedSize || '')" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-700 hover:border-[#04d1b0] transition">
             <div class="flex items-center gap-6">
               <div class="relative">
-                <img :src="getImageUrl(item.image)" :alt="item.name" class="w-24 h-24 object-cover rounded-lg border-2 border-[#04d1b0] shadow"/>
+                <img :src="getImageUrl(item.image)" :alt="item.name" width="96" height="96" loading="lazy" class="w-24 h-24 object-cover rounded-lg border-2 border-[#04d1b0] shadow"/>
               </div>
               <div class="flex-1">
                 <h2 class="text-lg font-bold text-white flex items-center gap-2">
