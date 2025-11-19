@@ -6,15 +6,6 @@ import MobileBottomNav from './components/MobileBottomNav.vue';
 import AcademicBanner from './components/AcademicBanner.vue';
 import Swal from 'sweetalert2';
 
-// ⚡ PERFORMANCE: FontAwesome carregado de forma assíncrona apenas o CSS
-const loadFontAwesome = async () => {
-  try {
-    await import('@fortawesome/fontawesome-free/css/all.min.css');
-  } catch (error) {
-    console.error('Erro ao carregar FontAwesome:', error);
-  }
-};
-
 const currentPage = ref('login');
 const user = ref(null);
 
@@ -50,7 +41,6 @@ const handleAuthChange = () => {
 };
 
 onMounted(() => {
-  loadFontAwesome(); // Carrega FontAwesome de forma assíncrona
   navigateToUrl('login');
   window.addEventListener('auth-change', handleAuthChange);
 });

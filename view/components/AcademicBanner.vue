@@ -80,8 +80,6 @@ const dismissBanner = () => {
 </script>
 
 <style scoped>
-@import '@fortawesome/fontawesome-free/css/all.css';
-
 .academic-banner {
   /* ⚡ PERFORMANCE */
   transform: translateZ(0);

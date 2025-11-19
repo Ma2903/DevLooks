@@ -63,5 +63,4 @@
 </script>
 
 <style scoped>
-@import '@fortawesome/fontawesome-free/css/all.css';
 </style>
