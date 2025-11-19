@@ -41,8 +41,8 @@ export default defineConfig({
         },
       },
     },
-    // Otimiza chunks
-    chunkSizeWarningLimit: 600,
+    // Aumenta o limite para evitar warnings
+    chunkSizeWarningLimit: 1000,
     // Sourcemap apenas em dev
     sourcemap: false,
   },
