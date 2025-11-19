@@ -2,10 +2,10 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-// 🚀 PERFORMANCE: Apenas páginas críticas carregadas imediatamente
-import Home from './components/Home.vue';
-import Login from './components/Login.vue';
-import Register from './components/Register.vue';
+// ⚡ PERFORMANCE: Todas as páginas com lazy loading para bundle inicial mínimo
+const Home = () => import('./components/Home.vue');
+const Login = () => import('./components/Login.vue');
+const Register = () => import('./components/Register.vue');
 
 // ⚡ LAZY LOADING: Code splitting automático - componentes carregados sob demanda
 const ProductList = () => import('./pages/ProductList.vue');

@@ -34,10 +34,25 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // Code splitting inteligente
-        manualChunks: {
-          'vendor': ['vue', 'vue-router'],
-          'ui': ['sweetalert2'],
+        // Code splitting inteligente para reduzir chunks grandes
+        manualChunks(id) {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            if (id.includes('vue')) {
+              return 'vendor-vue';
+            }
+            if (id.includes('sweetalert2')) {
+              return 'vendor-swal';
+            }
+            if (id.includes('axios')) {
+              return 'vendor-axios';
+            }
+            if (id.includes('@fortawesome')) {
+              return 'vendor-fontawesome';
+            }
+            // Outros vendors
+            return 'vendor-misc';
+          }
         },
       },
     },
