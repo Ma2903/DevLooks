@@ -1,0 +1,15 @@
+# robots.txt - DevLooks E-commerce
+User-agent: *
+Allow: /
+Allow: /products
+Allow: /about
+Allow: /faq
+Allow: /project
+
+Disallow: /admin
+Disallow: /cart
+Disallow: /profile
+Disallow: /checkout
+Disallow: /api/
+
+Sitemap: https://devlooks.vercel.app/sitemap.xml

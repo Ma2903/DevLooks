@@ -21,7 +21,7 @@
             </span>
           </p>
           <p class="text-xs text-gray-100 mt-1 hidden sm:block drop-shadow">
-            Desenvolvido por Mayara Silva • 
+            Desenvolvido por Manoela Pinheiro da Silva • 
             <router-link to="/project" class="text-white hover:text-yellow-200 underline font-semibold">
               Saiba mais sobre o projeto
             </router-link>
