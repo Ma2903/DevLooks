@@ -32,7 +32,6 @@ const CouponForm = () => import('./pages/CouponForm.vue');
 // 📄 INSTITUCIONAL: Lazy loading para páginas informativas
 const AboutUs = () => import('./pages/AboutUs.vue');
 const FAQ = () => import('./pages/FAQ.vue');
-const AboutProject = () => import('./pages/AboutProject.vue');
 const PrivacyPolicy = () => import('./pages/PrivacyPolicy.vue');
 const TermsOfService = () => import('./pages/TermsOfService.vue');
 
@@ -59,7 +58,7 @@ const routes = [
   { path: '/reset/confirm', name: 'ConfirmReset', component: ConfirmReset },
   { path: '/about', name: 'AboutUs', component: AboutUs },
   { path: '/faq', name: 'FAQ', component: FAQ },
-  { path: '/project', name: 'AboutProject', component: AboutProject },
+  { path: '/project', redirect: '/about' }, // Redireciona para Sobre Nós
   { path: '/privacy', name: 'PrivacyPolicy', component: PrivacyPolicy },
   { path: '/terms', name: 'TermsOfService', component: TermsOfService },
   
