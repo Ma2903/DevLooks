@@ -4,7 +4,7 @@
       
       <div class="md:col-span-2">
         <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-          <img src="@/assets/Logo.png" alt="DevLooks Logo" width="32" height="32" class="h-8">
+          <img src="@/assets/Logo-removebg.png" alt="DevLooks Logo" width="32" height="32" loading="lazy" class="h-8">
           DevLooks
         </h3>
         <p class="pr-4">

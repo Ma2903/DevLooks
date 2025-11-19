@@ -32,12 +32,23 @@
     
     <!-- ⚡ Preconnect para melhor performance -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://sdk.mercadopago.com">
+    <link rel="dns-prefetch" href="https://sdk.mercadopago.com">
     <link rel="dns-prefetch" href="https://api.mercadopago.com">
+    <link rel="dns-prefetch" href="https://cdn.pixabay.com">
     
-    <!-- ⚡ FontAwesome via CDN otimizado -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin="anonymous">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"></noscript>
+    <!-- ⚡ FontAwesome subset otimizado - apenas solid -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin>
+    <noscript>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" crossorigin>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" crossorigin>
+    </noscript>
+    
+    <style>
+      /* ⚡ Critical CSS inline para First Paint */
+      body{margin:0;background:#111827;color:#f9fafb;font-family:system-ui,-apple-system,sans-serif}
+      #app{min-height:100vh}
+    </style>
     
     <!-- Preload critical CSS -->
     <link rel="preload" href="/view/assets/main.css" as="style">
@@ -50,11 +61,10 @@
     
     <title>DevLooks - E-commerce para Desenvolvedores</title>
     
-    <!-- ⚡ Performance: Inline critical CSS for first paint -->
     <style>
-      /* Critical CSS para evitar FOUC (Flash of Unstyled Content) */
-      body { margin: 0; background-color: #111827; color: #f9fafb; font-family: system-ui, -apple-system, sans-serif; }
-      #app { min-height: 100vh; }
+      /* ⚡ Critical CSS inline para First Paint */
+      body{margin:0;background:#111827;color:#f9fafb;font-family:system-ui,-apple-system,sans-serif}
+      #app{min-height:100vh}
     </style>
   </head>
   <body>
