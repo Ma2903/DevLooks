@@ -72,6 +72,7 @@ input, select {
   border: none;
   outline: none;
   font-family: 'Fira Code', monospace;
+  font-display: swap;
 }
 input:focus, select:focus {
   border: 2px solid #04d1b0;

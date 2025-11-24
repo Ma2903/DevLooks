@@ -45,5 +45,6 @@ export default {
 
 body {
   font-family: 'Fira Code', monospace;
+  font-display: swap;
 }
 </style>
