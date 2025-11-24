@@ -28,8 +28,16 @@ import paymentRoutes from './routes/PaymentRoutes';
 
 const app = express();
 
+const allowedOrigins = ['https://devlooks.vercel.app'];
 const corsOptions = {
-    origin: '*',
+    origin: function (origin, callback) {
+        // Permite sem origin (ex: curl, Postman) ou se está na lista
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -37,6 +45,22 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// --- HEADERS DE SEGURANÇA ---
+app.use((req, res, next) => {
+    // Content Security Policy (CSP)
+    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://devlooks.vercel.app; style-src 'self' 'unsafe-inline' https://devlooks.vercel.app; img-src 'self' data: https://devlooks.vercel.app; font-src 'self' https://devlooks.vercel.app; connect-src 'self' https://devlooks.vercel.app; frame-ancestors 'none';");
+    // Anti-clickjacking
+    res.setHeader("X-Frame-Options", "DENY");
+    // Anti-MIME sniffing
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    // Cache-Control para rotas sensíveis (ajuste conforme necessário)
+    if (!req.url.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|json|txt|xml)$/)) {
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, private");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+    }
+    next();
+});
 
 const port = PORT;
 
