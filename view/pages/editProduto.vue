@@ -56,9 +56,9 @@
           <label class="block text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Imagem do Produto</label>
           <div v-if="produto.image && !previewUrl" class="mb-2">
             <p class="text-xs text-gray-400 mb-1">Imagem Atual:</p>
-            <img :src="getImageUrl(produto.image)" alt="Imagem atual" class="w-24 h-24 rounded-lg border-2 border-gray-500 object-cover shadow" loading="lazy"/>
+            <img :src="getImageUrl(produto.image)" alt="Imagem atual" class="w-24 h-24 rounded-lg border-2 border-gray-500 object-cover shadow"/>
           </div>
-          <img v-if="previewUrl" :src="previewUrl" alt="Pré-visualização da nova imagem" class="w-24 h-24 mb-2 rounded-lg border-2 border-[#04d1b0] object-cover shadow" loading="lazy"/>
+          <img v-if="previewUrl" :src="previewUrl" alt="Pré-visualização da nova imagem" class="w-24 h-24 mb-2 rounded-lg border-2 border-[#04d1b0] object-cover shadow"/>
           <input
             type="file"
             id="imagem"

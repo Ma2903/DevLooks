@@ -110,7 +110,6 @@ export default {
 
 body {
   font-family: 'Fira Code', monospace;
-  font-display: swap;
 }
 button:hover {
   transform: scale(1.05);

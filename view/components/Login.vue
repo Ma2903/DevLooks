@@ -168,7 +168,6 @@
 
   body {
     font-family: 'Fira Code', monospace;
-    font-display: swap;
   }
 
   button:hover {
