@@ -4,6 +4,7 @@ import { Request, Response, RequestHandler } from "express";
 import Coupon from "../models/CouponModel";
 import UserModel from "../models/UserModel"; // << IMPORTADO PARA VERIFICAR O USUÁRIO
 import jwt from 'jsonwebtoken'; // << IMPORTADO PARA PEGAR O ID DO USUÁRIO
+import { JWT_SECRET } from '../config/config';
 
 class CouponController {
     static createCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
@@ -67,7 +68,7 @@ class CouponController {
             res.status(500).json({ message: "Erro ao deletar cupom.", error: error.message });
         }
     };
-    
+
     static validateCoupon: RequestHandler = async (req: Request, res: Response): Promise<void> => {
         try {
             const { code } = req.body;
@@ -75,9 +76,9 @@ class CouponController {
                 res.status(400).json({ message: "Código do cupom não fornecido." });
                 return;
             }
-            
+
             // Busca case-insensitive usando RegExp
-            const coupon = await Coupon.findOne({ 
+            const coupon = await Coupon.findOne({
                 code: { $regex: new RegExp('^' + code + '$', 'i') },
                 isActive: true
             });
@@ -90,7 +91,7 @@ class CouponController {
             // Lógica de uso único
             const token = req.headers.authorization?.split(' ')[1];
             if (coupon.isSingleUse && token) {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
+                const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
                 const user = await UserModel.findById(decoded.id);
 
                 if (user && user.usedCoupons?.includes(coupon.code)) {

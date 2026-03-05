@@ -4,10 +4,11 @@ import { Request, Response, RequestHandler } from "express";
 import UserModel from "../models/UserModel";
 import jwt from 'jsonwebtoken';
 import axios from 'axios'; // Importe o axios para usar no proxy
+import { JWT_SECRET } from '../config/config';
 
 class AvatarController {
 
-   static proxyAvatar: RequestHandler = async (req: Request, res: Response) => {
+    static proxyAvatar: RequestHandler = async (req: Request, res: Response) => {
         const { url } = req.query;
         if (typeof url !== 'string') {
             return res.status(400).send('URL do avatar não fornecida.');
@@ -36,7 +37,7 @@ class AvatarController {
             if (!user) {
                 return res.status(404).json({ message: "Usuário não encontrado." });
             }
-            
+
             const isExistingAvatar = user.savedAvatars?.includes(avatarUrl);
 
             if (!isExistingAvatar && user.hasCreatedAvatar && (!user.avatarPasses || user.avatarPasses <= 0)) {
@@ -52,12 +53,12 @@ class AvatarController {
                     user.avatarPasses = (user.avatarPasses || 0) - 1;
                 }
             }
-            
+
             user.avatarUrl = avatarUrl;
             user.hasCreatedAvatar = true;
 
             await user.save();
-            
+
             const { password, ...userResponse } = user.toObject();
 
             res.status(200).json({ message: "Avatar definido com sucesso!", user: userResponse });
@@ -75,7 +76,7 @@ class AvatarController {
         }
 
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
+            const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
             const userId = decoded.id;
             const { avatarUrl } = req.body;
 

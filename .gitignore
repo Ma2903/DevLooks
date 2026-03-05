@@ -28,4 +28,15 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# --- Variáveis de Ambiente (NUNCA commitar secrets!) ---
 .env
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.*.local
+!.env.example
+
+# --- Arquivos de teste com possíveis credenciais ---
+test-*.js
